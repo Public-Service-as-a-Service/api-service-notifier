@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>se.sundsvall.dept44</groupId>
 		<artifactId>dept44-service-parent</artifactId>
-		<version>6.0.3</version>
+		<version>7.0.0</version>
 		<relativePath />
 		<!-- lookup parent from repository -->
 	</parent>
@@ -12,7 +12,10 @@
 	<artifactId>template-spring-boot</artifactId>
 	<version>1.0</version>
 	<name>template</name>
-	<properties />
+	<properties>
+		<generated-sources-path>${project.build.directory}/generated-sources</generated-sources-path>
+		<generated-sources-java-path>src/main/java</generated-sources-java-path>
+	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -20,11 +23,83 @@
 			<scope>runtime</scope>
 			<optional>true</optional>
 		</dependency>
+		<!-- Dept44 Framework-->
+		<dependency>
+			<groupId>se.sundsvall.dept44</groupId>
+			<artifactId>dept44-starter-feign</artifactId>
+		</dependency>
 		<!-- Test -->
 		<dependency>
 			<groupId>se.sundsvall.dept44</groupId>
 			<artifactId>dept44-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- Other -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
+	<build>
+
+		<plugins>
+			<plugin>
+				<groupId>org.openapitools</groupId>
+				<artifactId>openapi-generator-maven-plugin</artifactId>
+				<configuration>
+					<output>${generated-sources-path}</output>
+					<generatorName>spring</generatorName>
+					<generateApis>false</generateApis>
+					<generateSupportingFiles>false</generateSupportingFiles>
+					<configOptions>
+						<sourceFolder>${generated-sources-java-path}</sourceFolder>
+						<generatedConstructorWithRequiredArgs>false</generatedConstructorWithRequiredArgs>
+						<generatePom>false</generatePom>
+						<library>spring-boot</library>
+						<dateLibrary>java8</dateLibrary>
+						<apiPackage>generated</apiPackage>
+						<openApiNullable>false</openApiNullable>
+						<useSwaggerUi>false</useSwaggerUi>
+						<useBeanValidation>true</useBeanValidation>
+						<useSwaggerAnnotations>true</useSwaggerAnnotations>
+						<hideGenerationTimestamp>true</hideGenerationTimestamp>
+						<interfaceOnly>true</interfaceOnly>
+						<useSpringBoot3>true</useSpringBoot3>
+					</configOptions>
+				</configuration>
+				<executions>
+					<execution>
+						<id>sms-sender-api</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<inputSpec>${project.basedir}/src/main/resources/integrations/sms-sender-2.0.yml</inputSpec>
+							<configOptions>
+								<modelPackage>generated.se.sundsvall.smssender</modelPackage>
+							</configOptions>
+						</configuration>
+					</execution>
+					<execution>
+						<id>teams-sender-api</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<inputSpec>${project.basedir}/src/main/resources/integrations/teams-sender-1.0.yml</inputSpec>
+							<configOptions>
+								<modelPackage>generated.se.sundsvall.teamssender</modelPackage>
+							</configOptions>
+						</configuration>
+					</execution>
+
+				</executions>
+			</plugin>
+
+		</plugins>
+
+	</build>
+
 </project>

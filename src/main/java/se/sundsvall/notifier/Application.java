@@ -2,9 +2,11 @@ package se.sundsvall.notifier;
 
 import static org.springframework.boot.SpringApplication.run;
 
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import se.sundsvall.dept44.ServiceApplication;
 import se.sundsvall.dept44.util.jacoco.ExcludeFromJacocoGeneratedCoverageReport;
 
+@EnableFeignClients
 @ServiceApplication
 @ExcludeFromJacocoGeneratedCoverageReport
 public class Application {
