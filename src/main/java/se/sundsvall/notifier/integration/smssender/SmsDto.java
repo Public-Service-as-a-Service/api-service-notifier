@@ -5,8 +5,8 @@ import se.sundsvall.notifier.api.model.request.Priority;
 
 @Builder(setterPrefix = "with")
 public record SmsDto(
-        String sender,
-        String mobileNumber,
-        String message,
-        Priority priority) {
+	String sender,
+	String mobileNumber,
+	String message,
+	Priority priority) {
 }

@@ -1,5 +1,7 @@
 package se.sundsvall.notifier.integration.smssender;
 
+import static se.sundsvall.notifier.integration.smssender.SmsSenderConfiguration.CLIENT_ID;
+
 import generated.se.sundsvall.smssender.SendSmsRequest;
 import generated.se.sundsvall.smssender.SendSmsResponse;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -9,15 +11,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import static se.sundsvall.notifier.integration.smssender.SmsSenderIntegration.INTEGRATION_NAME;
-
 @FeignClient(
-        name = INTEGRATION_NAME,
-        url = "${integration.sms-sender.base-url}",
-        configuration = SmsSenderIntegrationConfiguration.class)
+	name = CLIENT_ID,
+	url = "${integration.sms-sender.base-url}",
+	configuration = SmsSenderConfiguration.class)
 
-@CircuitBreaker(name = INTEGRATION_NAME)
+@CircuitBreaker(name = CLIENT_ID)
 interface SmsSenderClient {
-    @PostMapping("/{municipalityId}/send/sms")
-    ResponseEntity<SendSmsResponse> sendSms(@PathVariable String municipalityId, @RequestBody SendSmsRequest request);
+	@PostMapping("/{municipalityId}/send/sms")
+	ResponseEntity<SendSmsResponse> sendSms(@PathVariable String municipalityId, @RequestBody SendSmsRequest request);
 }
