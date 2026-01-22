@@ -8,6 +8,18 @@ openapi:
   name: ${spring.application.name}
   title: ${spring.application.name}
   version: '@project.version@'
+
 spring:
   application:
-    name: template
+    name: notifier
+  datasource:
+    username: ${ENV.DB.USERNAME}
+    password: ${ENV.DB.PASSWORD}
+    url: ${ENV.DB.URL}
+
+integration:
+  sms-sender:
+    base-url: ${ENV.SMS-SENDER-BASE-URL}
+    token-url: ${ENV.SMS-SENDER-TOKEN-URL}
+    client-id: ${ENV.SMS-SENDER-CLEINT-ID}
+    client-secret: ${ENV.SMS-SENDER-CLIENT-SECRET}

@@ -1,4 +1,4 @@
-package se.sundsvall.notifier.integration.smsSender;
+package se.sundsvall.notifier.integration.smssender;
 
 import lombok.Getter;
 import lombok.Setter;
