@@ -17,17 +17,17 @@ import org.zalando.problem.Problem;
 @Tag(name = "Group Resource")
 
 @ApiResponse(
-		responseCode = "200",
-		description = "Successful Operation",
-		useReturnTypeSchema = true)
+	responseCode = "200",
+	description = "Successful Operation",
+	useReturnTypeSchema = true)
 @ApiResponse(
-		responseCode = "400",
-		description = "Bad Request",
-		content = @Content(schema = @Schema(implementation = Problem.class)))
+	responseCode = "400",
+	description = "Bad Request",
+	content = @Content(schema = @Schema(implementation = Problem.class)))
 @ApiResponse(
-		responseCode = "500",
-		description = "Internal Server Error",
-		content = @Content(schema = @Schema(implementation = Problem.class)))
+	responseCode = "500",
+	description = "Internal Server Error",
+	content = @Content(schema = @Schema(implementation = Problem.class)))
 
 public class GroupResource {
 
@@ -36,12 +36,12 @@ public class GroupResource {
 	public String getGroups() {
 		return "Här kommer en grupp";
 	}
+
 	@Operation(summary = "")
 	@PostMapping("/groups/{group}")
 	public String postGroup(@PathVariable("group") Long group) {
 		return "grupp tillagd";
 	}
-
 
 	@Operation(summary = "Update group information")
 	@PutMapping("/groups/{groupId}")
@@ -58,7 +58,7 @@ public class GroupResource {
 	@Operation(summary = "Get group member from specific group")
 	@GetMapping("/groups/{groupId}/{memberId}")
 	public String getMember(@PathVariable("groupId") Long groupId, @PathVariable("memberId") Long member) {
-		return "här kommer en meblem";
+		return "här kommer en medlem";
 	}
 
 	@Operation(summary = "Add member to a group")

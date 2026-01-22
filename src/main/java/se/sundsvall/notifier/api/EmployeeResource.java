@@ -13,21 +13,19 @@ import org.zalando.problem.Problem;
 @Tag(name = "Employee Resource")
 public class EmployeeResource {
 
-
-
 	@Operation(summary = "Get employee data", responses = {
 		@ApiResponse(
-				responseCode = "200",
-				description = "Successful Operation",
-				useReturnTypeSchema = true),
+			responseCode = "200",
+			description = "Successful Operation",
+			useReturnTypeSchema = true),
 		@ApiResponse(
-				responseCode = "404",
-				description = "Not Found",
-				content = @Content(schema = @Schema(implementation = Problem.class))),
+			responseCode = "404",
+			description = "Not Found",
+			content = @Content(schema = @Schema(implementation = Problem.class))),
 		@ApiResponse(
-				responseCode = "500",
-				description = "Internal Server Error",
-				content = @Content(schema = @Schema(implementation = Problem.class)))
+			responseCode = "500",
+			description = "Internal Server Error",
+			content = @Content(schema = @Schema(implementation = Problem.class)))
 	})
 	@GetMapping()
 	public String employee() {
