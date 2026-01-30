@@ -10,14 +10,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -26,59 +25,59 @@ import java.util.Set;
 @Table(name = "organization")
 public class Organization {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_org_id", referencedColumnName = "org_id", insertable = false, updatable = false)
-    private Organization parent;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "parent_org_id", referencedColumnName = "org_id", insertable = false, updatable = false)
+	private Organization parent;
 
-    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
-    private Set<Organization> children = new HashSet<>();
+	@OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
+	private Set<Organization> children = new HashSet<>();
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
+	private Long id;
 
-    @Column(name = "company_id", length = 64, nullable = false)
-    private String companyId;
+	@Column(name = "company_id", length = 64, nullable = false)
+	private String companyId;
 
-    @Column(name = "parent_org_id", length = 64, insertable = false, updatable = false)
-    private String parentOrgId;
+	@Column(name = "parent_org_id", length = 64, insertable = false, updatable = false)
+	private String parentOrgId;
 
-    @Column(name = "org_id", length = 64, unique = true, nullable = false)
-    private String orgId;
+	@Column(name = "org_id", length = 64, unique = true, nullable = false)
+	private String orgId;
 
-    @Column(name = "org_name", nullable = false)
-    private String name;
+	@Column(name = "org_name", nullable = false)
+	private String name;
 
-    @Column(name = "tree_level", nullable = false)
-    private int treeLevel;
+	@Column(name = "tree_level", nullable = false)
+	private int treeLevel;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+	@Column(name = "created_at", nullable = false, updatable = false)
+	private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
+	@Column(name = "updated_at", nullable = false)
+	private LocalDateTime updatedAt;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof Organization that))
-            return false;
-        return id != null && Objects.equals(id, that.id);
-    }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (!(o instanceof Organization that))
+			return false;
+		return id != null && Objects.equals(id, that.id);
+	}
 
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
+	@Override
+	public int hashCode() {
+		return getClass().hashCode();
+	}
 
-    @Override
-    public String toString() {
-        return "Organization{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", treeLevel=" + treeLevel +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "Organization{" +
+			"id=" + id +
+			", name='" + name + '\'' +
+			", treeLevel=" + treeLevel +
+			'}';
+	}
 }
