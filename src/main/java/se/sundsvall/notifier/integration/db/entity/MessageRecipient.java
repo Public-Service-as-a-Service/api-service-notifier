@@ -12,7 +12,6 @@ import jakarta.persistence.MapsId;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
-import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -55,7 +54,7 @@ public class MessageRecipient {
 	}
 
 	@PrePersist
-	protected void onCreate() {
+	public void onCreate() {
 		if (receivedAt == null) {
 			receivedAt = LocalDateTime.now();
 		}
@@ -145,9 +144,7 @@ public class MessageRecipient {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(
-			id != null ? id.getMessageId() : null,
-			id != null ? id.getEmployeeId() : null);
+		return id != null ? id.hashCode() : 0;
 	}
 
 	@Override
