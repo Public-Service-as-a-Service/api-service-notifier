@@ -38,7 +38,7 @@ public class Member {
 	private LocalDateTime joinedAt;
 
 	@PrePersist
-	protected void onCreate() {
+	public void onCreate() {
 		if (joinedAt == null) {
 			joinedAt = LocalDateTime.now();
 		}
