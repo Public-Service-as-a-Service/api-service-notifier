@@ -1,0 +1,87 @@
+package se.sundsvall.notifier.api;
+
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import se.sundsvall.notifier.api.model.request.OrganizationResponse;
+import se.sundsvall.notifier.service.OrganizationService;
+
+@WebMvcTest(OrganizationResource.class)
+@AutoConfigureMockMvc(addFilters = false)
+class OrganizationResourceTest {
+
+	@Autowired
+	MockMvc mvc;
+
+	@MockitoBean
+	OrganizationService service;
+
+	@Test
+	void getOne_succesful_test() throws Exception {
+		var response = mock(OrganizationResponse.class);
+
+		when(service.getSpecificOrg("id")).thenReturn(response);
+
+		mvc.perform(get("/api/notifier/organization/id")
+			.accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk());
+
+		verify(service).getSpecificOrg("id");
+	}
+
+	@Test
+	void getAll_succesfulTest() throws Exception {
+		var response = List.of(
+			new OrganizationResponse("1", "ParentorgId1", "orgId1", "name1", 3),
+			new OrganizationResponse("2", "ParentorgId2", "orgId2", "name2", 4));
+
+		when(service.getAllOrganizations()).thenReturn(response);
+
+		mvc.perform(get("/api/notifier/organization/organizations"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.length()").value(2));
+
+		verify(service).getAllOrganizations();
+
+	}
+
+	@Test
+	void getWithList_succesful() throws Exception {
+		var response = List.of(
+			new OrganizationResponse("1", "ParentorgId1", "orgId1", "name1", 3),
+			new OrganizationResponse("2", "ParentorgId2", "orgId2", "name2", 4));
+
+		when(service.getOrgsById(List.of("orgId1", "orgId2"))).thenReturn(response);
+
+		mvc.perform(get("/api/notifier/organization/ids").param("orgId", "orgId1", "orgId2"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.length()").value(2));
+
+		verify(service).getOrgsById(List.of("orgId1", "orgId2"));
+	}
+
+	@Test
+	void getOrgAndChildren_succesful() throws Exception {
+		var response = List.of(
+			new OrganizationResponse("1", "ParentorgId1", "orgId1", "name1", 3),
+			new OrganizationResponse("2", "orgId1", "orgId2", "name2", 4));
+
+		when(service.getOrgAndChildrenWithId("orgId1")).thenReturn(response);
+
+		mvc.perform(get("/api/notifier/organization/{orgId}/children", "orgId1")
+			.accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk());
+
+		verify(service).getOrgAndChildrenWithId("orgId1");
+	}
+}
