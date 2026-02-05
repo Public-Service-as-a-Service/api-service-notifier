@@ -13,7 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import se.sundsvall.notifier.api.model.request.EmployeeResponse;
+import se.sundsvall.notifier.api.model.response.EmployeeResponse;
 import se.sundsvall.notifier.service.EmployeeService;
 
 @WebMvcTest(EmployeeResource.class)

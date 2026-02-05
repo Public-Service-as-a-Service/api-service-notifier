@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.zalando.problem.Problem;
 import org.zalando.problem.Status;
 import se.sundsvall.notifier.api.mapper.EmployeeMapper;
-import se.sundsvall.notifier.api.model.request.EmployeeResponse;
+import se.sundsvall.notifier.api.model.response.EmployeeResponse;
 import se.sundsvall.notifier.integration.repository.EmployeeRepository;
 
 @Service

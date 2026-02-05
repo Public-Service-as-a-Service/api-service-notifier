@@ -10,7 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import se.sundsvall.notifier.api.mapper.EmployeeMapper;
-import se.sundsvall.notifier.api.model.request.EmployeeResponse;
+import se.sundsvall.notifier.api.model.response.EmployeeResponse;
 import se.sundsvall.notifier.integration.db.entity.Employee;
 import se.sundsvall.notifier.integration.repository.EmployeeRepository;
 

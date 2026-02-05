@@ -9,7 +9,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.zalando.problem.Problem;
-import se.sundsvall.notifier.api.model.request.EmployeeResponse;
+import se.sundsvall.notifier.api.model.response.EmployeeResponse;
 import se.sundsvall.notifier.service.EmployeeService;
 
 @RestController

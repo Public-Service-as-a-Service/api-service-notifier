@@ -1,7 +1,7 @@
 package se.sundsvall.notifier.api.mapper;
 
 import org.springframework.stereotype.Component;
-import se.sundsvall.notifier.api.model.request.EmployeeResponse;
+import se.sundsvall.notifier.api.model.response.EmployeeResponse;
 import se.sundsvall.notifier.integration.db.entity.Employee;
 
 @Component

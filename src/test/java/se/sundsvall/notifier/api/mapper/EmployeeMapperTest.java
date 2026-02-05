@@ -3,7 +3,7 @@ package se.sundsvall.notifier.api.mapper;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import se.sundsvall.notifier.api.model.request.EmployeeResponse;
+import se.sundsvall.notifier.api.model.response.EmployeeResponse;
 import se.sundsvall.notifier.integration.db.entity.Employee;
 
 public class EmployeeMapperTest {
