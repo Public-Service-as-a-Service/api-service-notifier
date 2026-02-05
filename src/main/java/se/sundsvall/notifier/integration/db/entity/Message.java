@@ -53,7 +53,7 @@ public class Message {
 	private Set<MessageRecipient> recipients = new HashSet<>();
 
 	@PrePersist
-	protected void onCreate() {
+	public void onCreate() {
 		if (createdAt == null) {
 			createdAt = LocalDateTime.now();
 		}
@@ -127,6 +127,7 @@ public class Message {
 		return "Message{" +
 			"id=" + id +
 			", title='" + title + '\'' +
+			", content='" + content + '\'' +
 			", sender=" + (sender != null ? sender.getId() : "null") +
 			", createdAt=" + createdAt +
 			'}';
