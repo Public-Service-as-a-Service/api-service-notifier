@@ -1,4 +1,4 @@
-package se.sundsvall.notifier.api.model.request;
+package se.sundsvall.notifier.api.model.response;
 
 import lombok.Builder;
 
