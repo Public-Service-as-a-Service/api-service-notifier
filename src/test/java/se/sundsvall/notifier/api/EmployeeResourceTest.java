@@ -1,0 +1,74 @@
+package se.sundsvall.notifier.api;
+
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import se.sundsvall.notifier.api.model.request.EmployeeResponse;
+import se.sundsvall.notifier.service.EmployeeService;
+
+@WebMvcTest(EmployeeResource.class)
+@AutoConfigureMockMvc(addFilters = false)
+public class EmployeeResourceTest {
+
+	@Autowired
+	MockMvc mvc;
+
+	@MockitoBean
+	EmployeeService service;
+
+	@Test
+	void getEmployee_succesful_test() throws Exception {
+		var response = List.of(
+			new EmployeeResponse("personId1", "orgId1", "firstName1", "lastName1", "email1", "workMobile1", "workPhone1", "workTitle1"),
+			new EmployeeResponse("personId2", "orgId1", "firstName2", "lastName2", "email2", "workMobile2", "workPhone2", "workTitle2"));
+
+		when(service.getEmployeesByOrg("orgId1")).thenReturn(response);
+
+		mvc.perform(get("/api/notifier/employee/{orgId}", "orgId1")
+			.accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk());
+
+		verify(service).getEmployeesByOrg("orgId1");
+	}
+
+	@Test
+	void getAll_succesfulTest() throws Exception {
+		var response = List.of(
+			new EmployeeResponse("personId1", "orgId1", "firstName1", "lastName1", "email1", "workMobile1", "workPhone1", "workTitle1"),
+			new EmployeeResponse("personId2", "orgId2", "firstName2", "lastName2", "email2", "workMobile2", "workPhone2", "workTitle2"));
+
+		when(service.getAllEmployees()).thenReturn(response);
+
+		mvc.perform(get("/api/notifier/employee/employees"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.length()").value(2));
+
+		verify(service).getAllEmployees();
+
+	}
+
+	@Test
+	void getWithList_succesful() throws Exception {
+		var response = List.of(
+			new EmployeeResponse("personId1", "orgId1", "firstName1", "lastName1", "email1", "workMobile1", "workPhone1", "workTitle1"),
+			new EmployeeResponse("personId2", "orgId2", "firstName2", "lastName2", "email2", "workMobile2", "workPhone2", "workTitle2"));
+
+		when(service.getEmployeesByOrgList(List.of("orgId1", "orgId2"))).thenReturn(response);
+
+		mvc.perform(get("/api/notifier/employee/ids").param("orgIds", "orgId1", "orgId2"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.length()").value(2));
+
+		verify(service).getEmployeesByOrgList(List.of("orgId1", "orgId2"));
+	}
+}
