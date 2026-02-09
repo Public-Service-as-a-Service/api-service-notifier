@@ -118,10 +118,18 @@ public class Employee {
 		return "Employee{" +
 			"id=" + id +
 			", personId='" + personId + '\'' +
+			", orgId='" + orgId + '\'' +
 			", firstName='" + firstName + '\'' +
 			", lastName='" + lastName + '\'' +
 			", email='" + email + '\'' +
+			", workMobile='" + workMobile + '\'' +
+			", workPhone='" + workPhone + '\'' +
+			", workTitle='" + workTitle + '\'' +
 			", activeEmployee=" + activeEmployee +
+			", managerPersonId='" + managerPersonId + '\'' +
+			", managerCode='" + managerCode + '\'' +
+			", createdAt=" + createdAt +
+			", updatedAt=" + updatedAt +
 			'}';
 	}
 }

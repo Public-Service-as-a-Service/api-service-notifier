@@ -69,15 +69,20 @@ public class Organization {
 
 	@Override
 	public int hashCode() {
-		return getClass().hashCode();
+		return id != null ? id.hashCode() : 0;
 	}
 
 	@Override
 	public String toString() {
 		return "Organization{" +
 			"id=" + id +
+			", companyId='" + companyId + '\'' +
+			", parentOrgId='" + parentOrgId + '\'' +
+			", orgId='" + orgId + '\'' +
 			", name='" + name + '\'' +
 			", treeLevel=" + treeLevel +
+			", createdAt=" + createdAt +
+			", updatedAt=" + updatedAt +
 			'}';
 	}
 }
