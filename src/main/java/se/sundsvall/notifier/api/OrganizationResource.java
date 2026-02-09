@@ -41,11 +41,11 @@ public class OrganizationResource {
 		this.organizationService = organizationService;
 	}
 
-	@Operation(summary = "Get spicific organization", responses =
-		@ApiResponse(
-				responseCode = "404",
-				description = "Not Found",
-				content = @Content(schema = @Schema(implementation = Problem.class))))
+	@Operation(summary = "Get spicific organization",
+		responses = @ApiResponse(
+			responseCode = "404",
+			description = "Not Found",
+			content = @Content(schema = @Schema(implementation = Problem.class))))
 	@GetMapping("/{orgId}")
 	public ResponseEntity<OrganizationResponse> getSpecificOrganization(@PathVariable String orgId) {
 		return ResponseEntity.ok(organizationService.getSpecificOrg(orgId));

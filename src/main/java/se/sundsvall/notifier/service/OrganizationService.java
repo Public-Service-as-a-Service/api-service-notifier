@@ -48,7 +48,7 @@ public class OrganizationService {
 	public List<OrganizationResponse> getOrgAndChildrenWithId(String orgId) {
 		var result = organizationRepository.findOrgWithChildren(orgId).stream().map(organizationMapper::toResponse).toList();
 
-		if(result.isEmpty()){
+		if (result.isEmpty()) {
 			throw Problem.valueOf(Status.NOT_FOUND, "No organization with id '%s' could be found".formatted(orgId));
 		}
 
