@@ -30,7 +30,7 @@ public class OrganizationService {
 		}
 
 		return organizationRepository.findByOrgId(orgId).map(organizationMapper::toResponse)
-			.orElseThrow(() -> Problem.valueOf(Status.NOT_FOUND, "not found"));
+			.orElseThrow(() -> Problem.valueOf(Status.NOT_FOUND, "orgnanization with id '%s' not found".formatted(orgId)));
 	}
 
 	public List<OrganizationResponse> getOrgsById(List<String> orgId) {
@@ -48,9 +48,10 @@ public class OrganizationService {
 	public List<OrganizationResponse> getOrgAndChildrenWithId(String orgId) {
 		var result = organizationRepository.findOrgWithChildren(orgId).stream().map(organizationMapper::toResponse).toList();
 
-		if (orgId == null || orgId.isEmpty()) {
-			throw new IllegalArgumentException("orgid is required");
+		if(result.isEmpty()){
+			throw Problem.valueOf(Status.NOT_FOUND, "No organization with id '%s' could be found".formatted(orgId));
 		}
+
 		return result;
 	}
 }
