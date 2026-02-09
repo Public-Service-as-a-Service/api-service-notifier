@@ -41,7 +41,7 @@ public class OrganizationResource {
 		this.organizationService = organizationService;
 	}
 
-	@Operation(summary = "Get spicific organization",
+	@Operation(summary = "Get specific organization",
 		responses = @ApiResponse(
 			responseCode = "404",
 			description = "Not Found",
