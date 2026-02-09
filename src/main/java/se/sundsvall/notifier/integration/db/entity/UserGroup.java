@@ -53,7 +53,7 @@ public class UserGroup {
 	private LocalDateTime updatedAt;
 
 	@PrePersist
-	protected void onCreate() {
+	public void onCreate() {
 		if (createdAt == null) {
 			createdAt = LocalDateTime.now();
 		}
@@ -63,7 +63,7 @@ public class UserGroup {
 	}
 
 	@PreUpdate
-	protected void onUpdate() {
+	public void onUpdate() {
 		updatedAt = LocalDateTime.now();
 	}
 
@@ -135,7 +135,7 @@ public class UserGroup {
 
 	@Override
 	public int hashCode() {
-		return getClass().hashCode();
+		return id != null ? id.hashCode() : 0;
 	}
 
 	@Override
@@ -143,8 +143,10 @@ public class UserGroup {
 		return "UserGroup{" +
 			"id=" + id +
 			", name='" + name + '\'' +
-			", creator=" + (creator != null ? creator.getId() : "null") +
+			", description='" + description + '\'' +
+			", creator=" + creator +
 			", createdAt=" + createdAt +
+			", updatedAt=" + updatedAt +
 			'}';
 	}
 }

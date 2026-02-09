@@ -9,6 +9,7 @@ openapi:
   title: ${spring.application.name}
   version: '@project.version@'
 
+
 spring:
   application:
     name: notifier
@@ -16,6 +17,10 @@ spring:
     username: ${ENV.DB.USERNAME}
     password: ${ENV.DB.PASSWORD}
     url: ${ENV.DB.URL}
+
+  flyway:
+    enabled: true
+
   security:
     oauth2:
       client:
@@ -24,6 +29,7 @@ spring:
             token-uri: ${ENV.SMS-SENDER-TOKEN-URL}
         registration:
           sms-sender:
+            authorization-grant-type: client_credentials
             client-id: ${ENV.SMS-SENDER-CLIENT-ID}
             client-secret: ${ENV.SMS-SENDER-CLIENT-SECRET}
 
