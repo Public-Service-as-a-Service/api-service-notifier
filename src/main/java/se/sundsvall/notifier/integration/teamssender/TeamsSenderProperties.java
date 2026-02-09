@@ -5,6 +5,6 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 
 @ConfigurationProperties("integration.teams-sender")
 public record TeamsSenderProperties(
-        @DefaultValue("5") int readTimeout,
-        @DefaultValue("30") int connectTimeout) {
+	@DefaultValue("5") int readTimeout,
+	@DefaultValue("30") int connectTimeout) {
 }

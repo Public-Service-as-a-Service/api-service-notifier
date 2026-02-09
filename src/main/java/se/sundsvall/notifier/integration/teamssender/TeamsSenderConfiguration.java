@@ -8,12 +8,13 @@ import se.sundsvall.dept44.configuration.feign.decoder.ProblemErrorDecoder;
 
 public class TeamsSenderConfiguration {
 
-    public static final String CLIENT_ID = "teams-sender";
-    @Bean
-    FeignBuilderCustomizer feignBuilderCustomizer(final TeamsSenderProperties properties, final ClientRegistrationRepository clientRegistrationRepository) {
-        return FeignMultiCustomizer.create()
-                .withErrorDecoder(new ProblemErrorDecoder(CLIENT_ID))
-                .withRequestTimeoutsInSeconds(properties.connectTimeout(), properties.readTimeout())
-                .composeCustomizersToOne();
-    }
+	public static final String CLIENT_ID = "teams-sender";
+
+	@Bean
+	FeignBuilderCustomizer feignBuilderCustomizer(final TeamsSenderProperties properties, final ClientRegistrationRepository clientRegistrationRepository) {
+		return FeignMultiCustomizer.create()
+			.withErrorDecoder(new ProblemErrorDecoder(CLIENT_ID))
+			.withRequestTimeoutsInSeconds(properties.connectTimeout(), properties.readTimeout())
+			.composeCustomizersToOne();
+	}
 }
