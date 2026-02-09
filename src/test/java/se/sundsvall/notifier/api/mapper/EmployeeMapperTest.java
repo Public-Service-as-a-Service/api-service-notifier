@@ -1,6 +1,6 @@
 package se.sundsvall.notifier.api.mapper;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 import se.sundsvall.notifier.api.model.response.EmployeeResponse;
@@ -25,13 +25,13 @@ public class EmployeeMapperTest {
 
 		EmployeeResponse response = employeeMapper.toResponse(employee);
 
-		assertEquals("personId", response.personId());
-		assertEquals("orgId", response.orgId());
-		assertEquals("firstName", response.firstName());
-		assertEquals("lastName", response.lastName());
-		assertEquals("email@test.se", response.email());
-		assertEquals("0601122333", response.workPhone());
-		assertEquals("0701122333", response.workMobile());
-		assertEquals("Arbetstitel", response.workTitle());
+		assertThat("personId").isEqualTo(response.personId());
+		assertThat("orgId").isEqualTo(response.orgId());
+		assertThat("firstName").isEqualTo(response.firstName());
+		assertThat("lastName").isEqualTo(response.lastName());
+		assertThat("email@test.se").isEqualTo(response.email());
+		assertThat("0601122333").isEqualTo(response.workPhone());
+		assertThat("0701122333").isEqualTo(response.workMobile());
+		assertThat("Arbetstitel").isEqualTo(response.workTitle());
 	}
 }

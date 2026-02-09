@@ -13,7 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import se.sundsvall.notifier.api.model.response.EmployeeResponse;
+import se.sundsvall.notifier.api.model.response.EmployeeWithOrgNameResponse;
 import se.sundsvall.notifier.service.EmployeeService;
 
 @WebMvcTest(EmployeeResource.class)
@@ -21,16 +21,16 @@ import se.sundsvall.notifier.service.EmployeeService;
 public class EmployeeResourceTest {
 
 	@Autowired
-	MockMvc mvc;
+	private MockMvc mvc;
 
 	@MockitoBean
-	EmployeeService service;
+	private EmployeeService service;
 
 	@Test
 	void getEmployee_succesful_test() throws Exception {
 		var response = List.of(
-			new EmployeeResponse("personId1", "orgId1", "firstName1", "lastName1", "email1", "workMobile1", "workPhone1", "workTitle1"),
-			new EmployeeResponse("personId2", "orgId1", "firstName2", "lastName2", "email2", "workMobile2", "workPhone2", "workTitle2"));
+			new EmployeeWithOrgNameResponse("personId1", "orgId1", "firstName1", "lastName1", "email1", "workMobile1", "workPhone1", "workTitle1", "avdelning1"),
+			new EmployeeWithOrgNameResponse("personId2", "orgId1", "firstName2", "lastName2", "email2", "workMobile2", "workPhone2", "workTitle2", "avdelning2"));
 
 		when(service.getEmployeesByOrg("orgId1")).thenReturn(response);
 
@@ -44,8 +44,8 @@ public class EmployeeResourceTest {
 	@Test
 	void getAll_succesfulTest() throws Exception {
 		var response = List.of(
-			new EmployeeResponse("personId1", "orgId1", "firstName1", "lastName1", "email1", "workMobile1", "workPhone1", "workTitle1"),
-			new EmployeeResponse("personId2", "orgId2", "firstName2", "lastName2", "email2", "workMobile2", "workPhone2", "workTitle2"));
+			new EmployeeWithOrgNameResponse("personId1", "orgId1", "firstName1", "lastName1", "email1", "workMobile1", "workPhone1", "workTitle1", "avdelning1"),
+			new EmployeeWithOrgNameResponse("personId2", "orgId2", "firstName2", "lastName2", "email2", "workMobile2", "workPhone2", "workTitle2", "avdelning1"));
 
 		when(service.getAllEmployees()).thenReturn(response);
 
@@ -60,8 +60,8 @@ public class EmployeeResourceTest {
 	@Test
 	void getWithList_succesful() throws Exception {
 		var response = List.of(
-			new EmployeeResponse("personId1", "orgId1", "firstName1", "lastName1", "email1", "workMobile1", "workPhone1", "workTitle1"),
-			new EmployeeResponse("personId2", "orgId2", "firstName2", "lastName2", "email2", "workMobile2", "workPhone2", "workTitle2"));
+			new EmployeeWithOrgNameResponse("personId1", "orgId1", "firstName1", "lastName1", "email1", "workMobile1", "workPhone1", "workTitle1", "avdelning1"),
+			new EmployeeWithOrgNameResponse("personId2", "orgId2", "firstName2", "lastName2", "email2", "workMobile2", "workPhone2", "workTitle2", "avdelning2"));
 
 		when(service.getEmployeesByOrgList(List.of("orgId1", "orgId2"))).thenReturn(response);
 
