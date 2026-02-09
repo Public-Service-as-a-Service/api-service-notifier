@@ -1,8 +1,11 @@
 package se.sundsvall.notifier.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,10 +21,10 @@ import se.sundsvall.notifier.integration.repository.OrganizationRepository;
 @ExtendWith(MockitoExtension.class)
 public class OrganizationServiceTest {
 	@Mock
-	OrganizationMapper organizationMapper;
+	private OrganizationMapper organizationMapper;
 
 	@Mock
-	OrganizationRepository organizationRepository;
+	private OrganizationRepository organizationRepository;
 
 	@Test
 	void getAllOrganizations() {
@@ -39,7 +42,7 @@ public class OrganizationServiceTest {
 
 		var result = service.getAllOrganizations();
 
-		assertEquals(List.of(response1, response2), result);
+		assertThat(List.of(response1, response2)).isEqualTo(result);
 		verify(organizationRepository).findAll();
 		verify(organizationMapper).toResponse(org1);
 		verify(organizationMapper).toResponse(org2);
@@ -58,7 +61,7 @@ public class OrganizationServiceTest {
 
 		var result = service.getSpecificOrg("orgId");
 
-		assertEquals(response, result);
+		assertThat(result).isEqualTo(response);
 	}
 
 	@Test
@@ -77,7 +80,7 @@ public class OrganizationServiceTest {
 
 		var result = service.getOrgsById(List.of("Id1", "Id2"));
 
-		assertEquals(List.of(response1, response2), result);
+		assertThat(List.of(response1, response2)).isEqualTo(result);
 	}
 
 	@Test
@@ -96,7 +99,7 @@ public class OrganizationServiceTest {
 
 		var result = service.getOrgAndChildrenWithId("Id1");
 
-		assertEquals(List.of(response1, response2), result);
+		assertThat(List.of(response1, response2)).isEqualTo(result);
 	}
 
 	@Test
@@ -105,7 +108,7 @@ public class OrganizationServiceTest {
 
 		var exception = assertThrows(IllegalArgumentException.class, () -> service.getOrgsById(null));
 
-		assertEquals("orgid is required", exception.getMessage());
+		assertThat("orgid is required").isEqualTo(exception.getMessage());
 		verifyNoInteractions(organizationRepository, organizationMapper);
 	}
 }

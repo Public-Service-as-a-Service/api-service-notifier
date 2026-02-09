@@ -28,10 +28,10 @@ import se.sundsvall.notifier.service.OrganizationService;
 class OrganizationResourceTest {
 
 	@Autowired
-	MockMvc mvc;
+	private MockMvc mvc;
 
 	@MockitoBean
-	OrganizationService service;
+	private OrganizationService service;
 
 	@Test
 	void getOne_succesful_test() throws Exception {
