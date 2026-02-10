@@ -1,76 +1,69 @@
 package se.sundsvall.notifier.api;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import java.util.List;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.zalando.problem.Problem;
+import org.springframework.web.util.UriComponentsBuilder;
+import se.sundsvall.notifier.api.model.request.GroupRequest;
+import se.sundsvall.notifier.api.model.request.GroupUpdateRequest;
+import se.sundsvall.notifier.api.model.response.GroupResponse;
+import se.sundsvall.notifier.service.GroupService;
 
-@RestController("/api/notifier")
-@Tag(name = "Group Resource")
-
-@ApiResponse(
-	responseCode = "200",
-	description = "Successful Operation",
-	useReturnTypeSchema = true)
-@ApiResponse(
-	responseCode = "400",
-	description = "Bad Request",
-	content = @Content(schema = @Schema(implementation = Problem.class)))
-@ApiResponse(
-	responseCode = "500",
-	description = "Internal Server Error",
-	content = @Content(schema = @Schema(implementation = Problem.class)))
-
+@RestController
+@RequestMapping("/api/notifier/groups")
 public class GroupResource {
+	private final GroupService groupService;
 
-	@Operation(summary = "Get information about groups")
-	@GetMapping("/groups")
-	public String getGroups() {
-		return "Här kommer en grupp";
+	public GroupResource(GroupService groupService) {
+		this.groupService = groupService;
 	}
 
-	@Operation(summary = "")
-	@PostMapping("/groups/{group}")
-	public String postGroup(@PathVariable("group") Long group) {
-		return "grupp tillagd";
+	@GetMapping
+	public ResponseEntity<List<GroupResponse>> getGroups(@RequestParam(required = false) String creatorId) {
+		var responses = (creatorId == null)
+			? groupService.getAllGroups()
+			: groupService.getGroupsByCreatorId(creatorId);
+
+		return ResponseEntity.ok(responses);
 	}
 
-	@Operation(summary = "Update group information")
-	@PutMapping("/groups/{groupId}")
-	public String putGroup(@PathVariable("groupId") Long groupId) {
-		return "en specific grupp";
+	@GetMapping("/{groupId}")
+	public ResponseEntity<GroupResponse> getGroupById(@PathVariable Long groupId) {
+		var response = groupService.getGroupById(groupId);
+
+		return ResponseEntity.ok(response);
 	}
 
-	@Operation(summary = "Delete group using groupId")
-	@DeleteMapping("/groups/{groupId}")
-	public String deleteGroup(@PathVariable("groupId") Long groupId) {
-		return "grupp borttagen";
+	@PostMapping
+	public ResponseEntity<Void> createGroup(@Valid @RequestBody GroupRequest groupRequest) {
+		var id = groupService.createGroup(groupRequest);
+
+		return ResponseEntity.created(UriComponentsBuilder.fromPath("/api/notifier/groups/{id}")
+			.buildAndExpand(id)
+			.toUri())
+			.build();
 	}
 
-	@Operation(summary = "Get group member from specific group")
-	@GetMapping("/groups/{groupId}/{memberId}")
-	public String getMember(@PathVariable("groupId") Long groupId, @PathVariable("memberId") Long member) {
-		return "här kommer en medlem";
+	@PutMapping("/{groupId}")
+	public ResponseEntity<GroupResponse> updateGroup(@PathVariable Long groupId, @Valid @RequestBody GroupUpdateRequest groupUpdateRequest) {
+		var updatedGroup = groupService.updateGroup(groupId, groupUpdateRequest);
+
+		return ResponseEntity.ok(updatedGroup);
 	}
 
-	@Operation(summary = "Add member to a group")
-	@PostMapping("/groups/{groupId}/members")
-	public String postMember(@PathVariable("groupId") Long groupId) {
-		return "medlem tillagd";
-	}
+	@DeleteMapping("/{groupId}")
+	public ResponseEntity<Void> deleteGroup(@PathVariable Long groupId) {
+		groupService.deleteGroup(groupId);
 
-	@Operation(summary = "Delete an emplyee from group")
-	@DeleteMapping("/groups/{groupid}/members/{employee}")
-	public String deleteMember(@PathVariable("groupId") int groupId) {
-		return "Borttagen";
+		return ResponseEntity.noContent().build();
 	}
-
 }
