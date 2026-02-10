@@ -78,12 +78,9 @@ CREATE TABLE message(
     message_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
-    sender_employee_id BIGINT NOT NULL,
+    sender VARCHAR(255) NOT NULL,
     group_id BIGINT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_message_sender FOREIGN KEY (sender_employee_id)
-                    REFERENCES employee(employee_id)
-                    ON DELETE RESTRICT,
     CONSTRAINT fk_message_group FOREIGN KEY (group_id)
                     REFERENCES user_group(group_id)
                     ON DELETE SET NULL

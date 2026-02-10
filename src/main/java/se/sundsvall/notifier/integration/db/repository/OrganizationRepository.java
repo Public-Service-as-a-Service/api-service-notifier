@@ -1,4 +1,4 @@
-package se.sundsvall.notifier.integration.repository;
+package se.sundsvall.notifier.integration.db.repository;
 
 import feign.Param;
 import java.util.List;

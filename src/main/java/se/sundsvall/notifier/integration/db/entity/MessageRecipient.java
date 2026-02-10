@@ -12,13 +12,13 @@ import jakarta.persistence.MapsId;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder(setterPrefix = "with")
 @Entity
 @Table(name = "message_recipient")
 public class MessageRecipient {
@@ -66,37 +66,9 @@ public class MessageRecipient {
 		}
 	}
 
-	public static MessageRecipient create() {
-		return new MessageRecipient();
-	}
-
 	public MessageRecipient withMessageAndEmployee(Message message, Employee employee) {
 		this.message = message;
 		this.employee = employee;
-		syncId();
-		return this;
-	}
-
-	public MessageRecipient withMessage(Message message) {
-		this.message = message;
-
-		if (message == null) {
-			id.setMessageId(null);
-			return this;
-		}
-
-		syncId();
-		return this;
-	}
-
-	public MessageRecipient withEmployee(Employee employee) {
-		this.employee = employee;
-
-		if (employee == null) {
-			id.setEmployeeId(null);
-			return this;
-		}
-
 		syncId();
 		return this;
 	}
@@ -108,26 +80,6 @@ public class MessageRecipient {
 		if (employee != null && employee.getId() != null) {
 			id.setEmployeeId(employee.getId());
 		}
-	}
-
-	public MessageRecipient withOrgId(String orgId) {
-		this.orgId = orgId;
-		return this;
-	}
-
-	public MessageRecipient withWorkTitle(String workTitle) {
-		this.workTitle = workTitle;
-		return this;
-	}
-
-	public MessageRecipient withReceivedAt(LocalDateTime receivedAt) {
-		this.receivedAt = receivedAt;
-		return this;
-	}
-
-	public MessageRecipient withDeliveryStatus(DeliveryStatus deliveryStatus) {
-		this.deliveryStatus = deliveryStatus;
-		return this;
 	}
 
 	@Override

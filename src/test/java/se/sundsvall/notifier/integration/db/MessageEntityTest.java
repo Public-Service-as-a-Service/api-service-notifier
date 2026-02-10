@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import se.sundsvall.notifier.integration.db.entity.Employee;
 import se.sundsvall.notifier.integration.db.entity.Message;
 import se.sundsvall.notifier.integration.db.entity.MessageRecipient;
 import se.sundsvall.notifier.integration.db.entity.UserGroup;
@@ -42,14 +41,15 @@ public class MessageEntityTest {
 
 		final var title = "title";
 		final var content = "content";
-		final var sender = new Employee();
+		final var sender = "sender";
 		final var group = new UserGroup();
 
-		var message = Message.create()
+		var message = Message.builder()
 			.withTitle(title)
 			.withContent(content)
 			.withSender(sender)
-			.withGroup(group);
+			.withGroup(group)
+			.build();
 
 		assertThat(message.getTitle()).isEqualTo(title);
 		assertThat(message.getContent()).isEqualTo(content);

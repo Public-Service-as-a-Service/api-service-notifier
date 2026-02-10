@@ -1,14 +1,12 @@
 package se.sundsvall.notifier.service;
 
-import static java.util.stream.Collectors.toList;
-
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.zalando.problem.Problem;
 import org.zalando.problem.Status;
 import se.sundsvall.notifier.api.mapper.EmployeeMapper;
 import se.sundsvall.notifier.api.model.response.EmployeeWithOrgNameResponse;
-import se.sundsvall.notifier.integration.repository.EmployeeRepository;
+import se.sundsvall.notifier.integration.db.repository.EmployeeRepository;
 
 @Service
 public class EmployeeService {
