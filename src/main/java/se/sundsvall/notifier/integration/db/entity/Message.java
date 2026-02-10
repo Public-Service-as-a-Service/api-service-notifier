@@ -16,13 +16,13 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder(setterPrefix = "with")
 @Entity
 @Table(name = "message")
 public class Message {
@@ -38,9 +38,8 @@ public class Message {
 	@Column(name = "content", columnDefinition = "TEXT", nullable = false)
 	private String content;
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "sender_employee_id", nullable = false)
-	private Employee sender;
+	@Column(name = "sender", nullable = false)
+	private String sender;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "group_id")
@@ -50,6 +49,7 @@ public class Message {
 	private LocalDateTime createdAt;
 
 	@OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
+	@Builder.Default
 	private Set<MessageRecipient> recipients = new HashSet<>();
 
 	@PrePersist
@@ -59,16 +59,13 @@ public class Message {
 		}
 	}
 
-	public static Message create() {
-		return new Message();
-	}
-
 	public void addRecipient(MessageRecipient recipient) {
 		if (recipient == null)
 			return;
 
 		recipients.add(recipient);
-		recipient.withMessage(this);
+		recipient.setMessage(this);
+		System.out.println("added recipient " + recipient);
 
 	}
 
@@ -82,30 +79,10 @@ public class Message {
 
 			if (r == recipient) {
 				it.remove();
-				r.withMessage(null);
+				r.setMessage(null);
 				return;
 			}
 		}
-	}
-
-	public Message withTitle(String title) {
-		this.title = title;
-		return this;
-	}
-
-	public Message withContent(String content) {
-		this.content = content;
-		return this;
-	}
-
-	public Message withSender(Employee sender) {
-		this.sender = sender;
-		return this;
-	}
-
-	public Message withGroup(UserGroup group) {
-		this.group = group;
-		return this;
 	}
 
 	@Override
@@ -128,7 +105,7 @@ public class Message {
 			"id=" + id +
 			", title='" + title + '\'' +
 			", content='" + content + '\'' +
-			", sender=" + (sender != null ? sender.getId() : "null") +
+			", sender=" + (sender != null ? sender : "null") +
 			", createdAt=" + createdAt +
 			'}';
 	}

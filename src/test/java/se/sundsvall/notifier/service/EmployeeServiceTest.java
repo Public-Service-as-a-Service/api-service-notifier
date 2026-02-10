@@ -14,7 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import se.sundsvall.notifier.api.mapper.EmployeeMapper;
 import se.sundsvall.notifier.api.model.response.EmployeeWithOrgNameResponse;
 import se.sundsvall.notifier.integration.db.entity.Employee;
-import se.sundsvall.notifier.integration.repository.EmployeeRepository;
+import se.sundsvall.notifier.integration.db.repository.EmployeeRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class EmployeeServiceTest {

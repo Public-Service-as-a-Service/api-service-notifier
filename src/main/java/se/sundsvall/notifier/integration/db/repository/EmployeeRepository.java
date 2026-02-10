@@ -1,4 +1,4 @@
-package se.sundsvall.notifier.integration.repository;
+package se.sundsvall.notifier.integration.db.repository;
 
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -44,12 +44,14 @@ class MessageRecipientEntityTest {
 		final var receivedAt = LocalDateTime.now();
 		final var deliveryStatus = MessageRecipient.DeliveryStatus.DELIVERED;
 
-		final var messageRecipient = MessageRecipient.create()
-			.withMessageAndEmployee(message, employee)
+		final var messageRecipient = MessageRecipient.builder()
 			.withOrgId(orgId)
 			.withWorkTitle(workTitle)
 			.withReceivedAt(receivedAt)
-			.withDeliveryStatus(deliveryStatus);
+			.withDeliveryStatus(deliveryStatus)
+			.withEmployee(employee)
+			.withMessage(message)
+			.build();
 
 		assertThat(messageRecipient.getMessage()).isSameAs(message);
 		assertThat(messageRecipient.getEmployee()).isSameAs(employee);
@@ -63,7 +65,7 @@ class MessageRecipientEntityTest {
 	void withMessage_null() {
 		var recipient = new MessageRecipient();
 
-		recipient.withMessage(null);
+		recipient.setMessage(null);
 
 		assertThat(recipient.getMessage()).isNull();
 		assertThat(recipient.getId().getMessageId()).isNull();
@@ -73,7 +75,7 @@ class MessageRecipientEntityTest {
 	void withEmployee_null() {
 		var recipient = new MessageRecipient();
 
-		recipient.withEmployee(null);
+		recipient.setEmployee(null);
 
 		assertThat(recipient.getEmployee()).isNull();
 		assertThat(recipient.getId().getEmployeeId()).isNull();
