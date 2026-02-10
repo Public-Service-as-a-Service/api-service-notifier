@@ -50,7 +50,7 @@ class MessageResourceTest {
 			.build();
 
 		// Act & Assert
-		mockMvc.perform(post("/api/notifier/users/messages")
+		mockMvc.perform(post("/api/notifier/messages")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isNoContent());
@@ -60,7 +60,7 @@ class MessageResourceTest {
 
 	@Test
 	void testGetMessages() throws Exception {
-		var user = "test@sundsvall.se";
+		var sender = "test@sundsvall.se";
 		var message = List.of(
 			MessageResponse.builder()
 				.withId(1L)
@@ -72,9 +72,9 @@ class MessageResourceTest {
 				.withTitle("title2")
 				.build());
 
-		when(messageService.getMessages(user)).thenReturn(message);
+		when(messageService.getMessages(sender)).thenReturn(message);
 
-		mockMvc.perform(get("/api/notifier/users/{user}/messages/", user))
+		mockMvc.perform(get("/api/notifier/messages/senders/{sender}", sender))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$").isArray())
@@ -83,7 +83,7 @@ class MessageResourceTest {
 			.andExpect(jsonPath("$[1].id").value(2))
 			.andExpect(jsonPath("$[1].title").value("title2"));
 
-		verify(messageService).getMessages(eq(user));
+		verify(messageService).getMessages(eq(sender));
 	}
 
 	@Test

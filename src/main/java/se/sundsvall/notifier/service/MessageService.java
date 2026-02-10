@@ -39,6 +39,7 @@ public class MessageService {
 
 	public void createMessage(MessageRequest messageRequest) {
 		MessageStatus smsStatus = MessageStatus.NOT_SENT;
+		Boolean teamsStatus = false;
 		// Inte implementerad då status för denna är osäker
 		Long userGroup = null;
 		if (messageRequest.groupId() != null) {
@@ -58,9 +59,10 @@ public class MessageService {
 			if (messageRequest.sendTeams() && employee.getEmail() != null) {
 				TeamsSenderDTO teamsDto = TeamsSenderDTO.builder()
 					.withMessage(messageRequest.content())
-					.withRecipient(employee.getEmail())
+					.withRecipient(null)
 					.build();
-				teamsSenderIntegration.sendTeamsMessage("2218", teamsDto);
+
+				teamsStatus = teamsSenderIntegration.sendTeamsMessage("2281", teamsDto);
 			}
 
 			// Skickar sms meddelande
@@ -81,7 +83,7 @@ public class MessageService {
 
 			MessageRecipient messageRecipient = MessageRecipient.builder()
 				.withEmployee(employee)
-				.withDeliveryStatus(smsStatus == MessageStatus.SENT ? MessageRecipient.DeliveryStatus.DELIVERED : MessageRecipient.DeliveryStatus.FAILED)
+				.withDeliveryStatus(smsStatus == MessageStatus.SENT || teamsStatus ? MessageRecipient.DeliveryStatus.DELIVERED : MessageRecipient.DeliveryStatus.FAILED)
 				.build();
 
 			savedMessage.addRecipient(messageRecipient);

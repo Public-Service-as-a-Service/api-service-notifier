@@ -13,7 +13,13 @@ public class TeamsSenderIntegration {
 		this.mapper = mapper;
 	}
 
-	public void sendTeamsMessage(final String municipalityId, final TeamsSenderDTO dto) {
-		teamsSenderClient.sendTeamsMessage(municipalityId, mapper.toSendTeamsMessageRequest(dto));
+	public Boolean sendTeamsMessage(final String municipalityId, final TeamsSenderDTO dto) {
+		try {
+			teamsSenderClient.sendTeamsMessage(municipalityId, mapper.toSendTeamsMessageRequest(dto));
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+
 	}
 }
