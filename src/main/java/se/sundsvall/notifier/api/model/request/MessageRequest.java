@@ -13,7 +13,6 @@ public record MessageRequest(
 	@Schema(description = "innehållet på meddelandet", example = "Ryssen kommer! göm er! ps grattis på födelsedagen Pelle!") @NotBlank String content,
 	@Schema(description = "", example = "test@sundsvall.se") @NotBlank String sender,
 	Long groupId,
-	@Schema(description = "Lista på mottagare id", example = "[1, 2, 3]")
-	@NotEmpty(message = "recipientEmployeeIds must contain at least one id") Set<Long> recipientEmployeeIds,
+	@Schema(description = "Lista på mottagare id", example = "[1, 2, 3]") @NotEmpty(message = "recipientEmployeeIds must contain at least one id") Set<Long> recipientEmployeeIds,
 	@NotNull Boolean sendSms,
 	@NotNull Boolean sendTeams) {}
