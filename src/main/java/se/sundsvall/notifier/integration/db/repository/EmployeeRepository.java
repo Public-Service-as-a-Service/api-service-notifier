@@ -1,5 +1,6 @@
 package se.sundsvall.notifier.integration.db.repository;
 
+import java.util.Set;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -8,6 +9,7 @@ import se.sundsvall.notifier.integration.db.entity.Employee;
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
+	Set<Employee> findAllByIdIn(Set<Long> ids);
 	List<Employee> findByOrgId(String orgId);
 
 	List<Employee> findByOrgIdIn(List<String> orgId);

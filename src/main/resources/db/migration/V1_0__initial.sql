@@ -1,22 +1,22 @@
 create table shedlock
 (
-    name       varchar(64)  not null,
-    lock_until timestamp(3) not null,
-    locked_at  timestamp(3) not null default current_timestamp(3),
-    locked_by  varchar(255) not null,
+    name       varchar(64)  NOT NULL,
+    lock_until timestamp(3) NOT NULL,
+    locked_at  timestamp(3) NOT NULL default current_timestamp(3),
+    locked_by  varchar(255) NOT NULL,
     primary key (name)
 );
 
 CREATE TABLE organization(
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    company_id VARCHAR(64),
+    company_id VARCHAR(64) NOT NULL,
     parent_org_id VARCHAR(64),
-    org_id VARCHAR(64),
+    org_id VARCHAR(64) NOT NULL,
     org_name VARCHAR(255) NOT NULL,
     tree_level INT NOT NULL,
 
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     CONSTRAINT uk_organization_org_id UNIQUE (org_id),
     CONSTRAINT fk_org_parent FOREIGN KEY(parent_org_id)
@@ -27,7 +27,7 @@ CREATE TABLE organization(
 CREATE TABLE employee(
     employee_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     person_id VARCHAR(36) NOT NULL,
-    org_id VARCHAR (64),
+    org_id VARCHAR (64) NOT NULL,
     first_name VARCHAR(100),
     last_name VARCHAR(100),
     email VARCHAR(255),
@@ -38,8 +38,8 @@ CREATE TABLE employee(
     manager_id VARCHAR(36),
     manager_code VARCHAR(10),
 
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     CONSTRAINT uq_pid_org_title UNIQUE(person_id, org_id, work_title),
 
@@ -52,26 +52,21 @@ CREATE TABLE user_group(
     group_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     group_name VARCHAR(255) NOT NULL,
     description TEXT,
-    creator_employee_id BIGINT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    CONSTRAINT fk_group_creator FOREIGN KEY (creator_employee_id)
-                       REFERENCES employee(employee_id)
-                       ON DELETE RESTRICT
+    creator_id VARCHAR(255) NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE member(
+CREATE TABLE employee_user_group (
     employee_id BIGINT NOT NULL,
     group_id BIGINT NOT NULL,
-    joined_at DATETIME,
     PRIMARY KEY (employee_id, group_id),
-    CONSTRAINT fk_member_employee FOREIGN KEY (employee_id)
-                   REFERENCES employee(employee_id)
-                   ON DELETE CASCADE,
-    CONSTRAINT fk_member_group FOREIGN KEY (group_id)
-                   REFERENCES user_group(group_id)
-                   ON DELETE CASCADE
+    CONSTRAINT fk_eug_employee
+        FOREIGN KEY (employee_id) REFERENCES employee(employee_id)
+            ON DELETE CASCADE,
+    CONSTRAINT fk_eug_group
+        FOREIGN KEY (group_id) REFERENCES user_group(group_id)
+            ON DELETE CASCADE
 );
 
 CREATE TABLE message(
@@ -80,7 +75,7 @@ CREATE TABLE message(
     content TEXT NOT NULL,
     sender VARCHAR(255) NOT NULL,
     group_id BIGINT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     CONSTRAINT fk_message_group FOREIGN KEY (group_id)
                     REFERENCES user_group(group_id)
                     ON DELETE SET NULL
@@ -90,10 +85,10 @@ CREATE TABLE message_recipient (
         message_id BIGINT NOT NULL,
         employee_id BIGINT NOT NULL,
 
-        org_id BIGINT NOT NULL,
+        org_id VARCHAR (64) NOT NULL,
         work_title VARCHAR(100),
 
-        received_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        received_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         delivery_status ENUM('DELIVERED', 'FAILED')
         NOT NULL DEFAULT 'DELIVERED',
 
