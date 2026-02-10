@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.zalando.problem.ThrowableProblem;
 import se.sundsvall.notifier.api.mapper.OrganizationMapper;
 import se.sundsvall.notifier.api.model.response.OrganizationResponse;
 import se.sundsvall.notifier.integration.db.entity.Organization;
@@ -84,6 +85,25 @@ public class OrganizationServiceTest {
 	}
 
 	@Test
+	void getOrgChildrenAndDescendantsWithId_test() {
+		var service = new OrganizationService(organizationMapper, organizationRepository);
+
+		var org1 = new Organization();
+		var org2 = new Organization();
+
+		var response1 = mock(OrganizationResponse.class);
+		var response2 = mock(OrganizationResponse.class);
+
+		when(organizationRepository.findOrgWithChildrenAndDescendants("Id1")).thenReturn(List.of(org1, org2));
+		when(organizationMapper.toResponse(org1)).thenReturn(response1);
+		when(organizationMapper.toResponse(org2)).thenReturn(response2);
+
+		var result = service.getOrgChildrenAndDescendantsWithId("Id1");
+
+		assertThat(List.of(response1, response2)).isEqualTo(result);
+	}
+
+	@Test
 	void getOrgAndChildrenWithId_test() {
 		var service = new OrganizationService(organizationMapper, organizationRepository);
 
@@ -93,7 +113,7 @@ public class OrganizationServiceTest {
 		var response1 = mock(OrganizationResponse.class);
 		var response2 = mock(OrganizationResponse.class);
 
-		when(organizationRepository.findOrgWithChildren("Id1")).thenReturn(List.of(org1, org2));
+		when(organizationRepository.findOrgAndChildren("Id1")).thenReturn(List.of(org1, org2));
 		when(organizationMapper.toResponse(org1)).thenReturn(response1);
 		when(organizationMapper.toResponse(org2)).thenReturn(response2);
 
@@ -111,4 +131,60 @@ public class OrganizationServiceTest {
 		assertThat("orgid is required").isEqualTo(exception.getMessage());
 		verifyNoInteractions(organizationRepository, organizationMapper);
 	}
+
+	@Test
+	void getSpecificOrg_Id_Null_test() {
+		var service = new OrganizationService(organizationMapper, organizationRepository);
+
+		var exception = assertThrows(IllegalArgumentException.class, () -> service.getSpecificOrg(null));
+
+		assertThat("orgid is required").isEqualTo(exception.getMessage());
+		verifyNoInteractions(organizationRepository, organizationMapper);
+	}
+
+	@Test
+	void getOrgChildrenAndDescendantsWithId_nothing_found_test() {
+		var service = new OrganizationService(organizationMapper, organizationRepository);
+
+		when(organizationRepository.findOrgWithChildrenAndDescendants("1"))
+			.thenReturn(List.of());
+
+		var exception = assertThrows(ThrowableProblem.class,
+			() -> service.getOrgChildrenAndDescendantsWithId("1"));
+
+		assertThat(exception.getMessage()).contains("No organization with id '1' could be found");
+		verify(organizationRepository).findOrgWithChildrenAndDescendants("1");
+		verifyNoInteractions(organizationMapper);
+	}
+
+	@Test
+	void getOrgAndChildrenWithId_nothing_found_test() {
+		var service = new OrganizationService(organizationMapper, organizationRepository);
+
+		when(organizationRepository.findOrgAndChildren("1"))
+			.thenReturn(List.of());
+
+		var exception = assertThrows(ThrowableProblem.class,
+			() -> service.getOrgAndChildrenWithId("1"));
+
+		assertThat(exception.getMessage()).contains("No organization with id '1' could be found");
+		verify(organizationRepository).findOrgAndChildren("1");
+		verifyNoInteractions(organizationMapper);
+	}
+
+	@Test
+	void getOrgsById_nothing_found_test() {
+		var service = new OrganizationService(organizationMapper, organizationRepository);
+
+		when(organizationRepository.findByOrgIdIn(List.of("1")))
+			.thenReturn(List.of());
+
+		var exception = assertThrows(ThrowableProblem.class,
+			() -> service.getOrgsById(List.of("1")));
+
+		assertThat(exception.getMessage()).contains("No organization found.");
+		verify(organizationRepository).findByOrgIdIn(List.of("1"));
+		verifyNoInteractions(organizationMapper);
+	}
+
 }

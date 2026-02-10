@@ -80,12 +80,13 @@ public class EmployeeServiceTest {
 	}
 
 	@Test
-	void byOrg_null_test() {
+	void getEmployee_Org_Id_Null_test() {
 		var service = new EmployeeService(employeeRepository, employeeMapper);
 
-		var exception = assertThrows(IllegalArgumentException.class, () -> service.getEmployeesByOrg(null));
+		var exception = assertThrows(IllegalArgumentException.class, () -> service.getEmployeesByOrgList(null));
 
 		assertThat("org id is required").isEqualTo(exception.getMessage());
 		verifyNoInteractions(employeeRepository, employeeMapper);
 	}
+
 }

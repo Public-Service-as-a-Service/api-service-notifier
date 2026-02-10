@@ -24,6 +24,7 @@ public class EmployeeMapper {
 	public EmployeeWithOrgNameResponse toResponseWithOrgName(Employee employee) {
 		var orgName = employee.getOrganization().getName();
 		return EmployeeWithOrgNameResponse.builder()
+			.withId(employee.getId())
 			.withPersonId(employee.getPersonId())
 			.withOrgId(employee.getOrgId())
 			.withFirstName(employee.getFirstName())
