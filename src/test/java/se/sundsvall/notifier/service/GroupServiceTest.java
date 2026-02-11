@@ -28,13 +28,13 @@ import se.sundsvall.notifier.integration.db.entity.Employee;
 import se.sundsvall.notifier.integration.db.entity.Group;
 import se.sundsvall.notifier.integration.db.repository.EmployeeRepository;
 import se.sundsvall.notifier.integration.db.repository.GroupRepository;
-import se.sundsvall.notifier.service.mapper.EntityToResponseMapper;
+import se.sundsvall.notifier.service.mapper.GroupEmployeeOrganizationMapper;
 
 @ExtendWith(MockitoExtension.class)
 public class GroupServiceTest {
 
 	@Mock
-	private EntityToResponseMapper mapper;
+	private GroupEmployeeOrganizationMapper mapper;
 
 	@Mock
 	private GroupRepository groupRepositoryMock;

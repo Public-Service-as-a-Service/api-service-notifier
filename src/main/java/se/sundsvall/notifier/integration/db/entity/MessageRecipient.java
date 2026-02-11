@@ -12,7 +12,11 @@ import jakarta.persistence.MapsId;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -63,22 +67,6 @@ public class MessageRecipient {
 		}
 		if (workTitle == null && employee != null) {
 			this.workTitle = employee.getWorkTitle();
-		}
-	}
-
-	public MessageRecipient withMessageAndEmployee(Message message, Employee employee) {
-		this.message = message;
-		this.employee = employee;
-		syncId();
-		return this;
-	}
-
-	private void syncId() {
-		if (message != null && message.getId() != null) {
-			id.setMessageId(message.getId());
-		}
-		if (employee != null && employee.getId() != null) {
-			id.setEmployeeId(employee.getId());
 		}
 	}
 

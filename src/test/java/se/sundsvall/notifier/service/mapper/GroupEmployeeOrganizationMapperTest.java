@@ -6,12 +6,15 @@ import java.time.LocalDateTime;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import se.sundsvall.notifier.api.model.response.EmployeeResponse;
+import se.sundsvall.notifier.api.model.response.EmployeeWithOrgNameResponse;
+import se.sundsvall.notifier.api.model.response.OrganizationResponse;
 import se.sundsvall.notifier.integration.db.entity.Employee;
 import se.sundsvall.notifier.integration.db.entity.Group;
+import se.sundsvall.notifier.integration.db.entity.Organization;
 
-public class EntityToResponseMapperTest {
+public class GroupEmployeeOrganizationMapperTest {
 
-	private final EntityToResponseMapper mapper = new EntityToResponseMapper();
+	private final GroupEmployeeOrganizationMapper mapper = new GroupEmployeeOrganizationMapper();
 
 	@Test
 	void mapToEmployeeResponse() {
@@ -35,7 +38,6 @@ public class EntityToResponseMapperTest {
 		assertThat(response.workMobile()).isEqualTo("0701234567");
 		assertThat(response.workPhone()).isEqualTo("0601234567");
 		assertThat(response.workTitle()).isEqualTo("testPerson");
-
 	}
 
 	@Test
@@ -86,5 +88,54 @@ public class EntityToResponseMapperTest {
 		assertThat(response.employees())
 			.isNotNull()
 			.isEmpty();
+	}
+
+	@Test
+	void mapToEmployeeWithOrgName() {
+		var organization = new Organization();
+		organization.setName("Sundsvalls kommun");
+
+		var employee = new Employee();
+		employee.setId(123L);
+		employee.setPersonId("p1");
+		employee.setOrgId("org1");
+		employee.setFirstName("firstTest");
+		employee.setLastName("lastTest");
+		employee.setEmail("test@test.se");
+		employee.setWorkMobile("0701234567");
+		employee.setWorkPhone("0601234567");
+		employee.setWorkTitle("testPerson");
+		employee.setOrganization(organization);
+
+		EmployeeWithOrgNameResponse response = mapper.mapToEmployeeWithOrgNameResponse(employee);
+
+		assertThat(response.id()).isEqualTo(123L);
+		assertThat(response.personId()).isEqualTo("p1");
+		assertThat(response.orgId()).isEqualTo("org1");
+		assertThat(response.firstName()).isEqualTo("firstTest");
+		assertThat(response.lastName()).isEqualTo("lastTest");
+		assertThat(response.email()).isEqualTo("test@test.se");
+		assertThat(response.workMobile()).isEqualTo("0701234567");
+		assertThat(response.workPhone()).isEqualTo("0601234567");
+		assertThat(response.workTitle()).isEqualTo("testPerson");
+		assertThat(response.orgName()).isEqualTo("Sundsvalls kommun");
+	}
+
+	@Test
+	void mapToOrganizationResponse() {
+		var organization = new Organization();
+		organization.setCompanyId("556000-0000");
+		organization.setParentOrgId("parent-1");
+		organization.setOrgId("org-1");
+		organization.setName("IT-avdelningen");
+		organization.setTreeLevel(3);
+
+		OrganizationResponse response = mapper.mapToOrganizationResponse(organization);
+
+		assertThat(response.companyId()).isEqualTo("556000-0000");
+		assertThat(response.parentOrgId()).isEqualTo("parent-1");
+		assertThat(response.orgId()).isEqualTo("org-1");
+		assertThat(response.name()).isEqualTo("IT-avdelningen");
+		assertThat(response.treeLevel()).isEqualTo(3);
 	}
 }
