@@ -41,7 +41,7 @@ public class OrganizationResource {
 		this.organizationService = organizationService;
 	}
 
-	@Operation(summary = "Get specific organization",
+	@Operation(summary = "Get a specific organization",
 		responses = @ApiResponse(
 			responseCode = "404",
 			description = "Not Found",
@@ -68,7 +68,18 @@ public class OrganizationResource {
 		return ResponseEntity.ok(organizationService.getOrgsById(orgId));
 	}
 
-	@Operation(summary = "Get a organization and all organizations under it", responses = {
+	@Operation(summary = "Get an organization and all organizations under it", responses = {
+		@ApiResponse(
+			responseCode = "404",
+			description = "Not Found",
+			content = @Content(schema = @Schema(implementation = Problem.class))),
+	})
+	@GetMapping("/{orgId}/children/descendants")
+	public ResponseEntity<List<OrganizationResponse>> getOrganizationWithChildrenAndDescendants(@PathVariable String orgId) {
+		return ResponseEntity.ok(organizationService.getOrgChildrenAndDescendantsWithId(orgId));
+	}
+
+	@Operation(summary = "Get an organization and its children", responses = {
 		@ApiResponse(
 			responseCode = "404",
 			description = "Not Found",
@@ -78,4 +89,5 @@ public class OrganizationResource {
 	public ResponseEntity<List<OrganizationResponse>> getOrganizationAndChildren(@PathVariable String orgId) {
 		return ResponseEntity.ok(organizationService.getOrgAndChildrenWithId(orgId));
 	}
+
 }
