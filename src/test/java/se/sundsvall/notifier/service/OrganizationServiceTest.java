@@ -17,7 +17,7 @@ import org.zalando.problem.ThrowableProblem;
 import se.sundsvall.notifier.api.mapper.OrganizationMapper;
 import se.sundsvall.notifier.api.model.response.OrganizationResponse;
 import se.sundsvall.notifier.integration.db.entity.Organization;
-import se.sundsvall.notifier.integration.repository.OrganizationRepository;
+import se.sundsvall.notifier.integration.db.repository.OrganizationRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class OrganizationServiceTest {

@@ -1,6 +1,5 @@
 package se.sundsvall.notifier.integration.db.entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -8,8 +7,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
@@ -36,8 +35,8 @@ public class Employee {
 	@JoinColumn(name = "org_id", referencedColumnName = "org_id", insertable = false, updatable = false)
 	private Organization organization;
 
-	@OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<Member> memberships = new HashSet<>();
+	@ManyToMany(mappedBy = "employees", fetch = FetchType.LAZY)
+	private Set<Group> groups = new HashSet<>();
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -74,30 +73,14 @@ public class Employee {
 	@Column(name = "manager_id", length = 36)
 	private String managerPersonId;
 
-	@Column(name = "manager_code", length = 255)
+	@Column(name = "manager_code", length = 10)
 	private String managerCode;
 
-	@Column(name = "created_at")
+	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 
-	@Column(name = "updated_at")
+	@Column(name = "updated_at", nullable = false)
 	private LocalDateTime updatedAt;
-
-	public void addMembership(Member member) {
-		if (member == null)
-			return;
-
-		memberships.add(member);
-		member.withEmployee(this);
-	}
-
-	public void removeMembership(Member member) {
-		if (member == null)
-			return;
-		if (memberships.remove(member)) {
-			member.withEmployee(null);
-		}
-	}
 
 	@Override
 	public boolean equals(Object o) {
