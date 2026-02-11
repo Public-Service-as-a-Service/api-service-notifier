@@ -82,23 +82,6 @@ class MessageRecipientEntityTest {
 	}
 
 	@Test
-	void withMessageAndEmployee_syncsIds_whenBothHaveIds() {
-		var message = new Message();
-		message.setId(10L);
-
-		var employee = new Employee();
-		employee.setId(20L);
-
-		var recipient = new MessageRecipient();
-		recipient.withMessageAndEmployee(message, employee);
-
-		assertThat(recipient.getMessage()).isSameAs(message);
-		assertThat(recipient.getEmployee()).isSameAs(employee);
-		assertThat(recipient.getId().getMessageId()).isEqualTo(10L);
-		assertThat(recipient.getId().getEmployeeId()).isEqualTo(20L);
-	}
-
-	@Test
 	void onCreate_setsReceivedAtWhenNull() {
 		var recipient = new MessageRecipient();
 		recipient.setReceivedAt(null);

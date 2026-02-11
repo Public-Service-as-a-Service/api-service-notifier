@@ -4,24 +4,24 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.zalando.problem.Problem;
 import org.zalando.problem.Status;
-import se.sundsvall.notifier.api.mapper.EmployeeMapper;
 import se.sundsvall.notifier.api.model.response.EmployeeWithOrgNameResponse;
 import se.sundsvall.notifier.integration.db.repository.EmployeeRepository;
+import se.sundsvall.notifier.service.mapper.GroupEmployeeOrganizationMapper;
 
 @Service
 public class EmployeeService {
 
 	private final EmployeeRepository employeeRepository;
-	private final EmployeeMapper employeeMapper;
+	private final GroupEmployeeOrganizationMapper mapper;
 
-	public EmployeeService(EmployeeRepository employeeRepository, EmployeeMapper employeeMapper) {
+	public EmployeeService(EmployeeRepository employeeRepository, GroupEmployeeOrganizationMapper mapper) {
 		this.employeeRepository = employeeRepository;
-		this.employeeMapper = employeeMapper;
+		this.mapper = mapper;
 	}
 
 	public List<EmployeeWithOrgNameResponse> getEmployeesByOrg(String orgId) {
 		return employeeRepository.findByOrgId(orgId)
-			.stream().map(employeeMapper::toResponseWithOrgName).toList();
+			.stream().map(mapper::mapToEmployeeWithOrgNameResponse).toList();
 	}
 
 	public List<EmployeeWithOrgNameResponse> getEmployeesByOrgList(List<String> orgId) {
@@ -35,11 +35,11 @@ public class EmployeeService {
 			throw Problem.valueOf(Status.NOT_FOUND);
 		}
 
-		return employees.stream().map(employeeMapper::toResponseWithOrgName).toList();
+		return employees.stream().map(mapper::mapToEmployeeWithOrgNameResponse).toList();
 	}
 
 	public List<EmployeeWithOrgNameResponse> getAllEmployees() {
-		return employeeRepository.findAll().stream().map(employeeMapper::toResponseWithOrgName).toList();
+		return employeeRepository.findAll().stream().map(mapper::mapToEmployeeWithOrgNameResponse).toList();
 	}
 
 }

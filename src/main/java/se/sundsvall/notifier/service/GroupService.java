@@ -12,15 +12,15 @@ import se.sundsvall.notifier.api.model.response.GroupResponse;
 import se.sundsvall.notifier.integration.db.entity.Group;
 import se.sundsvall.notifier.integration.db.repository.EmployeeRepository;
 import se.sundsvall.notifier.integration.db.repository.GroupRepository;
-import se.sundsvall.notifier.service.mapper.EntityToResponseMapper;
+import se.sundsvall.notifier.service.mapper.GroupEmployeeOrganizationMapper;
 
 @Service
 public class GroupService {
 	private final GroupRepository groupRepository;
 	private final EmployeeRepository employeeRepository;
-	private final EntityToResponseMapper mapper;
+	private final GroupEmployeeOrganizationMapper mapper;
 
-	public GroupService(GroupRepository groupRepo, EmployeeRepository employeeRepository, EntityToResponseMapper mapper) {
+	public GroupService(GroupRepository groupRepo, EmployeeRepository employeeRepository, GroupEmployeeOrganizationMapper mapper) {
 		this.groupRepository = groupRepo;
 		this.employeeRepository = employeeRepository;
 		this.mapper = mapper;
