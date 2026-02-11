@@ -39,9 +39,9 @@ spring:
             client-secret: ${ENV.TEAMS-SENDER-CLIENT-SECRET}
             authorization-grant-type: client_credentials
 
-
 server:
   port: 8082
+
 integration:
   sms-sender:
     base-url: ${ENV.SMS-SENDER-BASE-URL}
