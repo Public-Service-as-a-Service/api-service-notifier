@@ -4,6 +4,7 @@ import lombok.Builder;
 
 @Builder(setterPrefix = "with")
 public record EmployeeResponse(
+	Long id,
 	String personId,
 	String orgId,
 	String firstName,
@@ -11,4 +12,5 @@ public record EmployeeResponse(
 	String email,
 	String workMobile,
 	String workPhone,
-	String workTitle) {}
+	String workTitle) {
+}

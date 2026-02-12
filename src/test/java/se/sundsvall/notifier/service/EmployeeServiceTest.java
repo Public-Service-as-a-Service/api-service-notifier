@@ -11,23 +11,23 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import se.sundsvall.notifier.api.mapper.EmployeeMapper;
 import se.sundsvall.notifier.api.model.response.EmployeeWithOrgNameResponse;
 import se.sundsvall.notifier.integration.db.entity.Employee;
 import se.sundsvall.notifier.integration.db.repository.EmployeeRepository;
+import se.sundsvall.notifier.service.mapper.GroupEmployeeOrganizationMapper;
 
 @ExtendWith(MockitoExtension.class)
 public class EmployeeServiceTest {
 
 	@Mock
-	private EmployeeMapper employeeMapper;
+	private GroupEmployeeOrganizationMapper mapper;
 
 	@Mock
 	private EmployeeRepository employeeRepository;
 
 	@Test
 	void byOrg_test() {
-		var service = new EmployeeService(employeeRepository, employeeMapper);
+		var service = new EmployeeService(employeeRepository, mapper);
 
 		var employee1 = new Employee();
 		var employee2 = new Employee();
@@ -35,8 +35,8 @@ public class EmployeeServiceTest {
 		var response2 = mock(EmployeeWithOrgNameResponse.class);
 
 		when(employeeRepository.findByOrgId("Id")).thenReturn(List.of(employee1, employee2));
-		when(employeeMapper.toResponseWithOrgName(employee1)).thenReturn(response1);
-		when(employeeMapper.toResponseWithOrgName(employee2)).thenReturn(response2);
+		when(mapper.mapToEmployeeWithOrgNameResponse(employee1)).thenReturn(response1);
+		when(mapper.mapToEmployeeWithOrgNameResponse(employee2)).thenReturn(response2);
 
 		var result = service.getEmployeesByOrg("Id");
 
@@ -45,7 +45,7 @@ public class EmployeeServiceTest {
 
 	@Test
 	void byOrgList_test() {
-		var service = new EmployeeService(employeeRepository, employeeMapper);
+		var service = new EmployeeService(employeeRepository, mapper);
 
 		var employee1 = new Employee();
 		var employee2 = new Employee();
@@ -53,8 +53,8 @@ public class EmployeeServiceTest {
 		var response2 = mock(EmployeeWithOrgNameResponse.class);
 
 		when(employeeRepository.findByOrgIdIn(List.of("Id1", "Id2"))).thenReturn(List.of(employee1, employee2));
-		when(employeeMapper.toResponseWithOrgName(employee1)).thenReturn(response1);
-		when(employeeMapper.toResponseWithOrgName(employee2)).thenReturn(response2);
+		when(mapper.mapToEmployeeWithOrgNameResponse(employee1)).thenReturn(response1);
+		when(mapper.mapToEmployeeWithOrgNameResponse(employee2)).thenReturn(response2);
 
 		var result = service.getEmployeesByOrgList(List.of("Id1", "Id2"));
 
@@ -63,7 +63,7 @@ public class EmployeeServiceTest {
 
 	@Test
 	void getAll_test() {
-		var service = new EmployeeService(employeeRepository, employeeMapper);
+		var service = new EmployeeService(employeeRepository, mapper);
 
 		var employee1 = new Employee();
 		var employee2 = new Employee();
@@ -71,8 +71,8 @@ public class EmployeeServiceTest {
 		var response2 = mock(EmployeeWithOrgNameResponse.class);
 
 		when(employeeRepository.findAll()).thenReturn(List.of(employee1, employee2));
-		when(employeeMapper.toResponseWithOrgName(employee1)).thenReturn(response1);
-		when(employeeMapper.toResponseWithOrgName(employee2)).thenReturn(response2);
+		when(mapper.mapToEmployeeWithOrgNameResponse(employee1)).thenReturn(response1);
+		when(mapper.mapToEmployeeWithOrgNameResponse(employee2)).thenReturn(response2);
 
 		var result = service.getAllEmployees();
 
@@ -80,12 +80,13 @@ public class EmployeeServiceTest {
 	}
 
 	@Test
-	void byOrg_null_test() {
-		var service = new EmployeeService(employeeRepository, employeeMapper);
+	void getEmployee_Org_Id_Null_test() {
+		var service = new EmployeeService(employeeRepository, mapper);
 
-		var exception = assertThrows(IllegalArgumentException.class, () -> service.getEmployeesByOrg(null));
+		var exception = assertThrows(IllegalArgumentException.class, () -> service.getEmployeesByOrgList(null));
 
 		assertThat("org id is required").isEqualTo(exception.getMessage());
-		verifyNoInteractions(employeeRepository, employeeMapper);
+		verifyNoInteractions(employeeRepository, mapper);
 	}
+
 }

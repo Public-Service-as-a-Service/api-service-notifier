@@ -78,12 +78,27 @@ class OrganizationResourceTest {
 	}
 
 	@Test
+	void getOrgChildrenAndDescendants_succesful() throws Exception {
+		var response = List.of(
+			new OrganizationResponse("1", "ParentorgId1", "orgId1", "name1", 3),
+			new OrganizationResponse("2", "ParentorgId2", "orgId2", "name2", 4));
+
+		when(service.getOrgChildrenAndDescendantsWithId("orgId1")).thenReturn(response);
+
+		mvc.perform(get("/api/notifier/organization/{orgId}/children/descendants", "orgId1")
+			.accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk());
+
+		verify(service).getOrgChildrenAndDescendantsWithId("orgId1");
+	}
+
+	@Test
 	void getOrgAndChildren_succesful() throws Exception {
 		var response = List.of(
 			new OrganizationResponse("1", "ParentorgId1", "orgId1", "name1", 3),
-			new OrganizationResponse("2", "orgId1", "orgId2", "name2", 4));
+			new OrganizationResponse("2", "ParentorgId2", "orgId2", "name2", 4));
 
-		when(service.getOrgAndChildrenWithId("orgId1")).thenReturn(response);
+		when(service.getOrgChildrenAndDescendantsWithId("orgId1")).thenReturn(response);
 
 		mvc.perform(get("/api/notifier/organization/{orgId}/children", "orgId1")
 			.accept(MediaType.APPLICATION_JSON))

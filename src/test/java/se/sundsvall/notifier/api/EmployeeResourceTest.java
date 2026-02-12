@@ -29,8 +29,8 @@ public class EmployeeResourceTest {
 	@Test
 	void getEmployee_succesful_test() throws Exception {
 		var response = List.of(
-			new EmployeeWithOrgNameResponse("personId1", "orgId1", "firstName1", "lastName1", "email1", "workMobile1", "workPhone1", "workTitle1", "avdelning1"),
-			new EmployeeWithOrgNameResponse("personId2", "orgId1", "firstName2", "lastName2", "email2", "workMobile2", "workPhone2", "workTitle2", "avdelning2"));
+			new EmployeeWithOrgNameResponse(1L, "personId1", "orgId1", "firstName1", "lastName1", "email1", "workMobile1", "workPhone1", "workTitle1", "avdelning1"),
+			new EmployeeWithOrgNameResponse(2L, "personId2", "orgId1", "firstName2", "lastName2", "email2", "workMobile2", "workPhone2", "workTitle2", "avdelning2"));
 
 		when(service.getEmployeesByOrg("orgId1")).thenReturn(response);
 
@@ -44,8 +44,8 @@ public class EmployeeResourceTest {
 	@Test
 	void getAll_succesfulTest() throws Exception {
 		var response = List.of(
-			new EmployeeWithOrgNameResponse("personId1", "orgId1", "firstName1", "lastName1", "email1", "workMobile1", "workPhone1", "workTitle1", "avdelning1"),
-			new EmployeeWithOrgNameResponse("personId2", "orgId2", "firstName2", "lastName2", "email2", "workMobile2", "workPhone2", "workTitle2", "avdelning1"));
+			new EmployeeWithOrgNameResponse(1L, "personId1", "orgId1", "firstName1", "lastName1", "email1", "workMobile1", "workPhone1", "workTitle1", "avdelning1"),
+			new EmployeeWithOrgNameResponse(2L, "personId2", "orgId2", "firstName2", "lastName2", "email2", "workMobile2", "workPhone2", "workTitle2", "avdelning1"));
 
 		when(service.getAllEmployees()).thenReturn(response);
 
@@ -60,8 +60,8 @@ public class EmployeeResourceTest {
 	@Test
 	void getWithList_succesful() throws Exception {
 		var response = List.of(
-			new EmployeeWithOrgNameResponse("personId1", "orgId1", "firstName1", "lastName1", "email1", "workMobile1", "workPhone1", "workTitle1", "avdelning1"),
-			new EmployeeWithOrgNameResponse("personId2", "orgId2", "firstName2", "lastName2", "email2", "workMobile2", "workPhone2", "workTitle2", "avdelning2"));
+			new EmployeeWithOrgNameResponse(1L, "personId1", "orgId1", "firstName1", "lastName1", "email1", "workMobile1", "workPhone1", "workTitle1", "avdelning1"),
+			new EmployeeWithOrgNameResponse(2L, "personId2", "orgId2", "firstName2", "lastName2", "email2", "workMobile2", "workPhone2", "workTitle2", "avdelning2"));
 
 		when(service.getEmployeesByOrgList(List.of("orgId1", "orgId2"))).thenReturn(response);
 

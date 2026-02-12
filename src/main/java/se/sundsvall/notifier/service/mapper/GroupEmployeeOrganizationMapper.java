@@ -5,13 +5,16 @@ import java.util.Set;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 import se.sundsvall.notifier.api.model.response.EmployeeResponse;
+import se.sundsvall.notifier.api.model.response.EmployeeWithOrgNameResponse;
 import se.sundsvall.notifier.api.model.response.GroupResponse;
+import se.sundsvall.notifier.api.model.response.OrganizationResponse;
 import se.sundsvall.notifier.integration.db.entity.Employee;
 import se.sundsvall.notifier.integration.db.entity.Group;
+import se.sundsvall.notifier.integration.db.entity.Organization;
 
 @Component
 @NoArgsConstructor
-public class EntityToResponseMapper {
+public class GroupEmployeeOrganizationMapper {
 
 	public GroupResponse mapToGroupResponse(Group group) {
 		Set<Employee> employees = group.getEmployees();
@@ -34,6 +37,7 @@ public class EntityToResponseMapper {
 
 	public EmployeeResponse mapToEmployeeResponse(Employee employee) {
 		return EmployeeResponse.builder()
+			.withId(employee.getId())
 			.withPersonId(employee.getPersonId())
 			.withOrgId(employee.getOrgId())
 			.withFirstName(employee.getFirstName())
@@ -42,6 +46,32 @@ public class EntityToResponseMapper {
 			.withWorkMobile(employee.getWorkMobile())
 			.withWorkPhone(employee.getWorkPhone())
 			.withWorkTitle(employee.getWorkTitle())
+			.build();
+	}
+
+	public EmployeeWithOrgNameResponse mapToEmployeeWithOrgNameResponse(Employee employee) {
+		var orgName = employee.getOrganization().getName();
+		return EmployeeWithOrgNameResponse.builder()
+			.withId(employee.getId())
+			.withPersonId(employee.getPersonId())
+			.withOrgId(employee.getOrgId())
+			.withFirstName(employee.getFirstName())
+			.withLastName(employee.getLastName())
+			.withEmail(employee.getEmail())
+			.withWorkPhone(employee.getWorkPhone())
+			.withWorkMobile(employee.getWorkMobile())
+			.withWorkTitle(employee.getWorkTitle())
+			.withOrgName(orgName)
+			.build();
+	}
+
+	public OrganizationResponse mapToOrganizationResponse(Organization organization) {
+		return OrganizationResponse.builder()
+			.withCompanyId(organization.getCompanyId())
+			.withParentOrgId(organization.getParentOrgId())
+			.withOrgId(organization.getOrgId())
+			.withName(organization.getName())
+			.withTreeLevel(organization.getTreeLevel())
 			.build();
 	}
 }
