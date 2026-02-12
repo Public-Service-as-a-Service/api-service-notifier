@@ -1,9 +1,9 @@
 package se.sundsvall.notifier.service;
 
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.zalando.problem.Problem;
-import org.zalando.problem.Status;
 import se.sundsvall.notifier.api.model.response.EmployeeWithOrgNameResponse;
 import se.sundsvall.notifier.integration.db.repository.EmployeeRepository;
 import se.sundsvall.notifier.service.mapper.GroupEmployeeOrganizationMapper;
@@ -20,8 +20,7 @@ public class EmployeeService {
 	}
 
 	public List<EmployeeWithOrgNameResponse> getEmployeesByOrg(String orgId) {
-		return employeeRepository.findByOrgId(orgId)
-			.stream().map(mapper::mapToEmployeeWithOrgNameResponse).toList();
+		return employeeRepository.findByOrgId(orgId).stream().map(mapper::mapToEmployeeWithOrgNameResponse).toList();
 	}
 
 	public List<EmployeeWithOrgNameResponse> getEmployeesByOrgList(List<String> orgId) {
@@ -29,17 +28,15 @@ public class EmployeeService {
 			throw new IllegalArgumentException("org id is required");
 		}
 
-		var employees = employeeRepository.findByOrgIdIn(orgId);
-
-		if (employees.isEmpty()) {
-			throw Problem.valueOf(Status.NOT_FOUND);
-		}
-
-		return employees.stream().map(mapper::mapToEmployeeWithOrgNameResponse).toList();
+		return employeeRepository.findByOrgIdIn(orgId).stream().map(mapper::mapToEmployeeWithOrgNameResponse).toList();
 	}
 
 	public List<EmployeeWithOrgNameResponse> getAllEmployees() {
 		return employeeRepository.findAll().stream().map(mapper::mapToEmployeeWithOrgNameResponse).toList();
+	}
+
+	public Page<EmployeeWithOrgNameResponse> getEmployeesWithSearch(String search, Pageable page) {
+		return employeeRepository.findByFirstNameStartingWithOrLastNameStartingWith(search.toLowerCase(), search.toLowerCase(), page).map(mapper::mapToEmployeeWithOrgNameResponse);
 	}
 
 }

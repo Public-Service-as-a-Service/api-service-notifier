@@ -10,6 +10,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -70,5 +74,22 @@ public class EmployeeResourceTest {
 			.andExpect(jsonPath("$.length()").value(2));
 
 		verify(service).getEmployeesByOrgList(List.of("orgId1", "orgId2"));
+	}
+
+	@Test
+	void GetEmployeesWithPartialSearch_test() throws Exception {
+		var request = PageRequest.of(0, 2);
+		Page<EmployeeWithOrgNameResponse> result = new PageImpl<>(List.of(), request, 0);
+
+		when(service.getEmployeesWithSearch(eq("searchterm"), any(Pageable.class))).thenReturn(result);
+
+		mvc.perform(get("/api/notifier/employee/employees/search")
+			.param("search", "searchterm")
+			.param("page", String.valueOf(request.getPageNumber()))
+			.param("size", String.valueOf(request.getPageSize())))
+			.andExpect(status().isOk());
+
+		verify(service).getEmployeesWithSearch("searchterm", Pageable.ofSize(2));
+
 	}
 }
