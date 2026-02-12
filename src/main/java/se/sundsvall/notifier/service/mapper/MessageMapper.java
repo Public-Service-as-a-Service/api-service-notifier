@@ -57,10 +57,9 @@ public class MessageMapper {
 			.build();
 	}
 
-	public SmsDto toSendSmsDto(String sender, String content, String mobileNumber) {
+	public SmsDto toSendSmsDto(String content, String mobileNumber) {
 
 		return SmsDto.builder()
-			.withSender(sender)
 			.withMessage(content)
 			.withMobileNumber(mobileNumber)
 			.withPriority(Priority.HIGH)

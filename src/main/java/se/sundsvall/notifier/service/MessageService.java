@@ -64,7 +64,7 @@ public class MessageService {
 			String phoneNumber = cleanPhoneNumber(employee.getWorkMobile());
 
 			if (messageRequest.sendSms() && phoneNumber != null) {
-				var smsDto = messageMapper.toSendSmsDto(messageRequest.sender(), messageRequest.content(), phoneNumber);
+				var smsDto = messageMapper.toSendSmsDto(messageRequest.content(), phoneNumber);
 				smsStatus = smsSenderIntegration.sendSms("2281", smsDto);
 			}
 			// skapar embedded id för recipient
