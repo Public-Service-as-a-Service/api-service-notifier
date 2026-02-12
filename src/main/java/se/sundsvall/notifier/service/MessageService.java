@@ -2,8 +2,8 @@ package se.sundsvall.notifier.service;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import se.sundsvall.notifier.api.model.request.MessageRequest;
-import se.sundsvall.notifier.api.model.request.Priority;
 import se.sundsvall.notifier.api.model.response.MessageResponse;
 import se.sundsvall.notifier.integration.db.entity.Employee;
 import se.sundsvall.notifier.integration.db.entity.MessageRecipient;
@@ -11,7 +11,6 @@ import se.sundsvall.notifier.integration.db.entity.MessageRecipientId;
 import se.sundsvall.notifier.integration.db.repository.EmployeeRepository;
 import se.sundsvall.notifier.integration.db.repository.MessageRepository;
 import se.sundsvall.notifier.integration.smssender.MessageStatus;
-import se.sundsvall.notifier.integration.smssender.SmsDto;
 import se.sundsvall.notifier.integration.smssender.SmsSenderIntegration;
 import se.sundsvall.notifier.integration.teamssender.TeamsSenderDTO;
 import se.sundsvall.notifier.integration.teamssender.TeamsSenderIntegration;
@@ -37,6 +36,7 @@ public class MessageService {
 		this.teamsSenderIntegration = teamsSenderIntegration;
 	}
 
+	@Transactional
 	public void createMessage(MessageRequest messageRequest) {
 		MessageStatus smsStatus = MessageStatus.NOT_SENT;
 		Boolean teamsStatus = false;
@@ -45,37 +45,28 @@ public class MessageService {
 		if (messageRequest.groupId() != null) {
 
 		}
-
 		// sparar meddelandes så att embeddedId kan skapas
 		var savedMessage = messageRepository.save(messageMapper.toEntity(messageRequest));
 
 		var employees = employeeRepository.findAllById(messageRequest.recipientEmployeeIds());
-		if (employees.size() != messageRequest.recipientEmployeeIds().size()) {
-			System.out.println("Could not find all recipients");
-		}
+
 		for (Employee employee : employees) {
 
 			// Skickar Teams meddelande
-			if (messageRequest.sendTeams() && employee.getEmail() != null) {
+			if (messageRequest.sendToTeams() && employee.getEmail() != null) {
 				TeamsSenderDTO teamsDto = TeamsSenderDTO.builder()
 					.withMessage(messageRequest.content())
 					.withRecipient(null)
 					.build();
-
 				teamsStatus = teamsSenderIntegration.sendTeamsMessage("2281", teamsDto);
 			}
-
 			// Skickar sms meddelande
-			if (messageRequest.sendSms() && employee.getWorkMobile() != null) {
-				SmsDto sms = SmsDto.builder()
-					.withSender(messageRequest.sender())
-					.withMessage(savedMessage.getContent())
-					.withMobileNumber(employee.getWorkMobile())
-					.withPriority(Priority.HIGH)
-					.build();
-				smsStatus = smsSenderIntegration.sendSms("2281", sms);
-			}
+			String phoneNumber = cleanPhoneNumber(employee.getWorkMobile());
 
+			if (messageRequest.sendSms() && phoneNumber != null) {
+				var smsDto = messageMapper.toSendSmsDto(messageRequest.sender(), messageRequest.content(), phoneNumber);
+				smsStatus = smsSenderIntegration.sendSms("2281", smsDto);
+			}
 			// skapar embedded id för recipient
 			MessageRecipientId recipientId = new MessageRecipientId();
 			recipientId.setMessageId(savedMessage.getId());
@@ -100,5 +91,23 @@ public class MessageService {
 
 	public void deleteMessages(Long id) {
 		messageRepository.deleteById(id);
+	}
+
+	private String cleanPhoneNumber(String phoneNumber) {
+		if (phoneNumber == null || phoneNumber.isBlank()) {
+			return null;
+		}
+		phoneNumber = phoneNumber.replaceAll("[^0-9]", "");
+
+		if (phoneNumber.startsWith("0")) {
+			phoneNumber = "+46" + phoneNumber.substring(1);
+		} else if (phoneNumber.startsWith("46")) {
+			phoneNumber = "+" + phoneNumber;
+		}
+
+		if (phoneNumber.matches("^\\+[1-9][\\d]{3,14}$")) {
+			return phoneNumber;
+		}
+		return null;
 	}
 }

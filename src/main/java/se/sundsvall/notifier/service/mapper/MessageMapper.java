@@ -4,10 +4,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import se.sundsvall.notifier.api.model.request.MessageRequest;
-import se.sundsvall.notifier.api.model.response.MessageRecipientDto;
+import se.sundsvall.notifier.api.model.request.Priority;
+import se.sundsvall.notifier.api.model.response.MessageRecipientResponse;
 import se.sundsvall.notifier.api.model.response.MessageResponse;
 import se.sundsvall.notifier.integration.db.entity.Message;
 import se.sundsvall.notifier.integration.db.entity.MessageRecipient;
+import se.sundsvall.notifier.integration.smssender.SmsDto;
 
 @Component
 public class MessageMapper {
@@ -36,7 +38,7 @@ public class MessageMapper {
 
 	}
 
-	private Set<MessageRecipientDto> toMessageRecipientDtos(Set<MessageRecipient> messageRecipients) {
+	private Set<MessageRecipientResponse> toMessageRecipientDtos(Set<MessageRecipient> messageRecipients) {
 		if (messageRecipients == null || messageRecipients.isEmpty()) {
 			return Set.of();
 		}
@@ -46,12 +48,22 @@ public class MessageMapper {
 
 	}
 
-	private MessageRecipientDto toMessageRecipientDto(MessageRecipient messageRecipient) {
-		return MessageRecipientDto.builder()
+	private MessageRecipientResponse toMessageRecipientDto(MessageRecipient messageRecipient) {
+		return MessageRecipientResponse.builder()
 			.withEmployeeId(messageRecipient.getEmployee().getId())
 			.withWorkTitle(messageRecipient.getWorkTitle())
 			.withOrgId(messageRecipient.getOrgId())
 			.withDeliveryStatus(messageRecipient.getDeliveryStatus().toString())
+			.build();
+	}
+
+	public SmsDto toSendSmsDto(String sender, String content, String mobileNumber) {
+
+		return SmsDto.builder()
+			.withSender(sender)
+			.withMessage(content)
+			.withMobileNumber(mobileNumber)
+			.withPriority(Priority.HIGH)
 			.build();
 	}
 
