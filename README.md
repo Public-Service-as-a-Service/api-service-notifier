@@ -1,12 +1,12 @@
-# TemplateSpringBoot
+# Notifier
 
-_A concise description of what this Spring Boot microservice does._
+_The service provides functionality to send notifications to groups within an organization. Groups can be pre-defined or manually created._
 
 ## Getting Started
 
 ### Prerequisites
 
-- **Java 21 or higher**
+- **Java 25 or higher**
 - **Maven**
 - **MariaDB**(if applicable)
 - **Git**
@@ -48,11 +48,15 @@ _A concise description of what this Spring Boot microservice does._
 
 This microservice depends on the following services:
 
-- **Service Name**
-  - **Purpose:** Brief description of what the dependent service does.
-  - **Repository:** [Link to the repository](https://github.com/Sundsvallskommun/service_name)
+- **Sms Sender**
+  - **Purpose:** To send an sms message to a recipient
+  - **Repository:** [Link to the repository](https://github.com/Sundsvallskommun/api-service-sms-sender)
   - **Setup Instructions:** Refer to its documentation for installation and configuration steps.
 
+- **Teams Sender**
+    - **Purpose:** To send a Teams message to a recipient
+    - **Repository:** [Link to the repository](https://github.com/Sundsvallskommun/api-service-teams-sender)
+    - **Setup Instructions:** Refer to its documentation for installation and configuration steps.
 Ensure that these services are running and properly configured before starting this microservice.
 
 ## API Documentation
@@ -72,7 +76,7 @@ Refer to the [API Documentation](#api-documentation) for detailed information on
 ### Example Request
 
 ```bash
-curl -X GET http://localhost:8080/api/resource
+curl curl -X GET http://localhost:8080/api/notifier/employee/employees/123
 ```
 
 ## Configuration
@@ -100,15 +104,29 @@ Configuration is crucial for the application to run successfully. Ensure all nec
 
   ```yaml
   integration:
-    service:
-      url: http://dependency_service_url
+  sms-sender:
+    base-url: <service-url>
+    sender: <sender>
+  teams-sender:
+    base-url: <service-url>
+    
+    spring:
+    security:
       oauth2:
-        client-id: some-client-id
-        client-secret: some-client-secret
-
-  service:
-    oauth2:
-      token-url: http://dependecy_service_token_url
+        client:
+          provider:
+            sms-sender:
+              token-uri: <token-url>
+            teams-sender:
+              token-uri: <token-url>
+          registration:
+            sms-sender:
+              client-id: <client-id>
+              client-secret: <client-secret>           
+            teams-sender:
+              client-id: <client-id>
+              client-secret: <client-secret>
+            
   ```
 
 ### Database Initialization
@@ -121,8 +139,11 @@ spring:
     enabled: true
 ```
 
-- **No additional setup is required** for database initialization, as long as the database connection settings are correctly configured.
-
+- **Additional setup is required**
+  - **Purpus:** You must populate the database using the accompanying CSV loader. 
+  - **Repository:** [Link to the repository](https://github.com/Public-Service-as-a-Service/cvs-filereader)
+  - **Setup Instructions:** Refer to its documentation for installation and configuration steps.
+      
 ### Additional Notes
 
 - **Application Profiles:**
