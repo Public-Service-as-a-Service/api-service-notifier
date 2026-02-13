@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.zalando.problem.Problem;
@@ -34,12 +36,7 @@ public class EmployeeResource {
 		this.employeeService = employeeService;
 	}
 
-	@Operation(summary = "Get employee data from specific organization", responses = {
-		@ApiResponse(
-			responseCode = "404",
-			description = "Not Found",
-			content = @Content(schema = @Schema(implementation = Problem.class)))
-	})
+	@Operation(summary = "Get employee data from specific organization")
 	@GetMapping("/{orgId}")
 	public ResponseEntity<List<EmployeeWithOrgNameResponse>> getEmployeesByOrgId(@PathVariable String orgId) {
 		return ResponseEntity.ok(employeeService.getEmployeesByOrg(orgId));
@@ -51,14 +48,14 @@ public class EmployeeResource {
 		return ResponseEntity.ok(employeeService.getAllEmployees());
 	}
 
-	@Operation(summary = "Get employee data from multiple organizations", responses = {
-		@ApiResponse(
-			responseCode = "404",
-			description = "Not Found",
-			content = @Content(schema = @Schema(implementation = Problem.class)))
-	})
 	@GetMapping("/ids")
 	public ResponseEntity<List<EmployeeWithOrgNameResponse>> getAllOrganizationsWithList(@RequestParam List<String> orgIds) {
 		return ResponseEntity.ok(employeeService.getEmployeesByOrgList(orgIds));
+	}
+
+	@Operation(summary = "Searches for employees matching search term")
+	@GetMapping("/employees/search")
+	public ResponseEntity<Page<EmployeeWithOrgNameResponse>> getEmployeesPartialSearch(@RequestParam String search, Pageable page) {
+		return ResponseEntity.ok(employeeService.getEmployeesWithSearch(search, page));
 	}
 }

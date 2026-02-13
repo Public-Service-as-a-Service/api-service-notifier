@@ -11,6 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import se.sundsvall.notifier.api.model.response.EmployeeWithOrgNameResponse;
 import se.sundsvall.notifier.integration.db.entity.Employee;
 import se.sundsvall.notifier.integration.db.repository.EmployeeRepository;
@@ -87,6 +91,26 @@ public class EmployeeServiceTest {
 
 		assertThat("org id is required").isEqualTo(exception.getMessage());
 		verifyNoInteractions(employeeRepository, mapper);
+	}
+
+	@Test
+	void getWithPartialSearch_test() {
+		var service = new EmployeeService(employeeRepository, mapper);
+
+		var employee1 = new Employee();
+		var employee2 = new Employee();
+		var response1 = mock(EmployeeWithOrgNameResponse.class);
+		var response2 = mock(EmployeeWithOrgNameResponse.class);
+		Pageable page = PageRequest.of(0, 2);
+		Page<Employee> employeePage = new PageImpl<>(List.of(employee1, employee2), page, 2);
+
+		when(employeeRepository.findByFirstNameStartingWithOrLastNameStartingWith("searchterm", "searchterm", page)).thenReturn(employeePage);
+		when(mapper.mapToEmployeeWithOrgNameResponse(employee1)).thenReturn(response1);
+		when(mapper.mapToEmployeeWithOrgNameResponse(employee2)).thenReturn(response2);
+
+		var result = service.getEmployeesWithSearch("searchterm", page);
+
+		assertThat(result.getContent()).containsExactly(response1, response2);
 	}
 
 }
