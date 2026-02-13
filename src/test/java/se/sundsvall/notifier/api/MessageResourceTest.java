@@ -46,7 +46,7 @@ class MessageResourceTest {
 			.withTitle("title")
 			.withRecipientEmployeeIds(Set.of(1L, 2L, 3L))
 			.withSendSms(true)
-			.withSendTeams(true)
+			.withSendToTeams(true)
 			.build();
 
 		// Act & Assert

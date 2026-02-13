@@ -11,5 +11,5 @@ public record MessageResponse(
 	String content,
 	String sender,
 	LocalDateTime createdAt,
-	Set<MessageRecipientDto> recipients) {
+	Set<MessageRecipientResponse> recipients) {
 }

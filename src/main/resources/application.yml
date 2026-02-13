@@ -45,5 +45,6 @@ server:
 integration:
   sms-sender:
     base-url: ${ENV.SMS-SENDER-BASE-URL}
+    sender: Sundsvall
   teams-sender:
     base-url: ${ENV.TEAMS-SENDER-BASE-URL}

@@ -4,15 +4,21 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.Set;
 import lombok.Builder;
 
 @Builder(setterPrefix = "with")
 public record MessageRequest(
 	@Schema(description = "Titel", example = "Viktigt meddelande") @NotBlank String title,
-	@Schema(description = "innehållet på meddelandet", example = "Ryssen kommer! göm er! ps grattis på födelsedagen Pelle!") @NotBlank String content,
-	@Schema(description = "Avsändarens e-post", example = "test@sundsvall.se") @NotBlank String sender,
+
+	@Schema(description = "Innehållet på meddelandet", example = "Det finns inget kaffe!") @NotBlank @Size(min = 1, max = 160) String content,
+
+	@Schema(description = "Vilken användare som skickat meddelandet", example = "kalle.kula@sundsvall.se") @NotBlank String sender,
+
 	Long groupId,
+
 	@Schema(description = "Lista på mottagare id", example = "[1, 2, 3]") @NotEmpty(message = "recipientEmployeeIds must contain at least one id") Set<Long> recipientEmployeeIds,
-	@NotNull Boolean sendSms,
-	@NotNull Boolean sendTeams) {}
+
+	@Schema(example = "true") @NotNull Boolean sendSms,
+	@Schema(example = "false") @NotNull Boolean sendToTeams) {}
