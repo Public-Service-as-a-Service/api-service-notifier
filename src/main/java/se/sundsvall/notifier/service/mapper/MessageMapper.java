@@ -1,15 +1,16 @@
 package se.sundsvall.notifier.service.mapper;
 
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import se.sundsvall.notifier.api.model.request.MessageRequest;
 import se.sundsvall.notifier.api.model.request.Priority;
 import se.sundsvall.notifier.api.model.response.MessageRecipientResponse;
 import se.sundsvall.notifier.api.model.response.MessageResponse;
+import se.sundsvall.notifier.integration.db.entity.Employee;
 import se.sundsvall.notifier.integration.db.entity.Message;
 import se.sundsvall.notifier.integration.db.entity.MessageRecipient;
 import se.sundsvall.notifier.integration.smssender.SmsDto;
+import se.sundsvall.notifier.integration.teamssender.TeamsSenderDTO;
 
 @Component
 public class MessageMapper {
@@ -26,6 +27,13 @@ public class MessageMapper {
 		if (message == null) {
 			return null;
 		}
+		var recipients = message.getRecipients().stream()
+			.map(recipient -> MessageRecipientResponse.builder()
+				.withEmployeeId(recipient.getEmployee().getId())
+				.withWorkTitle(recipient.getWorkTitle())
+				.withOrgId(recipient.getOrgId())
+				.withDeliveryStatus(recipient.getDeliveryStatus().toString())
+				.build()).collect(Collectors.toSet());
 
 		return MessageResponse.builder()
 			.withId(message.getId())
@@ -33,28 +41,9 @@ public class MessageMapper {
 			.withContent(message.getContent())
 			.withSender(message.getSender())
 			.withCreatedAt(message.getCreatedAt())
-			.withRecipients(toMessageRecipientDtos(message.getRecipients()))
+			.withRecipients(recipients)
 			.build();
 
-	}
-
-	private Set<MessageRecipientResponse> toMessageRecipientDtos(Set<MessageRecipient> messageRecipients) {
-		if (messageRecipients == null || messageRecipients.isEmpty()) {
-			return Set.of();
-		}
-		return messageRecipients.stream()
-			.map(this::toMessageRecipientDto)
-			.collect(Collectors.toSet());
-
-	}
-
-	private MessageRecipientResponse toMessageRecipientDto(MessageRecipient messageRecipient) {
-		return MessageRecipientResponse.builder()
-			.withEmployeeId(messageRecipient.getEmployee().getId())
-			.withWorkTitle(messageRecipient.getWorkTitle())
-			.withOrgId(messageRecipient.getOrgId())
-			.withDeliveryStatus(messageRecipient.getDeliveryStatus().toString())
-			.build();
 	}
 
 	public SmsDto toSendSmsDto(String content, String mobileNumber) {
@@ -63,6 +52,20 @@ public class MessageMapper {
 			.withMessage(content)
 			.withMobileNumber(mobileNumber)
 			.withPriority(Priority.HIGH)
+			.build();
+	}
+
+	public TeamsSenderDTO toSendTeamsDto(String messageContent, String email) {
+		return TeamsSenderDTO.builder()
+			.withMessage(messageContent)
+			.withRecipient(email)
+			.build();
+	}
+
+	public MessageRecipient toMessageRecipient(Employee employee, MessageRecipient.DeliveryStatus deliveryStatus) {
+		return MessageRecipient.builder()
+			.withEmployee(employee)
+			.withDeliveryStatus(deliveryStatus)
 			.build();
 	}
 
