@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDateTime;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import se.sundsvall.notifier.api.model.response.EmployeeManagerResponse;
 import se.sundsvall.notifier.api.model.response.EmployeeResponse;
 import se.sundsvall.notifier.api.model.response.EmployeeWithOrgNameResponse;
 import se.sundsvall.notifier.api.model.response.OrganizationResponse;
@@ -12,9 +13,9 @@ import se.sundsvall.notifier.integration.db.entity.Employee;
 import se.sundsvall.notifier.integration.db.entity.Group;
 import se.sundsvall.notifier.integration.db.entity.Organization;
 
-public class GroupEmployeeOrganizationMapperTest {
+public class EntityToResponseMapperTest {
 
-	private final GroupEmployeeOrganizationMapper mapper = new GroupEmployeeOrganizationMapper();
+	private final EntityToResponseMapper mapper = new EntityToResponseMapper();
 
 	@Test
 	void mapToEmployeeResponse() {
@@ -137,5 +138,33 @@ public class GroupEmployeeOrganizationMapperTest {
 		assertThat(response.orgId()).isEqualTo("org-1");
 		assertThat(response.name()).isEqualTo("IT-avdelningen");
 		assertThat(response.treeLevel()).isEqualTo(3);
+	}
+
+	@Test
+	void mapToEmployeeManagerResponse() {
+		var emp = new Employee();
+		emp.setId(123L);
+		emp.setPersonId("p1");
+		emp.setOrgId("org1");
+		emp.setFirstName("firstTest");
+		emp.setLastName("lastTest");
+		emp.setEmail("test@test.se");
+		emp.setWorkMobile("0701234567");
+		emp.setWorkPhone("0601234567");
+		emp.setWorkTitle("testPerson");
+		emp.setManagerCode("managerCode");
+
+		EmployeeManagerResponse response = mapper.mapToEmployeeManagerResponse(emp);
+
+		assertThat(response.managerCode()).isEqualTo("managerCode");
+		assertThat(response.id()).isEqualTo(123L);
+		assertThat(response.personId()).isEqualTo("p1");
+		assertThat(response.orgId()).isEqualTo("org1");
+		assertThat(response.firstName()).isEqualTo("firstTest");
+		assertThat(response.lastName()).isEqualTo("lastTest");
+		assertThat(response.email()).isEqualTo("test@test.se");
+		assertThat(response.workMobile()).isEqualTo("0701234567");
+		assertThat(response.workPhone()).isEqualTo("0601234567");
+		assertThat(response.workTitle()).isEqualTo("testPerson");
 	}
 }
