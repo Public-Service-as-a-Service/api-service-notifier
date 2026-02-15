@@ -17,12 +17,12 @@ import org.zalando.problem.ThrowableProblem;
 import se.sundsvall.notifier.api.model.response.OrganizationResponse;
 import se.sundsvall.notifier.integration.db.entity.Organization;
 import se.sundsvall.notifier.integration.db.repository.OrganizationRepository;
-import se.sundsvall.notifier.service.mapper.GroupEmployeeOrganizationMapper;
+import se.sundsvall.notifier.service.mapper.EntityToResponseMapper;
 
 @ExtendWith(MockitoExtension.class)
 public class OrganizationServiceTest {
 	@Mock
-	private GroupEmployeeOrganizationMapper mapper;
+	private EntityToResponseMapper mapper;
 
 	@Mock
 	private OrganizationRepository organizationRepository;
