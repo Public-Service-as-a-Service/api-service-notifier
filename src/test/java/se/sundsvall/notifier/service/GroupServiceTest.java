@@ -20,7 +20,8 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.server.ResponseStatusException;
+import org.zalando.problem.Status;
+import org.zalando.problem.ThrowableProblem;
 import se.sundsvall.notifier.api.model.request.GroupRequest;
 import se.sundsvall.notifier.api.model.request.GroupUpdateRequest;
 import se.sundsvall.notifier.api.model.response.GroupResponse;
@@ -28,13 +29,13 @@ import se.sundsvall.notifier.integration.db.entity.Employee;
 import se.sundsvall.notifier.integration.db.entity.Group;
 import se.sundsvall.notifier.integration.db.repository.EmployeeRepository;
 import se.sundsvall.notifier.integration.db.repository.GroupRepository;
-import se.sundsvall.notifier.service.mapper.GroupEmployeeOrganizationMapper;
+import se.sundsvall.notifier.service.mapper.EntityToResponseMapper;
 
 @ExtendWith(MockitoExtension.class)
 public class GroupServiceTest {
 
 	@Mock
-	private GroupEmployeeOrganizationMapper mapper;
+	private EntityToResponseMapper mapper;
 
 	@Mock
 	private GroupRepository groupRepositoryMock;
@@ -156,9 +157,12 @@ public class GroupServiceTest {
 		when(groupRepositoryMock.findById(groupId)).thenReturn(Optional.empty());
 
 		assertThatThrownBy(() -> groupService.getGroupById(groupId))
-			.isInstanceOf(ResponseStatusException.class)
-			.hasMessageContaining("404 NOT_FOUND")
-			.hasMessageContaining("Group not found");
+			.isInstanceOf(ThrowableProblem.class)
+			.satisfies(ex -> {
+				var p = (ThrowableProblem) ex;
+				assertThat(p.getStatus()).isEqualTo(Status.NOT_FOUND);
+				assertThat(p.getDetail()).isEqualTo("Group with id '1' not found");
+			});
 
 		verify(groupRepositoryMock).findById(groupId);
 		verifyNoInteractions(employeeRepositoryMock, mapper);
@@ -213,9 +217,12 @@ public class GroupServiceTest {
 		when(groupRepositoryMock.findById(groupId)).thenReturn(Optional.empty());
 
 		assertThatThrownBy(() -> groupService.updateGroup(groupId, request))
-			.isInstanceOf(ResponseStatusException.class)
-			.hasMessageContaining("404 NOT_FOUND")
-			.hasMessageContaining("Group not found");
+			.isInstanceOf(ThrowableProblem.class)
+			.satisfies(ex -> {
+				var problem = (ThrowableProblem) ex;
+				assertThat(problem.getStatus()).isEqualTo(Status.NOT_FOUND);
+				assertThat(problem.getDetail()).isEqualTo("Group with id '1' not found");
+			});
 
 		verify(groupRepositoryMock).findById(groupId);
 		verifyNoInteractions(employeeRepositoryMock, mapper);
@@ -300,9 +307,12 @@ public class GroupServiceTest {
 		when(groupRepositoryMock.findById(groupId)).thenReturn(Optional.empty());
 
 		assertThatThrownBy(() -> groupService.deleteGroup(groupId))
-			.isInstanceOf(ResponseStatusException.class)
-			.hasMessageContaining("404 NOT_FOUND")
-			.hasMessageContaining("Group not found");
+			.isInstanceOf(ThrowableProblem.class)
+			.satisfies(ex -> {
+				var p = (ThrowableProblem) ex;
+				assertThat(p.getStatus()).isEqualTo(Status.NOT_FOUND);
+				assertThat(p.getDetail()).isEqualTo("Group with id '1' not found");
+			});
 
 		verify(groupRepositoryMock).findById(groupId);
 		verifyNoInteractions(employeeRepositoryMock, mapper);

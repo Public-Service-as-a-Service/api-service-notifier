@@ -18,4 +18,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 	List<Employee> findByOrgIdIn(List<String> orgId);
 
 	Page<Employee> findByFirstNameStartingWithOrLastNameStartingWith(String firstName, String lastName, Pageable page);
+
+	List<Employee> findAllByManagerCodeIsNotNull();
 }

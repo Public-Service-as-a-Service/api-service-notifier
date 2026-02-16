@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
+import se.sundsvall.notifier.api.model.response.EmployeeManagerResponse;
 import se.sundsvall.notifier.api.model.response.EmployeeResponse;
 import se.sundsvall.notifier.api.model.response.EmployeeWithOrgNameResponse;
 import se.sundsvall.notifier.api.model.response.GroupResponse;
@@ -14,7 +15,7 @@ import se.sundsvall.notifier.integration.db.entity.Organization;
 
 @Component
 @NoArgsConstructor
-public class GroupEmployeeOrganizationMapper {
+public class EntityToResponseMapper {
 
 	public GroupResponse mapToGroupResponse(Group group) {
 		Set<Employee> employees = group.getEmployees();
@@ -46,6 +47,21 @@ public class GroupEmployeeOrganizationMapper {
 			.withWorkMobile(employee.getWorkMobile())
 			.withWorkPhone(employee.getWorkPhone())
 			.withWorkTitle(employee.getWorkTitle())
+			.build();
+	}
+
+	public EmployeeManagerResponse mapToEmployeeManagerResponse(Employee employee) {
+		return EmployeeManagerResponse.builder()
+			.withId(employee.getId())
+			.withPersonId(employee.getPersonId())
+			.withOrgId(employee.getOrgId())
+			.withFirstName(employee.getFirstName())
+			.withLastName(employee.getLastName())
+			.withEmail(employee.getEmail())
+			.withWorkMobile(employee.getWorkMobile())
+			.withWorkPhone(employee.getWorkPhone())
+			.withWorkTitle(employee.getWorkTitle())
+			.withManagerCode(employee.getManagerCode())
 			.build();
 	}
 

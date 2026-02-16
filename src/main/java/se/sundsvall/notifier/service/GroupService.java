@@ -2,25 +2,25 @@ package se.sundsvall.notifier.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
+import org.zalando.problem.Problem;
+import org.zalando.problem.Status;
 import se.sundsvall.notifier.api.model.request.GroupRequest;
 import se.sundsvall.notifier.api.model.request.GroupUpdateRequest;
 import se.sundsvall.notifier.api.model.response.GroupResponse;
 import se.sundsvall.notifier.integration.db.entity.Group;
 import se.sundsvall.notifier.integration.db.repository.EmployeeRepository;
 import se.sundsvall.notifier.integration.db.repository.GroupRepository;
-import se.sundsvall.notifier.service.mapper.GroupEmployeeOrganizationMapper;
+import se.sundsvall.notifier.service.mapper.EntityToResponseMapper;
 
 @Service
 public class GroupService {
 	private final GroupRepository groupRepository;
 	private final EmployeeRepository employeeRepository;
-	private final GroupEmployeeOrganizationMapper mapper;
+	private final EntityToResponseMapper mapper;
 
-	public GroupService(GroupRepository groupRepo, EmployeeRepository employeeRepository, GroupEmployeeOrganizationMapper mapper) {
+	public GroupService(GroupRepository groupRepo, EmployeeRepository employeeRepository, EntityToResponseMapper mapper) {
 		this.groupRepository = groupRepo;
 		this.employeeRepository = employeeRepository;
 		this.mapper = mapper;
@@ -46,7 +46,7 @@ public class GroupService {
 	}
 
 	public GroupResponse getGroupById(Long id) {
-		var group = groupRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found"));
+		var group = groupRepository.findById(id).orElseThrow(() -> Problem.valueOf(Status.NOT_FOUND, "Group with id '%s' not found".formatted(id)));
 
 		return mapper.mapToGroupResponse(group);
 	}
@@ -66,7 +66,7 @@ public class GroupService {
 	@Transactional
 	public GroupResponse updateGroup(Long id, GroupUpdateRequest request) {
 		var existingGroup = groupRepository.findById(id)
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found"));
+			.orElseThrow(() -> Problem.valueOf(Status.NOT_FOUND, "Group with id '%s' not found".formatted(id)));
 
 		existingGroup.setName(request.name());
 		existingGroup.setDescription(request.description());
@@ -77,7 +77,7 @@ public class GroupService {
 	}
 
 	public void deleteGroup(Long id) {
-		var group = groupRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found"));
+		var group = groupRepository.findById(id).orElseThrow(() -> Problem.valueOf(Status.NOT_FOUND, "Group with id '%s' not found".formatted(id)));
 
 		groupRepository.deleteById(group.getId());
 	}
