@@ -1,12 +1,9 @@
 package se.sundsvall.notifier.service;
 
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.zalando.problem.Problem;
 import org.zalando.problem.Status;
@@ -67,16 +64,6 @@ public class OrganizationService {
 
 		if (result.isEmpty()) {
 			throw Problem.valueOf(Status.NOT_FOUND, "No organization with id '%s' could be found".formatted(orgId));
-		}
-
-		return result;
-	}
-
-	public List<OrganizationResponse> getChildrenWithId(String orgId) {
-		var result = organizationRepository.findChildren(orgId).stream().map(mapper::mapToOrganizationResponse).toList();
-
-		if (result.isEmpty()) {
-			throw Problem.valueOf(Status.NOT_FOUND, "No children for organization with id '%s' could be found".formatted(orgId));
 		}
 
 		return result;
