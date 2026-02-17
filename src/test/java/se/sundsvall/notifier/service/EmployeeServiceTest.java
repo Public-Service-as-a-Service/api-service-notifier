@@ -105,7 +105,7 @@ public class EmployeeServiceTest {
 		Pageable page = PageRequest.of(0, 2);
 		Page<Employee> employeePage = new PageImpl<>(List.of(employee1, employee2), page, 2);
 
-		when(employeeRepository.findByFirstNameStartingWithOrLastNameStartingWith("searchterm", "searchterm", page)).thenReturn(employeePage);
+		when(employeeRepository.findByFirstNameStartingWithOrLastNameStartingWithOrWorkTitleStartingWith("searchterm", "searchterm", "searchterm", page)).thenReturn(employeePage);
 		when(mapper.mapToEmployeeWithOrgNameResponse(employee1)).thenReturn(response1);
 		when(mapper.mapToEmployeeWithOrgNameResponse(employee2)).thenReturn(response2);
 

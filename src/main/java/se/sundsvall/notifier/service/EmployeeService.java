@@ -37,7 +37,7 @@ public class EmployeeService {
 	}
 
 	public Page<EmployeeWithOrgNameResponse> getEmployeesWithSearch(String search, Pageable page) {
-		return employeeRepository.findByFirstNameStartingWithOrLastNameStartingWith(search.toLowerCase(), search.toLowerCase(), page).map(mapper::mapToEmployeeWithOrgNameResponse);
+		return employeeRepository.findByFirstNameStartingWithOrLastNameStartingWithOrWorkTitleStartingWith(search.toLowerCase(), search.toLowerCase(), search.toLowerCase(), page).map(mapper::mapToEmployeeWithOrgNameResponse);
 	}
 
 	public List<EmployeeManagerResponse> getAllEmployeeManagers() {
