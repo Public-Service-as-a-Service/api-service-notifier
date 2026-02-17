@@ -87,7 +87,7 @@ public class OrganizationResource {
 	})
 	@GetMapping("/{orgId}/children")
 	public ResponseEntity<List<OrganizationResponse>> getOrganizationAndChildren(@PathVariable String orgId) {
-		return ResponseEntity.ok(organizationService.getOrgAndChildrenWithId(orgId));
+		return ResponseEntity.ok(organizationService.getChildrenReplaceDuplicateDescendantsWithRoot(orgId));
 	}
 
 }
