@@ -3,6 +3,7 @@ package se.sundsvall.notifier.api.model.response;
 import java.time.LocalDateTime;
 import java.util.Set;
 import lombok.Builder;
+import se.sundsvall.notifier.api.model.request.MessageType;
 
 @Builder(setterPrefix = "with")
 public record MessageResponse(
@@ -10,6 +11,7 @@ public record MessageResponse(
 	String title,
 	String content,
 	String sender,
+	MessageType messageType,
 	LocalDateTime createdAt,
-	Set<MessageRecipientDto> recipients) {
+	Set<MessageRecipientResponse> recipients) {
 }

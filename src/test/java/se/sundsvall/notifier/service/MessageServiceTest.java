@@ -11,33 +11,43 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import se.sundsvall.notifier.api.model.request.MessageRequest;
+import se.sundsvall.notifier.api.model.request.MessageType;
 import se.sundsvall.notifier.api.model.response.MessageResponse;
 import se.sundsvall.notifier.integration.db.entity.Employee;
 import se.sundsvall.notifier.integration.db.entity.Message;
+import se.sundsvall.notifier.integration.db.entity.MessageRecipient;
 import se.sundsvall.notifier.integration.db.repository.EmployeeRepository;
 import se.sundsvall.notifier.integration.db.repository.MessageRepository;
+import se.sundsvall.notifier.integration.smssender.MessageStatus;
 import se.sundsvall.notifier.integration.smssender.SmsSenderIntegration;
+import se.sundsvall.notifier.integration.teamssender.TeamsSenderIntegration;
 import se.sundsvall.notifier.service.mapper.MessageMapper;
+import se.sundsvall.notifier.service.utility.PhoneNumberUtil;
 
 @ExtendWith(MockitoExtension.class)
 class MessageServiceTest {
 
 	@Mock
+	private TeamsSenderIntegration teamsSenderIntegration;
+
+	@Mock
+	private SmsSenderIntegration smsSenderIntegration;
+	@Mock
+	private PhoneNumberUtil phoneNumberUtil;
+	@Mock
 	private MessageRepository messageRepository;
+
 	@Mock
 	private EmployeeRepository employeeRepository;
 
 	@Mock
 	private MessageMapper messageMapper;
 
-	@Mock
-	private SmsSenderIntegration smsSender;
-
 	@InjectMocks
 	private MessageService messageService;
 
 	@Test
-	void postMessagesTest() {
+	void createMessagesTest() {
 		var recipients = Set.of(1L, 2L);
 		var messageRequest = new MessageRequest(
 			"title",
@@ -45,8 +55,8 @@ class MessageServiceTest {
 			"sender",
 			null,
 			recipients,
-			true,
-			true);
+			MessageType.TEAMS_AND_SMS);
+		MessageRecipient recipient = new MessageRecipient();
 
 		var message = Message.builder().withId(1L).build();
 
@@ -60,7 +70,7 @@ class MessageServiceTest {
 		when(messageMapper.toEntity(messageRequest)).thenReturn(message);
 		when(messageRepository.save(any(Message.class))).thenReturn(message);
 		when(employeeRepository.findAllById(recipients)).thenReturn(employees);
-
+		when(messageMapper.toMessageRecipient(any(), any())).thenReturn(recipient);
 		messageService.createMessage(messageRequest);
 
 		verify(messageMapper).toEntity(messageRequest);
@@ -89,4 +99,32 @@ class MessageServiceTest {
 		verify(messageRepository).findAllBySender(sender);
 		verify(messageMapper, times(2)).entityToMessageResponse(any());
 	}
+
+	@Test
+	void sendMessageTest() {
+		Employee employee = new Employee();
+		employee.setEmail("test@example.com");
+		employee.setWorkMobile("+46701234567");
+
+		var messageRequest = MessageRequest.builder()
+			.withContent("content")
+			.withSender("sender")
+			.withMessageType(MessageType.TEAMS_AND_SMS)
+			.build();
+
+		when(phoneNumberUtil.cleanPhoneNumber(anyString()))
+			.thenReturn("+46701234567");
+		when(teamsSenderIntegration.sendTeamsMessage(anyString(), any()))
+			.thenReturn(true);
+		when(smsSenderIntegration.sendSms(anyString(), any()))
+			.thenReturn(MessageStatus.SENT);
+
+		var result = messageService.sendMessageToEmployee(employee, messageRequest);
+
+		assertThat(result).isEqualTo(MessageRecipient.DeliveryStatus.DELIVERED);
+		verify(smsSenderIntegration).sendSms(anyString(), any());
+		verify(phoneNumberUtil).cleanPhoneNumber(anyString());
+		verify(teamsSenderIntegration).sendTeamsMessage(anyString(), any());
+	}
+
 }
