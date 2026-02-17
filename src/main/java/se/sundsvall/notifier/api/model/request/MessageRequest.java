@@ -19,6 +19,4 @@ public record MessageRequest(
 	Long groupId,
 
 	@Schema(description = "Lista på mottagare id", example = "[1, 2, 3]") @NotEmpty(message = "recipientEmployeeIds must contain at least one id") Set<Long> recipientEmployeeIds,
-
-	@Schema(example = "true") @NotNull Boolean sendSms,
-	@Schema(example = "false") @NotNull Boolean sendToTeams) {}
+	@Schema(description = "Kan var SMS, TEAMS eller TEAMS_AND_SMS", example = "SMS") @NotNull MessageType messageType) {}

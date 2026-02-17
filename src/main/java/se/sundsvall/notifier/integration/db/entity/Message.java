@@ -3,6 +3,8 @@ package se.sundsvall.notifier.integration.db.entity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,6 +23,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import se.sundsvall.notifier.api.model.request.MessageType;
 
 @Getter
 @Setter
@@ -55,6 +58,10 @@ public class Message {
 	@OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default
 	private Set<MessageRecipient> recipients = new HashSet<>();
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "message_type", nullable = false, length = 20)
+	private MessageType messageType;
 
 	@PrePersist
 	public void onCreate() {
@@ -110,6 +117,7 @@ public class Message {
 			", title='" + title + '\'' +
 			", content='" + content + '\'' +
 			", sender=" + (sender != null ? sender : "null") +
+			", MessageType=" + messageType +
 			", createdAt=" + createdAt +
 			'}';
 	}

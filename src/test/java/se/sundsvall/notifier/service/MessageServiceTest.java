@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import se.sundsvall.notifier.api.model.request.MessageRequest;
+import se.sundsvall.notifier.api.model.request.MessageType;
 import se.sundsvall.notifier.api.model.response.MessageResponse;
 import se.sundsvall.notifier.integration.db.entity.Employee;
 import se.sundsvall.notifier.integration.db.entity.Message;
@@ -54,8 +55,7 @@ class MessageServiceTest {
 			"sender",
 			null,
 			recipients,
-			true,
-			true);
+			MessageType.TEAMS_AND_SMS);
 		MessageRecipient recipient = new MessageRecipient();
 
 		var message = Message.builder().withId(1L).build();
@@ -109,8 +109,7 @@ class MessageServiceTest {
 		var messageRequest = MessageRequest.builder()
 			.withContent("content")
 			.withSender("sender")
-			.withSendToTeams(true)
-			.withSendSms(true)
+			.withMessageType(MessageType.TEAMS_AND_SMS)
 			.build();
 
 		when(phoneNumberUtil.cleanPhoneNumber(anyString()))

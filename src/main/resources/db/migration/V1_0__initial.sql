@@ -75,6 +75,7 @@ CREATE TABLE message(
     content TEXT NOT NULL,
     sender VARCHAR(255) NOT NULL,
     group_id BIGINT NULL,
+    message_type VARCHAR(20) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     CONSTRAINT fk_message_group FOREIGN KEY (group_id)
                     REFERENCES user_group(group_id)

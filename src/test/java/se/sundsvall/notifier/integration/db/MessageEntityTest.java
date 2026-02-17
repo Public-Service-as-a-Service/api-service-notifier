@@ -33,7 +33,7 @@ public class MessageEntityTest {
 			hasValidGettersAndSetters(),
 			hasValidBeanEqualsFor("id"),
 			hasValidBeanHashCodeFor("id"),
-			hasValidBeanToStringExcluding("recipients", "group", "sender")));
+			hasValidBeanToStringExcluding("recipients", "group", "sender", "messageType")));
 	}
 
 	@Test

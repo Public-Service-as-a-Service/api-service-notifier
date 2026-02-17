@@ -20,6 +20,7 @@ public class MessageMapper {
 			.withTitle(messageRequest.title())
 			.withContent(messageRequest.content())
 			.withSender(messageRequest.sender())
+			.withMessageType(messageRequest.messageType())
 			.build();
 	}
 
@@ -30,8 +31,11 @@ public class MessageMapper {
 		var recipients = message.getRecipients().stream()
 			.map(recipient -> MessageRecipientResponse.builder()
 				.withEmployeeId(recipient.getEmployee().getId())
+				.withFirstName(recipient.getEmployee().getFirstName())
+				.withLastName(recipient.getEmployee().getLastName())
 				.withWorkTitle(recipient.getWorkTitle())
 				.withOrgId(recipient.getOrgId())
+				.withOrgName(recipient.getEmployee().getOrganization().getName())
 				.withDeliveryStatus(recipient.getDeliveryStatus().toString())
 				.build()).collect(Collectors.toSet());
 
