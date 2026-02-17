@@ -69,16 +69,6 @@ public class OrganizationService {
 		return result;
 	}
 
-	public List<OrganizationResponse> getChildrenWithId(String orgId) {
-		var result = organizationRepository.findChildren(orgId).stream().map(mapper::mapToOrganizationResponse).toList();
-
-		if (result.isEmpty()) {
-			throw Problem.valueOf(Status.NOT_FOUND, "No children for organization with id '%s' could be found".formatted(orgId));
-		}
-
-		return result;
-	}
-
 	public List<OrganizationResponse> getChildrenReplaceDuplicateDescendantsWithRoot(String orgId) {
 		List<Organization> directChildren = organizationRepository.findChildren(orgId);
 
