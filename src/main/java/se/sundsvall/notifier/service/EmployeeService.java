@@ -4,17 +4,18 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import se.sundsvall.notifier.api.model.response.EmployeeManagerResponse;
 import se.sundsvall.notifier.api.model.response.EmployeeWithOrgNameResponse;
 import se.sundsvall.notifier.integration.db.repository.EmployeeRepository;
-import se.sundsvall.notifier.service.mapper.GroupEmployeeOrganizationMapper;
+import se.sundsvall.notifier.service.mapper.EntityToResponseMapper;
 
 @Service
 public class EmployeeService {
 
 	private final EmployeeRepository employeeRepository;
-	private final GroupEmployeeOrganizationMapper mapper;
+	private final EntityToResponseMapper mapper;
 
-	public EmployeeService(EmployeeRepository employeeRepository, GroupEmployeeOrganizationMapper mapper) {
+	public EmployeeService(EmployeeRepository employeeRepository, EntityToResponseMapper mapper) {
 		this.employeeRepository = employeeRepository;
 		this.mapper = mapper;
 	}
@@ -37,6 +38,10 @@ public class EmployeeService {
 
 	public Page<EmployeeWithOrgNameResponse> getEmployeesWithSearch(String search, Pageable page) {
 		return employeeRepository.findByFirstNameStartingWithOrLastNameStartingWith(search.toLowerCase(), search.toLowerCase(), page).map(mapper::mapToEmployeeWithOrgNameResponse);
+	}
+
+	public List<EmployeeManagerResponse> getAllEmployeeManagers() {
+		return employeeRepository.findAllByManagerCodeIsNotNull().stream().map(mapper::mapToEmployeeManagerResponse).toList();
 	}
 
 }

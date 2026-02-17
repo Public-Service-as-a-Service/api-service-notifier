@@ -13,15 +13,15 @@ import org.zalando.problem.Status;
 import se.sundsvall.notifier.api.model.response.OrganizationResponse;
 import se.sundsvall.notifier.integration.db.entity.Organization;
 import se.sundsvall.notifier.integration.db.repository.OrganizationRepository;
-import se.sundsvall.notifier.service.mapper.GroupEmployeeOrganizationMapper;
+import se.sundsvall.notifier.service.mapper.EntityToResponseMapper;
 
 @Service
 public class OrganizationService {
 
-	private final GroupEmployeeOrganizationMapper mapper;
+	private final EntityToResponseMapper mapper;
 	private final OrganizationRepository organizationRepository;
 
-	public OrganizationService(GroupEmployeeOrganizationMapper mapper, OrganizationRepository organizationRepository) {
+	public OrganizationService(EntityToResponseMapper mapper, OrganizationRepository organizationRepository) {
 		this.mapper = mapper;
 		this.organizationRepository = organizationRepository;
 	}

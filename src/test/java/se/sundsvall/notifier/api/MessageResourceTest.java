@@ -22,6 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import se.sundsvall.notifier.api.model.request.MessageRequest;
+import se.sundsvall.notifier.api.model.request.MessageType;
 import se.sundsvall.notifier.api.model.response.MessageResponse;
 import se.sundsvall.notifier.service.MessageService;
 
@@ -45,8 +46,7 @@ class MessageResourceTest {
 			.withSender("sender")
 			.withTitle("title")
 			.withRecipientEmployeeIds(Set.of(1L, 2L, 3L))
-			.withSendSms(true)
-			.withSendTeams(true)
+			.withMessageType(MessageType.SMS)
 			.build();
 
 		// Act & Assert
