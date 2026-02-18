@@ -60,8 +60,8 @@ public class EmployeeResource {
 
 	@Operation(summary = "Searches for employees matching search term")
 	@GetMapping("/employees/search")
-	public ResponseEntity<Page<EmployeeWithOrgNameResponse>> getEmployeesPartialSearch(@RequestParam String search, Pageable page) {
-		return ResponseEntity.ok(employeeService.getEmployeesWithSearch(search, page));
+	public ResponseEntity<Page<EmployeeWithOrgNameResponse>> getEmployeesPartialSearch(@RequestParam String search, Pageable pageable) {
+		return ResponseEntity.ok(employeeService.getEmployeesWithSearch(search, pageable));
 	}
 
 	@Operation(summary = "Get all employees with manager-code")
