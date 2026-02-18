@@ -1,0 +1,31 @@
+package se.sundsvall.notifier.integration.teamssender;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
+
+class TeamsSenderIntegrationMapperTest {
+
+	private final TeamsSenderIntegrationMapper mapper = new TeamsSenderIntegrationMapper();
+
+	@Test
+	void toSendTeamsMessageRequestTest() {
+
+		var dto = TeamsSenderDTO.builder()
+			.withMessage("message")
+			.withRecipient("recipient")
+			.build();
+		var result = mapper.toSendTeamsMessageRequest(dto);
+
+		assertThat(result).isNotNull();
+		assertThat(result.getMessage()).isEqualTo("message");
+		assertThat(result.getRecipient()).isEqualTo("recipient");
+
+	}
+
+	@Test
+	void toSendTeamsMessageRequestIsNullTest() {
+		assertThat(mapper.toSendTeamsMessageRequest(null)).isNull();
+	}
+
+}
