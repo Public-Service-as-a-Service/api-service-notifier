@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -88,6 +90,12 @@ public class OrganizationResource {
 	@GetMapping("/{orgId}/children")
 	public ResponseEntity<List<OrganizationResponse>> getOrganizationAndChildren(@PathVariable String orgId) {
 		return ResponseEntity.ok(organizationService.getChildrenReplaceDuplicateDescendantsWithRoot(orgId));
+	}
+
+	@Operation(summary = "Searches for employees matching search term")
+	@GetMapping("/organizations/search")
+	public ResponseEntity<Page<OrganizationResponse>> getEmployeesPartialSearch(@RequestParam String search, Pageable pageable) {
+		return ResponseEntity.ok(organizationService.getOrganizationWithSearch(search, pageable));
 	}
 
 }
