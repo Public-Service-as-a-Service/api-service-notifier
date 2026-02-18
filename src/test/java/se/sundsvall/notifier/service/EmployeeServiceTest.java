@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import se.sundsvall.notifier.api.model.response.EmployeeManagerResponse;
 import se.sundsvall.notifier.api.model.response.EmployeeWithOrgNameResponse;
 import se.sundsvall.notifier.integration.db.entity.Employee;
@@ -102,10 +103,12 @@ public class EmployeeServiceTest {
 		var employee2 = new Employee();
 		var response1 = mock(EmployeeWithOrgNameResponse.class);
 		var response2 = mock(EmployeeWithOrgNameResponse.class);
-		Pageable page = PageRequest.of(0, 2);
+
+		Pageable page = PageRequest.of(0, 2,
+			Sort.by(Sort.Order.asc("firstName"), Sort.Order.asc("lastName")));
 		Page<Employee> employeePage = new PageImpl<>(List.of(employee1, employee2), page, 2);
 
-		when(employeeRepository.findMatchingEmployee("searchterm", "searchterm", page)).thenReturn(employeePage);
+		when(employeeRepository.findMatchingEmployee("searchterm", null, page)).thenReturn(employeePage);
 		when(mapper.mapToEmployeeWithOrgNameResponse(employee1)).thenReturn(response1);
 		when(mapper.mapToEmployeeWithOrgNameResponse(employee2)).thenReturn(response2);
 
