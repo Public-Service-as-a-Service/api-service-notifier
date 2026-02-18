@@ -36,7 +36,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 					or e.firstName like concat(:s1,'%') and e.workTitle like concat(:s2,'%')
 					or e.workTitle like concat(:s1,'%') and e.firstName like concat(:s2,'%')
 		)""")
-	Page<Employee> findByFirstNameStartingWithOrLastNameStartingWithOrWorkTitleStartingWith(@Param("s1") String searchTerm1, @Param("s2") String searchTerm2, Pageable page);
+	Page<Employee> findMatchingEmployee(@Param("s1") String searchTerm1, @Param("s2") String searchTerm2, Pageable page);
 
 	List<Employee> findAllByManagerCodeIsNotNull();
 }

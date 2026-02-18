@@ -51,7 +51,7 @@ public class EmployeeService {
 				Sort.by("firstName").ascending().and(
 					Sort.by("lastName").ascending()));
 		}
-		return employeeRepository.findByFirstNameStartingWithOrLastNameStartingWithOrWorkTitleStartingWith(searchTerm1, searchTerm2, pageable).map(mapper::mapToEmployeeWithOrgNameResponse);
+		return employeeRepository.findMatchingEmployee(searchTerm1, searchTerm2, pageable).map(mapper::mapToEmployeeWithOrgNameResponse);
 	}
 
 	public List<EmployeeManagerResponse> getAllEmployeeManagers() {
