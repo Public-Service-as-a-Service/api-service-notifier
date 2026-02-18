@@ -11,6 +11,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import se.sundsvall.notifier.Application;
@@ -19,6 +20,7 @@ import se.sundsvall.notifier.api.model.request.GroupUpdateRequest;
 import se.sundsvall.notifier.api.model.response.GroupResponse;
 import se.sundsvall.notifier.service.GroupService;
 
+@ActiveProfiles("junit")
 @SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class GroupResourceTest {
 
@@ -110,12 +112,11 @@ public class GroupResourceTest {
 
 	@Test
 	void createGroup_invalidBody_returns400() {
-		// NotBlank / NotNull ska trigga 400
 		var invalid = GroupRequest.builder()
-			.withName("")                 // NotBlank
-			.withDescription("")          // NotBlank
-			.withCreatorId("")            // NotBlank
-			.withEmployees(null)          // NotNull
+			.withName("")
+			.withDescription("")
+			.withCreatorId("")
+			.withEmployees(null)
 			.build();
 
 		webTestClient.post()
@@ -124,7 +125,6 @@ public class GroupResourceTest {
 			.exchange()
 			.expectStatus().isBadRequest();
 
-		// Viktigt: service ska inte anropas vid valideringsfel
 		verifyNoMoreInteractions(groupService);
 	}
 
@@ -163,9 +163,9 @@ public class GroupResourceTest {
 		var groupId = 1L;
 
 		var invalid = GroupUpdateRequest.builder()
-			.withName("")          // NotBlank
-			.withDescription("")   // NotBlank
-			.withEmployees(null)   // NotNull
+			.withName("")
+			.withDescription("")
+			.withEmployees(null)
 			.build();
 
 		webTestClient.put()
