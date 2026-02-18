@@ -43,4 +43,11 @@ public interface OrganizationRepository extends JpaRepository<Organization, Long
 		WHERE child.parent_org_id = :orgId
 		""", nativeQuery = true)
 	List<Organization> findOrgAndChildren(@Param("orgId") String orgId);
+
+	@Query(value = """
+		SELECT child.*
+		FROM organization child
+		WHERE child.parent_org_id = :orgId
+		""", nativeQuery = true)
+	List<Organization> findChildren(@Param("orgId") String orgId);
 }

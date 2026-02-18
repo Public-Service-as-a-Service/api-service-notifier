@@ -2,7 +2,7 @@ package se.sundsvall.notifier.api.model.response;
 
 import lombok.Builder;
 
-@Builder(setterPrefix = "with")
+@Builder(setterPrefix = "with", toBuilder = true)
 public record OrganizationResponse(
 	String companyId,
 	String parentOrgId,

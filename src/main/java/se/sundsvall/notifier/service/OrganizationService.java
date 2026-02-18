@@ -1,10 +1,14 @@
 package se.sundsvall.notifier.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.zalando.problem.Problem;
 import org.zalando.problem.Status;
 import se.sundsvall.notifier.api.model.response.OrganizationResponse;
+import se.sundsvall.notifier.integration.db.entity.Organization;
 import se.sundsvall.notifier.integration.db.repository.OrganizationRepository;
 import se.sundsvall.notifier.service.mapper.EntityToResponseMapper;
 
@@ -63,5 +67,49 @@ public class OrganizationService {
 		}
 
 		return result;
+	}
+
+	public List<OrganizationResponse> getChildrenReplaceDuplicateDescendantsWithRoot(String orgId) {
+		List<Organization> directChildren = organizationRepository.findChildren(orgId);
+
+		if (directChildren.isEmpty()) {
+			throw Problem.valueOf(Status.NOT_FOUND, "No children for organization with id '%s' could be found".formatted(orgId));
+		}
+
+		List<OrganizationResponse> response = new ArrayList<>();
+
+		for (Organization topChild : directChildren) {
+			Organization bottomDuplicateChild = findBottomDuplicateChild(topChild);
+
+			OrganizationResponse bottomResponse = mapper.mapToOrganizationResponse(bottomDuplicateChild);
+			if (!bottomDuplicateChild.getOrgId().equals(topChild.getOrgId())) {
+				bottomResponse = bottomResponse.toBuilder()
+					.withParentOrgId(orgId)
+					.withTreeLevel(topChild.getTreeLevel())
+					.build();
+			}
+			response.add(bottomResponse);
+		}
+		return response;
+	}
+
+	private Organization findBottomDuplicateChild(Organization first) {
+		Organization current = first;
+
+		while (true) {
+			List<Organization> children = organizationRepository.findChildren(current.getOrgId());
+
+			String currentName = current.getName();
+
+			Optional<Organization> nextDuplicate = children.stream()
+				.filter(child -> Objects.equals(child.getName(), currentName))
+				.findAny();
+
+			if (nextDuplicate.isEmpty()) {
+				return current;
+			}
+
+			current = nextDuplicate.get();
+		}
 	}
 }
