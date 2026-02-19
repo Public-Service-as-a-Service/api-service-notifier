@@ -1,6 +1,8 @@
 package se.sundsvall.notifier.api;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -34,7 +36,7 @@ class OrganizationResourceTest {
 	private OrganizationService service;
 
 	@Test
-	void getOne_succesful_test() throws Exception {
+	void getOne_successful_test() throws Exception {
 		var response = mock(OrganizationResponse.class);
 
 		when(service.getSpecificOrg("id")).thenReturn(response);
@@ -47,7 +49,7 @@ class OrganizationResourceTest {
 	}
 
 	@Test
-	void getAll_succesfulTest() throws Exception {
+	void getAll_successfulTest() throws Exception {
 		var response = List.of(
 			new OrganizationResponse("1", "ParentorgId1", "orgId1", "name1", 3),
 			new OrganizationResponse("2", "ParentorgId2", "orgId2", "name2", 4));
@@ -63,7 +65,7 @@ class OrganizationResourceTest {
 	}
 
 	@Test
-	void getWithList_succesful() throws Exception {
+	void getWithList_successful() throws Exception {
 		var response = List.of(
 			new OrganizationResponse("1", "ParentorgId1", "orgId1", "name1", 3),
 			new OrganizationResponse("2", "ParentorgId2", "orgId2", "name2", 4));
@@ -78,7 +80,7 @@ class OrganizationResourceTest {
 	}
 
 	@Test
-	void getOrgChildrenAndDescendants_succesful() throws Exception {
+	void getOrgChildrenAndDescendants_successful() throws Exception {
 		var response = List.of(
 			new OrganizationResponse("1", "ParentorgId1", "orgId1", "name1", 3),
 			new OrganizationResponse("2", "ParentorgId2", "orgId2", "name2", 4));
@@ -93,7 +95,7 @@ class OrganizationResourceTest {
 	}
 
 	@Test
-	void getOrgAndChildren_succesful() throws Exception {
+	void getOrgAndChildren_successful() throws Exception {
 		var response = List.of(
 			new OrganizationResponse("1", "ParentorgId1", "orgId1", "name1", 3),
 			new OrganizationResponse("2", "ParentorgId2", "orgId2", "name2", 4));

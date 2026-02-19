@@ -103,7 +103,9 @@ public class EmployeeServiceTest {
 		var employee2 = new Employee();
 		var response1 = mock(EmployeeWithOrgNameResponse.class);
 		var response2 = mock(EmployeeWithOrgNameResponse.class);
-		Pageable page = PageRequest.of(0, 2);
+
+		Pageable page = PageRequest.of(0, 2,
+			Sort.by(Sort.Order.asc("firstName"), Sort.Order.asc("lastName")));
 		Pageable sortedPage = PageRequest.of(0, 2, Sort.by("firstName").ascending().and(Sort.by("lastName").ascending()));
 
 		Page<Employee> employeePage = new PageImpl<>(List.of(employee1, employee2), sortedPage, 2);
