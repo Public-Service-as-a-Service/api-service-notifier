@@ -1,0 +1,12 @@
+{
+	"title": "testTitle",
+	"content": "testContent",
+	"sender": "test@sundsvall.se",
+	"recipientEmployeeIds": [
+		1,
+		2,
+		3
+	],
+	"sendSms": false,
+	"sendToTeams": false
+}

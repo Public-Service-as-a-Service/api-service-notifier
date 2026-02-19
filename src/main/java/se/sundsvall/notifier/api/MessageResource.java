@@ -9,18 +9,24 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.zalando.problem.Problem;
 import se.sundsvall.notifier.api.model.request.MessageRequest;
 import se.sundsvall.notifier.api.model.response.MessageResponse;
 import se.sundsvall.notifier.service.MessageService;
 
 @RestController
-@RequestMapping("/api/notifier")
+@RequestMapping("/api/notifier/messages")
 @Tag(name = "Message Resource")
 @ApiResponse(
-	responseCode = "401",
+	responseCode = "400",
 	description = "Bad Request",
 	content = @Content(schema = @Schema(implementation = Problem.class)))
 @ApiResponse(
@@ -36,8 +42,8 @@ public class MessageResource {
 	}
 
 	@Operation(description = "Create a new message")
-	@ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = MessageResponse.class)))
-	@PostMapping("/messages")
+	@ApiResponse(responseCode = "204", description = "No Content")
+	@PostMapping
 	public ResponseEntity<Void> sendMessage(@RequestBody @Valid MessageRequest message) {
 		messageService.createMessage(message);
 		return ResponseEntity.noContent().build();
@@ -45,14 +51,16 @@ public class MessageResource {
 
 	@Operation(description = "Get message from specific user")
 	@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true)
-	@GetMapping("/messages/senders/{sender}")
-	public ResponseEntity<List<MessageResponse>> getMessages(@PathVariable @Valid @Email String sender) {
+	@GetMapping
+	public ResponseEntity<List<MessageResponse>> getMessages(
+		@RequestParam("sender") @Email String sender) {
+
 		var messageHistory = messageService.getMessages(sender);
 		return ResponseEntity.ok(messageHistory);
 	}
 
 	// Denna endpoint är mer för clean up under utveckling
-	@DeleteMapping("/messages/{id}")
+	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deleteMessage(@PathVariable Long id) {
 		messageService.deleteMessages(id);
 		return ResponseEntity.noContent().build();

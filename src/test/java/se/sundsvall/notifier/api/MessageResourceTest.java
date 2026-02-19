@@ -43,7 +43,7 @@ class MessageResourceTest {
 	void createMessageTest() throws Exception {
 		var request = MessageRequest.builder()
 			.withContent("content")
-			.withSender("sender")
+			.withSender("sender@sundsvall.se")
 			.withTitle("title")
 			.withRecipientEmployeeIds(Set.of(1L, 2L, 3L))
 			.withMessageType(MessageType.SMS)
@@ -74,7 +74,8 @@ class MessageResourceTest {
 
 		when(messageService.getMessages(sender)).thenReturn(message);
 
-		mockMvc.perform(get("/api/notifier/messages/senders/{sender}", sender))
+		mockMvc.perform(get("/api/notifier/messages")
+			.param("sender", sender))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$").isArray())
