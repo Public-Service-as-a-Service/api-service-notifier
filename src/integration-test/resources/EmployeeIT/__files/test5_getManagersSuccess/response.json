@@ -1,0 +1,14 @@
+[
+	{
+		"id": 3,
+		"personId": "p3",
+		"orgId": "ORG-2",
+		"firstName": "Kalle",
+		"lastName": "Three",
+		"email": "test3@sundsvall.se",
+		"workMobile": "0701234567",
+		"workPhone": "0701234567",
+		"workTitle": "Developer",
+		"managerCode": "A"
+	}
+]
