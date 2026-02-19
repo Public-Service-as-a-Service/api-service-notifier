@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.zalando.problem.Problem;
 import org.zalando.problem.Status;
@@ -67,6 +69,12 @@ public class OrganizationService {
 		}
 
 		return result;
+	}
+
+	public Page<OrganizationResponse> getOrganizationWithSearch(String search, Pageable pageable) {
+		String searchLowercase = search.trim().toLowerCase();
+		Page<Organization> searchResult = organizationRepository.findByNameContaining(searchLowercase, pageable);
+		return searchResult.map(mapper::mapToOrganizationResponse);
 	}
 
 	public List<OrganizationResponse> getChildrenReplaceDuplicateDescendantsWithRoot(String orgId) {

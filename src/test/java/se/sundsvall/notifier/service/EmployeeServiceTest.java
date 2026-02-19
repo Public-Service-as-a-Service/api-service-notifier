@@ -106,13 +106,15 @@ public class EmployeeServiceTest {
 
 		Pageable page = PageRequest.of(0, 2,
 			Sort.by(Sort.Order.asc("firstName"), Sort.Order.asc("lastName")));
-		Page<Employee> employeePage = new PageImpl<>(List.of(employee1, employee2), page, 2);
+		Pageable sortedPage = PageRequest.of(0, 2, Sort.by("firstName").ascending().and(Sort.by("lastName").ascending()));
 
-		when(employeeRepository.findMatchingEmployee("searchterm", null, page)).thenReturn(employeePage);
+		Page<Employee> employeePage = new PageImpl<>(List.of(employee1, employee2), sortedPage, 2);
+
+		when(employeeRepository.findMatchingEmployee("searchterm1", "serachterm2", sortedPage)).thenReturn(employeePage);
 		when(mapper.mapToEmployeeWithOrgNameResponse(employee1)).thenReturn(response1);
 		when(mapper.mapToEmployeeWithOrgNameResponse(employee2)).thenReturn(response2);
 
-		var result = service.getEmployeesWithSearch("searchterm", page);
+		var result = service.getEmployeesWithSearch("searchterm1 serachterm2", page);
 
 		assertThat(result.getContent()).containsExactly(response1, response2);
 	}
