@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -216,16 +217,6 @@ public class OrganizationServiceTest {
 	void getChildrenReplaceDuplicateDescendantsWithRoot_test() {
 		var service = new OrganizationService(mapper, organizationRepository);
 
-		var org1 = new Organization();
-		var org2 = new Organization();
-		var response1 = mock(OrganizationResponse.class);
-		var response2 = mock(OrganizationResponse.class);
-	}
-
-	@Test
-	void getChildrenReplaceDuplicateDescendantsWithRoot_replacesDuplicatesAndRewritesParentAndTreeLevel() {
-		var service = new OrganizationService(mapper, organizationRepository);
-
 		var top = new Organization();
 		top.setOrgId("orgIdTop");
 		top.setParentOrgId("parentOrgId");
@@ -251,11 +242,11 @@ public class OrganizationServiceTest {
 			.withName("duplicateOrg")
 			.build();
 
+		when(mapper.mapToOrganizationResponse(bottom)).thenReturn(bottomResponse);
 		when(organizationRepository.findChildren("parentOrgId")).thenReturn(List.of(top));
 		when(organizationRepository.findChildren("orgIdTop")).thenReturn(List.of(middle));
 		when(organizationRepository.findChildren("orgIdMiddle")).thenReturn(List.of(bottom));
 		when(organizationRepository.findChildren("orgIdBottom")).thenReturn(List.of());
-		when(mapper.mapToOrganizationResponse(bottom)).thenReturn(bottomResponse);
 
 		var result = service.getChildrenReplaceDuplicateDescendantsWithRoot("parentOrgId");
 		var remainingOrg = result.getFirst();
@@ -265,6 +256,7 @@ public class OrganizationServiceTest {
 		assertThat(remainingOrg.parentOrgId()).isEqualTo(top.getParentOrgId());
 		assertThat(remainingOrg.name()).isEqualTo(top.getName());
 
-        verify(mapper.mapToOrganizationResponse(bottom));
+		verify(mapper).mapToOrganizationResponse(bottom);
+		verifyNoMoreInteractions(mapper);
 	}
 }
