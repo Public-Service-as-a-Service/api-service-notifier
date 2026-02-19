@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import se.sundsvall.notifier.api.model.response.EmployeeManagerResponse;
 import se.sundsvall.notifier.api.model.response.EmployeeWithOrgNameResponse;
 import se.sundsvall.notifier.integration.db.entity.Employee;
@@ -103,13 +104,15 @@ public class EmployeeServiceTest {
 		var response1 = mock(EmployeeWithOrgNameResponse.class);
 		var response2 = mock(EmployeeWithOrgNameResponse.class);
 		Pageable page = PageRequest.of(0, 2);
-		Page<Employee> employeePage = new PageImpl<>(List.of(employee1, employee2), page, 2);
+		Pageable sortedPage = PageRequest.of(0, 2, Sort.by("firstName").ascending().and(Sort.by("lastName").ascending()));
 
-		when(employeeRepository.findMatchingEmployee("searchterm", "searchterm", page)).thenReturn(employeePage);
+		Page<Employee> employeePage = new PageImpl<>(List.of(employee1, employee2), sortedPage, 2);
+
+		when(employeeRepository.findMatchingEmployee("searchterm1", "serachterm2", sortedPage)).thenReturn(employeePage);
 		when(mapper.mapToEmployeeWithOrgNameResponse(employee1)).thenReturn(response1);
 		when(mapper.mapToEmployeeWithOrgNameResponse(employee2)).thenReturn(response2);
 
-		var result = service.getEmployeesWithSearch("searchterm", page);
+		var result = service.getEmployeesWithSearch("searchterm1 serachterm2", page);
 
 		assertThat(result.getContent()).containsExactly(response1, response2);
 	}

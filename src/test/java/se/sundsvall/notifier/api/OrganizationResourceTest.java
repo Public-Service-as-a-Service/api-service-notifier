@@ -98,12 +98,12 @@ class OrganizationResourceTest {
 			new OrganizationResponse("1", "ParentorgId1", "orgId1", "name1", 3),
 			new OrganizationResponse("2", "ParentorgId2", "orgId2", "name2", 4));
 
-		when(service.getOrgChildrenAndDescendantsWithId("orgId1")).thenReturn(response);
+		when(service.getChildrenReplaceDuplicateDescendantsWithRoot("orgId1")).thenReturn(response);
 
 		mvc.perform(get("/api/notifier/organization/{orgId}/children", "orgId1")
 			.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk());
 
-		verify(service).getOrgAndChildrenWithId("orgId1");
+		verify(service).getChildrenReplaceDuplicateDescendantsWithRoot("orgId1");
 	}
 }
