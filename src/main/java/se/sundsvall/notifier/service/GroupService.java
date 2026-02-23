@@ -1,6 +1,7 @@
 package se.sundsvall.notifier.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,8 +40,8 @@ public class GroupService {
 	}
 
 	public List<GroupResponse> getGroupsByCreatorId(String creatorId) {
-		return groupRepository.findAllByCreatorId(creatorId)
-			.stream()
+		return groupRepository.findAllByCreatorId(creatorId).stream()
+			.sorted(Comparator.comparing(Group::getId))
 			.map(mapper::mapToGroupResponse)
 			.toList();
 	}
