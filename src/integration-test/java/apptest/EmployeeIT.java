@@ -14,10 +14,10 @@ import static org.springframework.http.HttpStatus.OK;
 @Testcontainers
 @Sql(scripts = {
     "/db/script/truncate.sql",
-    "/db/script/employeeit-db.sql"
+    "/db/script/testdata.sql"
 })
 public class EmployeeIT extends AbstractAppTest {
-    private static final String PATH = "/api/notifier/employee";
+    private static final String PATH = "/api/notifier/employees";
     private static final String RESPONSE_FILE = "response.json";
 
     @Test
@@ -33,7 +33,7 @@ public class EmployeeIT extends AbstractAppTest {
     @Test
     void test2_getAllOrganizationsSuccess() {
         setupCall()
-                .withServicePath(PATH + "/employees")
+                .withServicePath(PATH)
                 .withHttpMethod(GET)
                 .withExpectedResponse(RESPONSE_FILE)
                 .withExpectedResponseStatus(OK)
@@ -53,7 +53,7 @@ public class EmployeeIT extends AbstractAppTest {
     @Test
     void test4_getEmployeesPartialSearch() {
         setupCall()
-                .withServicePath(PATH + "/employees/search?search=john&page=0&size=1")
+                .withServicePath(PATH + "/search?search=one&page=0&size=1")
                 .withHttpMethod(GET)
                 .withExpectedResponse(RESPONSE_FILE)
                 .withExpectedResponseStatus(OK)
@@ -82,7 +82,7 @@ public class EmployeeIT extends AbstractAppTest {
     @Test
     void test7_searchEmployees_noResult() {
         setupCall()
-                .withServicePath(PATH + "/employees/search?search=abcdefgh&page=0&size=1")
+                .withServicePath(PATH + "/search?search=abcdefgh&page=0&size=1")
                 .withHttpMethod(GET)
                 .withExpectedResponse(RESPONSE_FILE)
                 .withExpectedResponseStatus(OK)

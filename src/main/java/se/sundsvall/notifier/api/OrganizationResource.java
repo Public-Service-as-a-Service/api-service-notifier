@@ -81,20 +81,20 @@ public class OrganizationResource {
 		return ResponseEntity.ok(organizationService.getOrgChildrenAndDescendantsWithId(orgId));
 	}
 
-	@Operation(summary = "Get an organization and its children", responses = {
+	@Operation(summary = "Get an organizations children", responses = {
 		@ApiResponse(
 			responseCode = "404",
 			description = "Not Found",
 			content = @Content(schema = @Schema(implementation = Problem.class))),
 	})
 	@GetMapping("/{orgId}/children")
-	public ResponseEntity<List<OrganizationResponse>> getOrganizationAndChildren(@PathVariable String orgId) {
+	public ResponseEntity<List<OrganizationResponse>> getChildren(@PathVariable String orgId) {
 		return ResponseEntity.ok(organizationService.getChildrenReplaceDuplicateDescendantsWithRoot(orgId));
 	}
 
-	@Operation(summary = "Searches for employees matching search term")
+	@Operation(summary = "Searches for organization matching search term")
 	@GetMapping("/organizations/search")
-	public ResponseEntity<Page<OrganizationResponse>> getEmployeesPartialSearch(@RequestParam String search, Pageable pageable) {
+	public ResponseEntity<Page<OrganizationResponse>> getOrganizationPartialSearch(@RequestParam String search, Pageable pageable) {
 		return ResponseEntity.ok(organizationService.getOrganizationWithSearch(search, pageable));
 	}
 

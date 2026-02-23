@@ -3,36 +3,30 @@
 		"id": 1,
 		"personId": "p1",
 		"orgId": "ORG-1",
-		"firstName": "John",
+		"firstName": "Test",
 		"lastName": "One",
-		"email": "test@sundsvall.se",
-		"workMobile": "0701234567",
-		"workPhone": "0701234567",
+		"email": "test1@sundsvall.se",
 		"workTitle": "Developer",
 		"orgName": "Org 1"
 	},
 	{
 		"id": 2,
 		"personId": "p2",
-		"orgId": "ORG-1",
-		"firstName": "Jane",
+		"orgId": "ORG-2",
+		"firstName": "Test",
 		"lastName": "Two",
 		"email": "test2@sundsvall.se",
-		"workMobile": "0701234567",
-		"workPhone": "0701234567",
 		"workTitle": "Developer",
-		"orgName": "Org 1"
+		"orgName": "Org 2"
 	},
 	{
 		"id": 3,
 		"personId": "p3",
-		"orgId": "ORG-2",
-		"firstName": "Kalle",
+		"orgId": "ORG-3",
+		"firstName": "Test",
 		"lastName": "Three",
 		"email": "test3@sundsvall.se",
-		"workMobile": "0701234567",
-		"workPhone": "0701234567",
-		"workTitle": "Developer",
-		"orgName": "Org 2"
+		"workTitle": "Manager",
+		"orgName": "Org 3"
 	}
 ]
