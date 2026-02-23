@@ -41,7 +41,7 @@ public class EmployeeIT extends AbstractAppTest {
     }
 
     @Test
-    void test3_getAllEmployeesWithListSuccess() {
+    void test3_getAllEmployeesWithOrgIdListSuccess() {
         setupCall()
                 .withServicePath(PATH + "/ids?orgIds=ORG-1,ORG-2")
                 .withHttpMethod(GET)

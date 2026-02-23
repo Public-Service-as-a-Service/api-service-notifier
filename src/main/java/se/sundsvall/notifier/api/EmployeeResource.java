@@ -54,7 +54,7 @@ public class EmployeeResource {
 	}
 
 	@GetMapping("/ids")
-	public ResponseEntity<List<EmployeeWithOrgNameResponse>> getAllEmployeesWithList(@RequestParam List<String> orgIds) {
+	public ResponseEntity<List<EmployeeWithOrgNameResponse>> getAllEmployeesWithOrgIdList(@RequestParam List<String> orgIds) {
 		return ResponseEntity.ok(employeeService.getEmployeesByOrgList(orgIds));
 	}
 
