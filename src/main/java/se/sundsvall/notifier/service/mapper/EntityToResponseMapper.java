@@ -1,7 +1,9 @@
 package se.sundsvall.notifier.service.mapper;
 
-import java.util.HashSet;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 import se.sundsvall.notifier.api.model.response.EmployeeManagerResponse;
@@ -18,12 +20,10 @@ import se.sundsvall.notifier.integration.db.entity.Organization;
 public class EntityToResponseMapper {
 
 	public GroupResponse mapToGroupResponse(Group group) {
-		Set<Employee> employees = group.getEmployees();
-		Set<EmployeeResponse> response = new HashSet<>();
-
-		for (Employee employee : employees) {
-			response.add(mapToEmployeeResponse(employee));
-		}
+		Set<EmployeeResponse> response = group.getEmployees().stream()
+			.sorted(Comparator.comparing(Employee::getId))
+			.map(this::mapToEmployeeResponse)
+			.collect(Collectors.toCollection(LinkedHashSet::new));
 
 		return GroupResponse.builder()
 			.withId(group.getId())

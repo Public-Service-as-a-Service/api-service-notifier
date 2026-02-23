@@ -9,10 +9,10 @@ VALUES (1, 'p1', 'ORG-1', 'Test', 'One', 'test1@sundsvall.se', NULL, NULL, 'Deve
        (2, 'p2', 'ORG-2', 'Test', 'Two', 'test2@sundsvall.se', NULL, NULL, 'Developer', TRUE, 'p1', 'B_'),
        (3, 'p3', 'ORG-3', 'Test', 'Three', 'test3@sundsvall.se', NULL, NULL, 'Manager', TRUE, 'p1', 'C_');
 
-INSERT INTO user_group(group_id, group_name, description, creator_id)
-VALUES (1, 'G1', 'Group 1', 'creator-123'),
-       (2, 'G2', 'Group 2', 'creator-123'),
-       (3, 'G3', 'Group 3', 'creator-999');
+INSERT INTO user_group(group_id, group_name, description, creator_id, created_at)
+VALUES (1, 'G1', 'Group 1', 'creator-123', '2026-02-17 16:00:00.000000'),
+       (2, 'G2', 'Group 2', 'creator-123', '2026-02-17 16:01:00.000000'),
+       (3, 'G3', 'Group 3', 'creator-999', '2026-02-17 16:02:00.000000');
 
 INSERT INTO employee_user_group(employee_id, group_id)
 VALUES (1, 1),

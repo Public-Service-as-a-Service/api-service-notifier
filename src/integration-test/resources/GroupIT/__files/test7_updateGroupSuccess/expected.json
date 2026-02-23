@@ -1,0 +1,31 @@
+{
+	"id": 1,
+	"name": "G12",
+	"description": "Group 12",
+	"creatorId": "creator-123",
+	"employees": [
+		{
+			"id": 2,
+			"personId": "p2",
+			"orgId": "ORG-2",
+			"firstName": "Test",
+			"lastName": "Two",
+			"email": "test2@sundsvall.se",
+			"workMobile": null,
+			"workPhone": null,
+			"workTitle": "Developer"
+		},
+		{
+			"id": 3,
+			"personId": "p3",
+			"orgId": "ORG-3",
+			"firstName": "Test",
+			"lastName": "Three",
+			"email": "test3@sundsvall.se",
+			"workMobile": null,
+			"workPhone": null,
+			"workTitle": "Manager"
+		}
+	],
+	"created": "2026-02-17T16:00:00.00"
+}
