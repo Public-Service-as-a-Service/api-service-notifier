@@ -1,111 +1,128 @@
 package se.sundsvall.notifier.api;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import se.sundsvall.notifier.Application;
 import se.sundsvall.notifier.api.model.response.OrganizationResponse;
-import se.sundsvall.notifier.service.OrganizationService;
 
-@WebMvcTest(
-	controllers = OrganizationResource.class,
-	excludeAutoConfiguration = {
-		SecurityAutoConfiguration.class,
-		OAuth2ClientAutoConfiguration.class,
-		OAuth2ResourceServerAutoConfiguration.class
-	})
+@SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("junit")
+@Sql(
+	scripts = {
+		"/db/script/truncate.sql", "/db/script/testdata.sql"
+	},
+	executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class OrganizationResourceTest {
 
 	@Autowired
-	private MockMvc mvc;
+	private WebTestClient webTestClient;
 
-	@MockitoBean
-	private OrganizationService service;
+	private static final String BASE_PATH = "/api/notifier/organization";
 
 	@Test
-	void getOne_successful_test() throws Exception {
-		var response = mock(OrganizationResponse.class);
+	void getOne_ok_returnsOrganization() {
+		final var response = webTestClient.get()
+			.uri(BASE_PATH + "/ORG-1")
+			.accept(MediaType.APPLICATION_JSON)
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBody(OrganizationResponse.class)
+			.returnResult()
+			.getResponseBody();
 
-		when(service.getSpecificOrg("id")).thenReturn(response);
-
-		mvc.perform(get("/api/notifier/organization/id")
-			.accept(MediaType.APPLICATION_JSON))
-			.andExpect(status().isOk());
-
-		verify(service).getSpecificOrg("id");
+		assertThat(response).isNotNull();
+		assertThat(response.orgId()).isEqualTo("ORG-1");
+		assertThat(response.name()).isEqualTo("Org 1");
 	}
 
 	@Test
-	void getAll_successfulTest() throws Exception {
-		var response = List.of(
-			new OrganizationResponse("1", "ParentorgId1", "orgId1", "name1", 3),
-			new OrganizationResponse("2", "ParentorgId2", "orgId2", "name2", 4));
-
-		when(service.getAllOrganizations()).thenReturn(response);
-
-		mvc.perform(get("/api/notifier/organization/organizations"))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.length()").value(2));
-
-		verify(service).getAllOrganizations();
-
+	void getOne_notFound_returns404() {
+		webTestClient.get()
+			.uri(BASE_PATH + "/ORG-999")
+			.accept(MediaType.APPLICATION_JSON)
+			.exchange()
+			.expectStatus().isNotFound();
 	}
 
 	@Test
-	void getWithList_successful() throws Exception {
-		var response = List.of(
-			new OrganizationResponse("1", "ParentorgId1", "orgId1", "name1", 3),
-			new OrganizationResponse("2", "ParentorgId2", "orgId2", "name2", 4));
+	void getAll_ok_returnsAllOrganizations() {
+		final var response = webTestClient.get()
+			.uri(BASE_PATH + "/organizations")
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBodyList(OrganizationResponse.class)
+			.returnResult()
+			.getResponseBody();
 
-		when(service.getOrgsById(List.of("orgId1", "orgId2"))).thenReturn(response);
-
-		mvc.perform(get("/api/notifier/organization/ids").param("orgId", "orgId1", "orgId2"))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.length()").value(2));
-
-		verify(service).getOrgsById(List.of("orgId1", "orgId2"));
+		assertThat(response).isNotNull();
+		assertThat(response).hasSize(3);
+		assertThat(response)
+			.extracting(OrganizationResponse::orgId)
+			.containsExactlyInAnyOrder("ORG-1", "ORG-2", "ORG-3");
 	}
 
 	@Test
-	void getOrgChildrenAndDescendants_successful() throws Exception {
-		var response = List.of(
-			new OrganizationResponse("1", "ParentorgId1", "orgId1", "name1", 3),
-			new OrganizationResponse("2", "ParentorgId2", "orgId2", "name2", 4));
+	void getWithList_ok_returnsMatchingOrganizations() {
+		final var response = webTestClient.get()
+			.uri(BASE_PATH + "/ids?orgId=ORG-1&orgId=ORG-2")
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBodyList(OrganizationResponse.class)
+			.returnResult()
+			.getResponseBody();
 
-		when(service.getOrgChildrenAndDescendantsWithId("orgId1")).thenReturn(response);
-
-		mvc.perform(get("/api/notifier/organization/{orgId}/children/descendants", "orgId1")
-			.accept(MediaType.APPLICATION_JSON))
-			.andExpect(status().isOk());
-
-		verify(service).getOrgChildrenAndDescendantsWithId("orgId1");
+		assertThat(response).isNotNull();
+		assertThat(response).hasSize(2);
+		assertThat(response)
+			.extracting(OrganizationResponse::orgId)
+			.containsExactlyInAnyOrder("ORG-1", "ORG-2");
 	}
 
 	@Test
-	void getOrgAndChildren_successful() throws Exception {
-		var response = List.of(
-			new OrganizationResponse("1", "ParentorgId1", "orgId1", "name1", 3),
-			new OrganizationResponse("2", "ParentorgId2", "orgId2", "name2", 4));
+	void getOrgChildrenAndDescendants_ok_returnsDescendants() {
+		// ORG-1 är förälder till ORG-2 och ORG-3
+		final var response = webTestClient.get()
+			.uri(BASE_PATH + "/ORG-1/children/descendants")
+			.accept(MediaType.APPLICATION_JSON)
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBodyList(OrganizationResponse.class)
+			.returnResult()
+			.getResponseBody();
 
-		when(service.getChildrenReplaceDuplicateDescendantsWithRoot("orgId1")).thenReturn(response);
+		assertThat(response).isNotNull();
+		assertThat(response)
+			.extracting(OrganizationResponse::orgId)
+			.containsExactlyInAnyOrder("ORG-1", "ORG-2", "ORG-3");
+	}
 
-		mvc.perform(get("/api/notifier/organization/{orgId}/children", "orgId1")
-			.accept(MediaType.APPLICATION_JSON))
-			.andExpect(status().isOk());
+	@Test
+	void getOrgAndChildren_ok_returnsChildren() {
+		// ORG-1 är förälder till ORG-2 och ORG-3
+		final var response = webTestClient.get()
+			.uri(BASE_PATH + "/ORG-1/children")
+			.accept(MediaType.APPLICATION_JSON)
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBodyList(OrganizationResponse.class)
+			.returnResult()
+			.getResponseBody();
 
-		verify(service).getChildrenReplaceDuplicateDescendantsWithRoot("orgId1");
+		assertThat(response).isNotNull();
+		assertThat(response)
+			.extracting(OrganizationResponse::orgId)
+			.containsExactlyInAnyOrder("ORG-2", "ORG-3");
 	}
 }

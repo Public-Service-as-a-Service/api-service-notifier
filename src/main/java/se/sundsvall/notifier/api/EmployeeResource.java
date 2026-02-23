@@ -21,7 +21,7 @@ import se.sundsvall.notifier.api.model.response.EmployeeWithOrgNameResponse;
 import se.sundsvall.notifier.service.EmployeeService;
 
 @RestController
-@RequestMapping("/api/notifier/employee")
+@RequestMapping("/api/notifier/employees")
 @Tag(name = "Employee Resource")
 @ApiResponses({
 	@ApiResponse(
@@ -48,7 +48,7 @@ public class EmployeeResource {
 	}
 
 	@Operation(summary = "Get employee data from all organizations")
-	@GetMapping("/employees")
+	@GetMapping
 	public ResponseEntity<List<EmployeeWithOrgNameResponse>> getAllOrganizations() {
 		return ResponseEntity.ok(employeeService.getAllEmployees());
 	}
@@ -59,7 +59,7 @@ public class EmployeeResource {
 	}
 
 	@Operation(summary = "Searches for employees matching search term")
-	@GetMapping("/employees/search")
+	@GetMapping("/search")
 	public ResponseEntity<Page<EmployeeWithOrgNameResponse>> getEmployeesPartialSearch(@RequestParam String search, Pageable pageable) {
 		return ResponseEntity.ok(employeeService.getEmployeesWithSearch(search, pageable));
 	}

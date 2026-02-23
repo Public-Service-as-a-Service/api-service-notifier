@@ -1,46 +1,36 @@
 package se.sundsvall.notifier.api;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import se.sundsvall.notifier.Application;
 import se.sundsvall.notifier.api.model.request.MessageRequest;
 import se.sundsvall.notifier.api.model.request.MessageType;
 import se.sundsvall.notifier.api.model.response.MessageResponse;
-import se.sundsvall.notifier.service.MessageService;
 
-@WebMvcTest(MessageResource.class)
-@AutoConfigureMockMvc(addFilters = false)
+@SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("junit")
+@Sql(
+	scripts = {
+		"/db/script/truncate.sql", "/db/script/testdata.sql"
+	},
+	executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class MessageResourceTest {
 
 	@Autowired
-	private MockMvc mockMvc;
+	private WebTestClient webTestClient;
 
-	@MockitoBean
-	private MessageService messageService;
-
-	@Autowired
-	private ObjectMapper objectMapper;
+	private static final String BASE_PATH = "/api/notifier/messages";
 
 	@Test
-	void createMessageTest() throws Exception {
+	void createMessage_ok() {
 		var request = MessageRequest.builder()
 			.withContent("content")
 			.withSender("sender@sundsvall.se")
@@ -49,52 +39,70 @@ class MessageResourceTest {
 			.withMessageType(MessageType.SMS)
 			.build();
 
-		// Act & Assert
-		mockMvc.perform(post("/api/notifier/messages")
+		webTestClient.post()
+			.uri(BASE_PATH)
 			.contentType(MediaType.APPLICATION_JSON)
-			.content(objectMapper.writeValueAsString(request)))
-			.andExpect(status().isNoContent());
-
-		verify(messageService).createMessage(any(MessageRequest.class));
+			.bodyValue(request)
+			.exchange()
+			.expectStatus().isNoContent()
+			.expectBody().isEmpty();
 	}
 
 	@Test
-	void testGetMessages() throws Exception {
-		var sender = "test@sundsvall.se";
-		var message = List.of(
-			MessageResponse.builder()
-				.withId(1L)
-				.withTitle("title")
-				.withContent("content")
-				.build(),
-			MessageResponse.builder()
-				.withId(2L)
-				.withTitle("title2")
-				.build());
+	void createMessage_invalidBody() {
+		var invalid = MessageRequest.builder()
+			.withSender("no-email")
+			.build();
 
-		when(messageService.getMessages(sender)).thenReturn(message);
-
-		mockMvc.perform(get("/api/notifier/messages")
-			.param("sender", sender))
-			.andExpect(status().isOk())
-			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-			.andExpect(jsonPath("$").isArray())
-			.andExpect(jsonPath("$[0].id").value(1))
-			.andExpect(jsonPath("$[0].title").value("title"))
-			.andExpect(jsonPath("$[1].id").value(2))
-			.andExpect(jsonPath("$[1].title").value("title2"));
-
-		verify(messageService).getMessages(eq(sender));
+		webTestClient.post()
+			.uri(BASE_PATH)
+			.contentType(MediaType.APPLICATION_JSON)
+			.bodyValue(invalid)
+			.exchange()
+			.expectStatus().isBadRequest();
 	}
 
 	@Test
-	void deleteMessageTest() throws Exception {
-		var messageId = 1L;
+	void getMessagesForSender_ok() {
+		final var response = webTestClient.get()
+			.uri(BASE_PATH + "?sender=test@sundsvall.se")
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBodyList(MessageResponse.class)
+			.returnResult()
+			.getResponseBody();
 
-		mockMvc.perform(delete("/api/notifier/messages/{id}", messageId))
-			.andExpect(status().isNoContent());
+		assertThat(response).isNotNull();
+		assertThat(response).hasSize(1);
+		assertThat(response)
+			.extracting(MessageResponse::title)
+			.contains("Test title");
+	}
 
-		verify(messageService).deleteMessages(eq(messageId));
+	@Test
+	void getMessagesForSender_invalidSender() {
+		webTestClient.get()
+			.uri(BASE_PATH + "?sender=invalid")
+			.exchange()
+			.expectStatus().isBadRequest();
+	}
+
+	@Test
+	void deleteMessage_ok() {
+		webTestClient.delete()
+			.uri(BASE_PATH + "/1")
+			.exchange()
+			.expectStatus().isNoContent()
+			.expectBody().isEmpty();
+
+		webTestClient.get()
+			.uri(BASE_PATH + "?sender=test@sundsvall.se")
+			.exchange()
+			.expectStatus().isOk()
+			.expectBodyList(MessageResponse.class)
+			.hasSize(0);
+
 	}
 
 }
