@@ -17,7 +17,7 @@ import static org.springframework.http.HttpStatus.OK;
 @Testcontainers
 @Sql(scripts = {
         "/db/script/truncate.sql",
-        "/db/script/messageit-db.sql"
+        "/db/script/testdata.sql"
 })
 class MessageIT extends AbstractAppTest {
 
