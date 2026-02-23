@@ -49,12 +49,12 @@ public class EmployeeResource {
 
 	@Operation(summary = "Get employee data from all organizations")
 	@GetMapping
-	public ResponseEntity<List<EmployeeWithOrgNameResponse>> getAllOrganizations() {
+	public ResponseEntity<List<EmployeeWithOrgNameResponse>> getAllEmployees() {
 		return ResponseEntity.ok(employeeService.getAllEmployees());
 	}
 
 	@GetMapping("/ids")
-	public ResponseEntity<List<EmployeeWithOrgNameResponse>> getAllOrganizationsWithList(@RequestParam List<String> orgIds) {
+	public ResponseEntity<List<EmployeeWithOrgNameResponse>> getAllEmployeesWithOrgIdList(@RequestParam List<String> orgIds) {
 		return ResponseEntity.ok(employeeService.getEmployeesByOrgList(orgIds));
 	}
 

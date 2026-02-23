@@ -7,7 +7,7 @@
 		"lastName": "One",
 		"email": "test1@sundsvall.se",
 		"workTitle": "Developer",
-		"managerCode": "A_"
+		"orgName": "Org 1"
 	},
 	{
 		"id": 2,
@@ -17,7 +17,7 @@
 		"lastName": "Two",
 		"email": "test2@sundsvall.se",
 		"workTitle": "Developer",
-		"managerCode": "B_"
+		"orgName": "Org 2"
 	},
 	{
 		"id": 3,
@@ -27,6 +27,6 @@
 		"lastName": "Three",
 		"email": "test3@sundsvall.se",
 		"workTitle": "Manager",
-		"managerCode": "C_"
+		"orgName": "Org 3"
 	}
 ]

@@ -8,5 +8,15 @@
 		"email": "test1@sundsvall.se",
 		"workTitle": "Developer",
 		"orgName": "Org 1"
+	},
+	{
+		"id": 2,
+		"personId": "p2",
+		"orgId": "ORG-2",
+		"firstName": "Test",
+		"lastName": "Two",
+		"email": "test2@sundsvall.se",
+		"workTitle": "Developer",
+		"orgName": "Org 2"
 	}
 ]
