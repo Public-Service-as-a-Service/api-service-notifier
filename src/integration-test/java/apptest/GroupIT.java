@@ -32,9 +32,7 @@ public class GroupIT extends AbstractAppTest {
     @Test
     void test1_getAllGroupsWithCreatorIdSuccess() {
         setupCall()
-                .withServicePath(b -> b.path(PATH)
-                        .queryParam("creatorId", "creator-123")
-                        .build())
+                .withServicePath(PATH + "?creatorId=creator-123")
                 .withHttpMethod(GET)
                 .withExpectedResponseStatus(OK)
                 .withExpectedResponse(EXPECTED_FILE)

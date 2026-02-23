@@ -48,9 +48,7 @@ class MessageIT extends AbstractAppTest {
     @Test
     void test3_getMessagesSuccess() {
         setupCall()
-                .withServicePath(b -> b.path(PATH)
-                        .queryParam("sender", "test@sundsvall.se")
-                        .build())
+                .withServicePath(PATH + "?sender=test@sundsvall.se")
                 .withHttpMethod(GET)
                 .withExpectedResponseStatus(OK)
                 .withExpectedResponse(EXPECTED_FILE)
