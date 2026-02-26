@@ -18,6 +18,9 @@ spring:
     password: ${ENV_DB_PASSWORD}
     url: ${ENV_DB_URL}
 
+  flyway:
+    enabled: true
+
   security:
     oauth2:
       client:
