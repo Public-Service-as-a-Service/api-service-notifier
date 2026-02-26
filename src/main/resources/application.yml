@@ -14,29 +14,26 @@ spring:
   application:
     name: notifier
   datasource:
-    username: ${ENV.DB.USERNAME}
-    password: ${ENV.DB.PASSWORD}
-    url: ${ENV.DB.URL}
-
-  flyway:
-    enabled: true
+    username: ${ENV_DB_USERNAME}
+    password: ${ENV_DB_PASSWORD}
+    url: ${ENV_DB_URL}
 
   security:
     oauth2:
       client:
         provider:
           sms-sender:
-            token-uri: ${ENV.SMS-SENDER-TOKEN-URL}
+            token-uri: ${ENV_SMS_SENDER_TOKEN_URL}
           teams-sender:
-            token-uri: ${ENV.TEAMS-SENDER-TOKEN-URL}
+            token-uri: ${ENV_TEAMS_SENDER_TOKEN_URL}
         registration:
           sms-sender:
-            client-id: ${ENV.SMS-SENDER-CLIENT-ID}
-            client-secret: ${ENV.SMS-SENDER-CLIENT-SECRET}
+            client-id: ${ENV_SMS_SENDER_CLIENT_ID}
+            client-secret: ${ENV_SMS_SENDER_CLIENT_SECRET}
             authorization-grant-type: client_credentials
           teams-sender:
-            client-id: ${ENV.TEAMS-SENDER-CLIENT-ID}
-            client-secret: ${ENV.TEAMS-SENDER-CLIENT-SECRET}
+            client-id: ${ENV_TEAMS_SENDER_CLIENT_ID}
+            client-secret: ${ENV_TEAMS_SENDER_CLIENT_SECRET}
             authorization-grant-type: client_credentials
 
 server:
@@ -44,7 +41,7 @@ server:
 
 integration:
   sms-sender:
-    base-url: ${ENV.SMS-SENDER-BASE-URL}
+    base-url: ${ENV_SMS_SENDER_BASE_URL}
     sender: Sundsvall
   teams-sender:
-    base-url: ${ENV.TEAMS-SENDER-BASE-URL}
+    base-url: ${ENV_TEAMS_SENDER_BASE_URL}
