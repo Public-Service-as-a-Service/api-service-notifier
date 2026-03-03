@@ -1,5 +1,6 @@
 package se.sundsvall.notifier.integration.smssender;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -107,5 +108,17 @@ class SmsSenderIntegrationTest {
 		verify(mapper).toSendSmsRequest(dto);
 		verify(client).sendSms(eq(municipalityId), any(SendSmsRequest.class));
 		verifyNoMoreInteractions(client, mapper);
+	}
+
+	@Test
+	void sendSms_exception() {
+		var municipalityId = "2281";
+		var dto = mock(SmsDto.class);
+
+		when(client.sendSms(eq(municipalityId), any()))
+			.thenThrow(new RuntimeException("Connection refused"));
+		var result = integration.sendSms(municipalityId, dto);
+
+		assertThat(result).isEqualTo(MessageStatus.NOT_SENT);
 	}
 }
