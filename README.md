@@ -1,6 +1,6 @@
 # Notifier
 
-_The service provides functionality to send notifications to groups within an organization. Groups can be pre-defined or manually created._
+_The service provides functionality to send notifications to employees within an organization or group. Groups can be manually created and contain employees from different organization._
 
 ## Getting Started
 
@@ -17,8 +17,8 @@ _The service provides functionality to send notifications to groups within an or
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/Sundsvallskommun/YOUR-PROJECT-ID.git
-   cd YOUR-PROJECT-ID
+   git clone https://github.com/Public-Service-as-a-Service/api-service-notifier
+   cd api-service-
    ```
 2. **Configure the application:**
 
@@ -49,12 +49,12 @@ _The service provides functionality to send notifications to groups within an or
 This microservice depends on the following services:
 
 - **Sms Sender**
-  - **Purpose:** To send an sms message to a recipient
+  - **Purpose:**  Is used to send text messages to recipients
   - **Repository:** [Link to the repository](https://github.com/Sundsvallskommun/api-service-sms-sender)
   - **Setup Instructions:** Refer to its documentation for installation and configuration steps.
 
 - **Teams Sender**
-    - **Purpose:** To send a Teams message to a recipient
+    - **Purpose:** Is used to send teams messages to recipients
     - **Repository:** [Link to the repository](https://github.com/Sundsvallskommun/api-service-teams-sender)
     - **Setup Instructions:** Refer to its documentation for installation and configuration steps.
 Ensure that these services are running and properly configured before starting this microservice.
@@ -140,7 +140,7 @@ spring:
 ```
 
 - **Additional setup is required**
-  - **Purpus:** You must populate the database using the accompanying CSV loader. 
+  - **Purpose:** You must populate the database using the accompanying CSV loader. 
   - **Repository:** [Link to the repository](https://github.com/Public-Service-as-a-Service/cvs-filereader)
   - **Setup Instructions:** Refer to its documentation for installation and configuration steps.
       
