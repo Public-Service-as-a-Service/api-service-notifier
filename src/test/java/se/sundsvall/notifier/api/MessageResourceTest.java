@@ -63,6 +63,34 @@ class MessageResourceTest {
 	}
 
 	@Test
+	void getMessageById_ok() {
+		String sender = "test@sundsvall.se";
+		Long messageId = 1L;
+		final var response = webTestClient.get()
+			.uri(BASE_PATH + "/{messageId}/{sender}", messageId, sender)
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBodyList(MessageResponse.class)
+			.returnResult()
+			.getResponseBody();
+
+		assertThat(response).isNotNull();
+		assertThat(response).hasSize(1);
+		assertThat(response).extracting(MessageResponse::sender).contains("test@sundsvall.se");
+	}
+
+	@Test
+	void getMessageById_invalidSender() {
+		String sender = "no-email";
+		Long messageId = 1L;
+		webTestClient.get()
+			.uri(BASE_PATH + "/{messageId}/{sender}", messageId, sender)
+			.exchange()
+			.expectStatus().isBadRequest();
+	}
+
+	@Test
 	void getMessagesForSender_ok() {
 		final var response = webTestClient.get()
 			.uri(BASE_PATH + "?sender=test@sundsvall.se")

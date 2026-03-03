@@ -3,6 +3,8 @@ package se.sundsvall.notifier.service;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.zalando.problem.Problem;
+import org.zalando.problem.Status;
 import se.sundsvall.notifier.api.model.request.MessageRequest;
 import se.sundsvall.notifier.api.model.request.MessageType;
 import se.sundsvall.notifier.api.model.response.MessageResponse;
@@ -52,6 +54,12 @@ public class MessageService {
 			savedMessage.addRecipient(messageRecipient);
 		}
 		messageRepository.save(savedMessage);
+	}
+
+	public MessageResponse getMessageById(String sender, Long messageId) {
+		var message = messageRepository.findBySenderAndId(sender, messageId)
+			.orElseThrow(() -> Problem.valueOf(Status.NOT_FOUND, "Message with id: " + messageId + " not found"));
+		return messageMapper.entityToMessageResponse(message);
 	}
 
 	public List<MessageResponse> getMessages(String sender) {

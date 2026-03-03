@@ -10,6 +10,7 @@ import se.sundsvall.notifier.Application;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -62,5 +63,34 @@ class MessageIT extends AbstractAppTest {
                 .withHttpMethod(GET)
                 .withExpectedResponseStatus(BAD_REQUEST)
                 .sendRequestAndVerifyResponse();
+    }
+
+    @Test
+    void test5_getMessageByIdSuccess() {
+        setupCall()
+                .withServicePath(PATH + "/1/test@sundsvall.se")
+                .withHttpMethod(GET)
+                .withExpectedResponseStatus(OK)
+                .withExpectedResponse(EXPECTED_FILE)
+                .sendRequestAndVerifyResponse();
+
+    }
+    @Test
+    void test6_getMessageByIdBadRequest() {
+        setupCall()
+                .withServicePath(PATH + "/1/badRequest")
+                .withHttpMethod(GET)
+                .withExpectedResponseStatus(BAD_REQUEST)
+                .sendRequestAndVerifyResponse();
+    }
+
+    @Test
+    void test7_getMessagesByIdNotFound() {
+        setupCall()
+                .withServicePath(PATH + "/10000/test@sundsvall.se")
+                .withHttpMethod(GET)
+                .withExpectedResponseStatus(NOT_FOUND)
+                .sendRequestAndVerifyResponse();
+
     }
 }
