@@ -8,7 +8,6 @@ import se.sundsvall.notifier.api.model.request.MessageType;
 import se.sundsvall.notifier.api.model.response.MessageResponse;
 import se.sundsvall.notifier.integration.db.entity.Employee;
 import se.sundsvall.notifier.integration.db.entity.MessageRecipient;
-import se.sundsvall.notifier.integration.db.entity.MessageRecipientId;
 import se.sundsvall.notifier.integration.db.repository.EmployeeRepository;
 import se.sundsvall.notifier.integration.db.repository.MessageRepository;
 import se.sundsvall.notifier.integration.smssender.MessageStatus;
@@ -46,10 +45,6 @@ public class MessageService {
 		var employees = employeeRepository.findAllById(messageRequest.recipientEmployeeIds());
 
 		for (Employee employee : employees) {
-
-			MessageRecipientId recipientId = new MessageRecipientId();
-			recipientId.setMessageId(savedMessage.getId());
-			recipientId.setEmployeeId(employee.getId());
 
 			var delivered = sendMessageToEmployee(employee, messageRequest);
 			MessageRecipient messageRecipient = messageMapper.toMessageRecipient(employee, delivered);
