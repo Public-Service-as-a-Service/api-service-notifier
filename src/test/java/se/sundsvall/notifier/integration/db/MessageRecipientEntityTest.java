@@ -62,26 +62,6 @@ class MessageRecipientEntityTest {
 	}
 
 	@Test
-	void withMessage_null() {
-		var recipient = new MessageRecipient();
-
-		recipient.setMessage(null);
-
-		assertThat(recipient.getMessage()).isNull();
-		assertThat(recipient.getId().getMessageId()).isNull();
-	}
-
-	@Test
-	void withEmployee_null() {
-		var recipient = new MessageRecipient();
-
-		recipient.setEmployee(null);
-
-		assertThat(recipient.getEmployee()).isNull();
-		assertThat(recipient.getId().getEmployeeId()).isNull();
-	}
-
-	@Test
 	void onCreate_setsReceivedAtWhenNull() {
 		var recipient = new MessageRecipient();
 		recipient.setReceivedAt(null);

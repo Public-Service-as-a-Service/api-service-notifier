@@ -19,10 +19,10 @@ VALUES (1, 1),
        (2, 1),
        (3, 2);
 
-INSERT INTO message(message_id, title, content, sender, group_id, message_type, created_at)
-VALUES (1, 'Test title', 'Test content', 'test@sundsvall.se', 1, 'SMS', '2026-02-17 16:00:00.000000'),
-       (2, 'Test title2', 'Test content2', 'test2@sundsvall.se', NULL, 'SMS', '2026-02-17 16:01:00.000000'),
-       (3, 'Test title3', 'Test content3', 'test3@sundsvall.se', 2, 'TEAMS', '2026-02-17 16:02:00.000000');
+INSERT INTO message(message_id, title, content, sender, message_type, created_at)
+VALUES (1, 'Test title', 'Test content', 'test@sundsvall.se', 'SMS', '2026-02-17 16:00:00.000000'),
+       (2, 'Test title2', 'Test content2', 'test2@sundsvall.se', 'SMS', '2026-02-17 16:01:00.000000'),
+       (3, 'Test title3', 'Test content3', 'test3@sundsvall.se', 'TEAMS', '2026-02-17 16:02:00.000000');
 
 INSERT INTO message_recipient(message_id, employee_id, org_id, work_title, received_at, delivery_status)
 VALUES (2, 1, 'ORG-1', 'Developer', '2026-02-17 16:00:10.000000', 'DELIVERED'),
