@@ -27,7 +27,6 @@ class MessageMapperTest {
 		var messageRequest = new MessageRequest("title",
 			"content",
 			"sender",
-			null,
 			Set.of(1L, 2L, 3L),
 			MessageType.SMS);
 		var result = messageMapper.toEntity(messageRequest);
