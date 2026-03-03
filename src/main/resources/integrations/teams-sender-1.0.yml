@@ -1,0 +1,333 @@
+openapi: 3.1.0
+info:
+  title: teamssender
+  contact: {}
+  license:
+    name: MIT License
+    url: https://opensource.org/licenses/MIT
+  version: "1.0"
+servers:
+  - url: http://localhost:8080
+    description: Generated server url
+paths:
+  /{municipalityId}/teams/messages:
+    post:
+      tags:
+        - teams-sender-resource
+      summary: Send a message in Microsoft Teams
+      operationId: sendTeamsMessage
+      parameters:
+        - name: municipalityId
+          in: path
+          description: Municipality id
+          required: true
+          schema:
+            type: string
+          example: 2281
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendTeamsMessageRequest"
+        required: true
+      responses:
+        "204":
+          description: Message sent successfully
+        "400":
+          description: Incorrect or malformed request
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Problem"
+                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+        "404":
+          description: Requested resource could not be found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "422":
+          description: Message could not be created or sent
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "401":
+          description: Authentication information is either missing or invalid
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "503":
+          description: Connection issue to Microsoft Graph API
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "500":
+          description: Unexpected internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Problem"
+  /{municipalityId}/login:
+    get:
+      tags:
+        - auth-resource
+      summary: Login for user in a specific municipality
+      description: Redirects the user to Microsoft loginpage
+      operationId: login
+      parameters:
+        - name: municipalityId
+          in: path
+          description: Municipality id
+          required: true
+          schema:
+            type: string
+          example: 2281
+      responses:
+        "302":
+          description: Redirects the user to Microsoft loginpage
+        "404":
+          description: Invalid municipality ID
+  /callback:
+    get:
+      tags:
+        - auth-resource
+      operationId: callback
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api-docs:
+    get:
+      tags:
+        - API
+      summary: OpenAPI
+      operationId: getApiDocs
+      responses:
+        "200":
+          description: OK
+          content:
+            application/yaml:
+              schema:
+                type: string
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-mutual-ssl: Optional
+components:
+  schemas:
+    Problem:
+      type: object
+      properties:
+        instance:
+          type: string
+          format: uri
+        type:
+          type: string
+          format: uri
+        parameters:
+          type: object
+          additionalProperties: {}
+        status:
+          $ref: "#/components/schemas/StatusType"
+        detail:
+          type: string
+        title:
+          type: string
+    StatusType:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          format: int32
+        reasonPhrase:
+          type: string
+    ConstraintViolationProblem:
+      type: object
+      properties:
+        cause:
+          $ref: "#/components/schemas/ThrowableProblem"
+        stackTrace:
+          type: array
+          items:
+            type: object
+            properties:
+              classLoaderName:
+                type: string
+              moduleName:
+                type: string
+              moduleVersion:
+                type: string
+              methodName:
+                type: string
+              fileName:
+                type: string
+              lineNumber:
+                type: integer
+                format: int32
+              className:
+                type: string
+              nativeMethod:
+                type: boolean
+        type:
+          type: string
+          format: uri
+        status:
+          $ref: "#/components/schemas/StatusType"
+        violations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Violation"
+        title:
+          type: string
+        message:
+          type: string
+        instance:
+          type: string
+          format: uri
+        parameters:
+          type: object
+          additionalProperties: {}
+        detail:
+          type: string
+        suppressed:
+          type: array
+          items:
+            type: object
+            properties:
+              stackTrace:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    classLoaderName:
+                      type: string
+                    moduleName:
+                      type: string
+                    moduleVersion:
+                      type: string
+                    methodName:
+                      type: string
+                    fileName:
+                      type: string
+                    lineNumber:
+                      type: integer
+                      format: int32
+                    className:
+                      type: string
+                    nativeMethod:
+                      type: boolean
+              message:
+                type: string
+              localizedMessage:
+                type: string
+        localizedMessage:
+          type: string
+    ThrowableProblem:
+      type: object
+      properties:
+        cause: {}
+        stackTrace:
+          type: array
+          items:
+            type: object
+            properties:
+              classLoaderName:
+                type: string
+              moduleName:
+                type: string
+              moduleVersion:
+                type: string
+              methodName:
+                type: string
+              fileName:
+                type: string
+              lineNumber:
+                type: integer
+                format: int32
+              className:
+                type: string
+              nativeMethod:
+                type: boolean
+        message:
+          type: string
+        instance:
+          type: string
+          format: uri
+        type:
+          type: string
+          format: uri
+        parameters:
+          type: object
+          additionalProperties: {}
+        status:
+          $ref: "#/components/schemas/StatusType"
+        detail:
+          type: string
+        title:
+          type: string
+        suppressed:
+          type: array
+          items:
+            type: object
+            properties:
+              stackTrace:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    classLoaderName:
+                      type: string
+                    moduleName:
+                      type: string
+                    moduleVersion:
+                      type: string
+                    methodName:
+                      type: string
+                    fileName:
+                      type: string
+                    lineNumber:
+                      type: integer
+                      format: int32
+                    className:
+                      type: string
+                    nativeMethod:
+                      type: boolean
+              message:
+                type: string
+              localizedMessage:
+                type: string
+        localizedMessage:
+          type: string
+    Violation:
+      type: object
+      properties:
+        field:
+          type: string
+        message:
+          type: string
+    SendTeamsMessageRequest:
+      type: object
+      description: Request model for sending a Teams message
+      properties:
+        recipient:
+          type: string
+          description: The user ID or email to send the message to
+          examples:
+            - first.last@municipaladress.com
+          minLength: 1
+        message:
+          type: string
+          description: The content of the message
+          examples:
+            - Don't forget the meeting at 3 PM
+          minLength: 1
+      required:
+        - message
+        - recipient
+  securitySchemes: {}

@@ -1,0 +1,32 @@
+[
+	{
+		"id": 1,
+		"personId": "p1",
+		"orgId": "ORG-1",
+		"firstName": "Test",
+		"lastName": "One",
+		"email": "test1@sundsvall.se",
+		"workTitle": "Developer",
+		"orgName": "Org 1"
+	},
+	{
+		"id": 2,
+		"personId": "p2",
+		"orgId": "ORG-2",
+		"firstName": "Test",
+		"lastName": "Two",
+		"email": "test2@sundsvall.se",
+		"workTitle": "Developer",
+		"orgName": "Org 2"
+	},
+	{
+		"id": 3,
+		"personId": "p3",
+		"orgId": "ORG-3",
+		"firstName": "Test",
+		"lastName": "Three",
+		"email": "test3@sundsvall.se",
+		"workTitle": "Manager",
+		"orgName": "Org 3"
+	}
+]

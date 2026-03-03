@@ -1,0 +1,65 @@
+{
+	"content": [
+		{
+			"id": 1,
+			"personId": "p1",
+			"orgId": "ORG-1",
+			"firstName": "Test",
+			"lastName": "One",
+			"email": "test1@sundsvall.se",
+			"workTitle": "Developer",
+			"orgName": "Org 1"
+		}
+	],
+	"pageable": {
+		"pageNumber": 0,
+		"pageSize": 1,
+		"sort": [
+			{
+				"direction": "ASC",
+				"property": "firstName",
+				"ignoreCase": false,
+				"nullHandling": "NATIVE",
+				"descending": false,
+				"ascending": true
+			},
+			{
+				"direction": "ASC",
+				"property": "lastName",
+				"ignoreCase": false,
+				"nullHandling": "NATIVE",
+				"descending": false,
+				"ascending": true
+			}
+		],
+		"offset": 0,
+		"paged": true,
+		"unpaged": false
+	},
+	"last": true,
+	"totalPages": 1,
+	"totalElements": 1,
+	"size": 1,
+	"number": 0,
+	"first": true,
+	"numberOfElements": 1,
+	"sort": [
+		{
+			"direction": "ASC",
+			"property": "firstName",
+			"ignoreCase": false,
+			"nullHandling": "NATIVE",
+			"descending": false,
+			"ascending": true
+		},
+		{
+			"direction": "ASC",
+			"property": "lastName",
+			"ignoreCase": false,
+			"nullHandling": "NATIVE",
+			"descending": false,
+			"ascending": true
+		}
+	],
+	"empty": false
+}
