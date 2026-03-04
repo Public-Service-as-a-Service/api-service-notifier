@@ -44,6 +44,7 @@ public class MessageMapper {
 			.withTitle(message.getTitle())
 			.withContent(message.getContent())
 			.withSender(message.getSender())
+			.withMessageType(message.getMessageType())
 			.withCreatedAt(message.getCreatedAt())
 			.withRecipients(recipients)
 			.build();
