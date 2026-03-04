@@ -76,7 +76,7 @@ Refer to the [API Documentation](#api-documentation) for detailed information on
 ### Example Request
 
 ```bash
-curl curl -X GET http://localhost:8080/api/notifier/employee/employees/123
+curl -X GET http://localhost:8080/api/notifier/employee/employees/123
 ```
 
 ## Configuration
@@ -139,8 +139,8 @@ spring:
     enabled: true
 ```
 
-- **Additional setup is required**
-  - **Purpose:** You must populate the database using the accompanying CSV loader. 
+- **Additional setup**
+  - **Purpose:** To populate the database it's recommended to use the accompanying CSV-file loader. 
   - **Repository:** [Link to the repository](https://github.com/Public-Service-as-a-Service/cvs-filereader)
   - **Setup Instructions:** Refer to its documentation for installation and configuration steps.
       
