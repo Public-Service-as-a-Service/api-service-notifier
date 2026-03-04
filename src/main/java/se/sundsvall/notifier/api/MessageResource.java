@@ -49,6 +49,14 @@ public class MessageResource {
 		return ResponseEntity.noContent().build();
 	}
 
+	@Operation(description = "Get a single message from user")
+	@GetMapping("/{messageId}/{sender}")
+	@ApiResponse(responseCode = "200", description = "Successful Operation")
+	@ApiResponse(responseCode = "404", description = "Not Found")
+	public ResponseEntity<MessageResponse> getMessage(@PathVariable @Email String sender, @PathVariable Long messageId) {
+		return ResponseEntity.ok(messageService.getMessageById(sender, messageId));
+	}
+
 	@Operation(description = "Get message from specific user")
 	@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true)
 	@GetMapping
