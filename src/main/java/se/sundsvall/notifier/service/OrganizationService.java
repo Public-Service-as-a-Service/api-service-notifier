@@ -7,12 +7,13 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.zalando.problem.Problem;
-import org.zalando.problem.Status;
+import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.notifier.api.model.response.OrganizationResponse;
 import se.sundsvall.notifier.integration.db.entity.Organization;
 import se.sundsvall.notifier.integration.db.repository.OrganizationRepository;
 import se.sundsvall.notifier.service.mapper.EntityToResponseMapper;
+
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
 public class OrganizationService {
@@ -36,7 +37,7 @@ public class OrganizationService {
 		}
 
 		return organizationRepository.findByOrgId(orgId).map(mapper::mapToOrganizationResponse)
-			.orElseThrow(() -> Problem.valueOf(Status.NOT_FOUND, "orgnanization with id '%s' not found".formatted(orgId)));
+			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "orgnanization with id '%s' not found".formatted(orgId)));
 	}
 
 	public List<OrganizationResponse> getOrgsById(List<String> orgId) {
@@ -46,7 +47,7 @@ public class OrganizationService {
 		var result = organizationRepository.findByOrgIdIn(orgId).stream().map(mapper::mapToOrganizationResponse).toList();
 
 		if (result.isEmpty()) {
-			throw Problem.valueOf(Status.NOT_FOUND, "No organization found.");
+			throw Problem.valueOf(NOT_FOUND, "No organization found.");
 		}
 		return result;
 	}
@@ -55,7 +56,7 @@ public class OrganizationService {
 		var result = organizationRepository.findOrgWithChildrenAndDescendants(orgId).stream().map(mapper::mapToOrganizationResponse).toList();
 
 		if (result.isEmpty()) {
-			throw Problem.valueOf(Status.NOT_FOUND, "No organization with id '%s' could be found".formatted(orgId));
+			throw Problem.valueOf(NOT_FOUND, "No organization with id '%s' could be found".formatted(orgId));
 		}
 
 		return result;
@@ -65,7 +66,7 @@ public class OrganizationService {
 		var result = organizationRepository.findOrgAndChildren(orgId).stream().map(mapper::mapToOrganizationResponse).toList();
 
 		if (result.isEmpty()) {
-			throw Problem.valueOf(Status.NOT_FOUND, "No organization with id '%s' could be found".formatted(orgId));
+			throw Problem.valueOf(NOT_FOUND, "No organization with id '%s' could be found".formatted(orgId));
 		}
 
 		return result;
@@ -81,7 +82,7 @@ public class OrganizationService {
 		List<Organization> directChildren = organizationRepository.findChildren(orgId);
 
 		if (directChildren.isEmpty()) {
-			throw Problem.valueOf(Status.NOT_FOUND, "No children for organization with id '%s' could be found".formatted(orgId));
+			throw Problem.valueOf(NOT_FOUND, "No children for organization with id '%s' could be found".formatted(orgId));
 		}
 
 		List<OrganizationResponse> response = new ArrayList<>();

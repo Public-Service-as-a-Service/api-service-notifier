@@ -1,5 +1,13 @@
 package se.sundsvall.notifier.integration.db;
 
+import com.google.code.beanmatchers.BeanMatchers;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import se.sundsvall.notifier.integration.db.entity.Message;
+import se.sundsvall.notifier.integration.db.entity.MessageRecipient;
+
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanConstructor;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEqualsFor;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCodeFor;
@@ -7,15 +15,6 @@ import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanToStringExcl
 import static com.google.code.beanmatchers.BeanMatchers.hasValidGettersAndSetters;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.AllOf.allOf;
-
-import com.google.code.beanmatchers.BeanMatchers;
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import se.sundsvall.notifier.integration.db.entity.Group;
-import se.sundsvall.notifier.integration.db.entity.Message;
-import se.sundsvall.notifier.integration.db.entity.MessageRecipient;
 
 public class MessageEntityTest {
 
@@ -42,7 +41,6 @@ public class MessageEntityTest {
 		final var title = "title";
 		final var content = "content";
 		final var sender = "sender";
-		final var group = new Group();
 
 		var message = Message.builder()
 			.withTitle(title)

@@ -1,15 +1,5 @@
 package se.sundsvall.notifier.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -20,8 +10,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.zalando.problem.Status;
-import org.zalando.problem.ThrowableProblem;
+import se.sundsvall.dept44.problem.ThrowableProblem;
 import se.sundsvall.notifier.api.model.request.GroupRequest;
 import se.sundsvall.notifier.api.model.request.GroupUpdateRequest;
 import se.sundsvall.notifier.api.model.response.GroupResponse;
@@ -30,6 +19,17 @@ import se.sundsvall.notifier.integration.db.entity.Group;
 import se.sundsvall.notifier.integration.db.repository.EmployeeRepository;
 import se.sundsvall.notifier.integration.db.repository.GroupRepository;
 import se.sundsvall.notifier.service.mapper.EntityToResponseMapper;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @ExtendWith(MockitoExtension.class)
 public class GroupServiceTest {
@@ -160,7 +160,7 @@ public class GroupServiceTest {
 			.isInstanceOf(ThrowableProblem.class)
 			.satisfies(ex -> {
 				var p = (ThrowableProblem) ex;
-				assertThat(p.getStatus()).isEqualTo(Status.NOT_FOUND);
+				assertThat(p.getStatus()).isEqualTo(NOT_FOUND);
 				assertThat(p.getDetail()).isEqualTo("Group with id '1' not found");
 			});
 
@@ -220,7 +220,7 @@ public class GroupServiceTest {
 			.isInstanceOf(ThrowableProblem.class)
 			.satisfies(ex -> {
 				var problem = (ThrowableProblem) ex;
-				assertThat(problem.getStatus()).isEqualTo(Status.NOT_FOUND);
+				assertThat(problem.getStatus()).isEqualTo(NOT_FOUND);
 				assertThat(problem.getDetail()).isEqualTo("Group with id '1' not found");
 			});
 
@@ -310,7 +310,7 @@ public class GroupServiceTest {
 			.isInstanceOf(ThrowableProblem.class)
 			.satisfies(ex -> {
 				var p = (ThrowableProblem) ex;
-				assertThat(p.getStatus()).isEqualTo(Status.NOT_FOUND);
+				assertThat(p.getStatus()).isEqualTo(NOT_FOUND);
 				assertThat(p.getDetail()).isEqualTo("Group with id '1' not found");
 			});
 

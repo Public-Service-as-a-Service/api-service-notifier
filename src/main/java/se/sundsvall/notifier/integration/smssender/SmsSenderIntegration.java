@@ -1,12 +1,12 @@
 package se.sundsvall.notifier.integration.smssender;
 
-import static java.util.Optional.ofNullable;
-import static se.sundsvall.notifier.integration.smssender.MessageStatus.NOT_SENT;
-import static se.sundsvall.notifier.integration.smssender.MessageStatus.SENT;
-
 import generated.se.sundsvall.smssender.SendSmsResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import static java.util.Optional.ofNullable;
+import static se.sundsvall.notifier.integration.smssender.MessageStatus.NOT_SENT;
+import static se.sundsvall.notifier.integration.smssender.MessageStatus.SENT;
 
 @Slf4j
 @Component

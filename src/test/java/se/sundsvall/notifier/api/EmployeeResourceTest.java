@@ -1,10 +1,9 @@
 package se.sundsvall.notifier.api;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
@@ -13,6 +12,9 @@ import se.sundsvall.notifier.Application;
 import se.sundsvall.notifier.api.model.response.EmployeeManagerResponse;
 import se.sundsvall.notifier.api.model.response.EmployeeWithOrgNameResponse;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+@AutoConfigureWebTestClient
 @SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("junit")
 @Sql(
