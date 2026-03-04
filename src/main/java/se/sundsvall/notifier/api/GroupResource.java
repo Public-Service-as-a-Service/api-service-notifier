@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,14 +19,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.zalando.problem.Problem;
+import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.notifier.api.model.request.GroupRequest;
 import se.sundsvall.notifier.api.model.request.GroupUpdateRequest;
 import se.sundsvall.notifier.api.model.response.GroupResponse;
 import se.sundsvall.notifier.service.GroupService;
 
 @RestController
-@RequestMapping("/api/notifier/groups")
+@RequestMapping(path = "/api/notifier/groups", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Group Resource")
 @ApiResponse(
 	responseCode = "500",
