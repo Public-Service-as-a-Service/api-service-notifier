@@ -52,12 +52,11 @@ This microservice depends on the following services:
   - **Purpose:**  Is used to send text messages to recipients
   - **Repository:** [Link to the repository](https://github.com/Sundsvallskommun/api-service-sms-sender)
   - **Setup Instructions:** Refer to its documentation for installation and configuration steps.
-
 - **Teams Sender**
-    - **Purpose:** Is used to send teams messages to recipients
-    - **Repository:** [Link to the repository](https://github.com/Sundsvallskommun/api-service-teams-sender)
-    - **Setup Instructions:** Refer to its documentation for installation and configuration steps.
-Ensure that these services are running and properly configured before starting this microservice.
+  - **Purpose:** Is used to send teams messages to recipients
+  - **Repository:** [Link to the repository](https://github.com/Sundsvallskommun/api-service-teams-sender)
+  - **Setup Instructions:** Refer to its documentation for installation and configuration steps.
+    Ensure that these services are running and properly configured before starting this microservice.
 
 ## API Documentation
 
@@ -109,7 +108,7 @@ Configuration is crucial for the application to run successfully. Ensure all nec
     sender: <sender>
   teams-sender:
     base-url: <service-url>
-    
+
     spring:
     security:
       oauth2:
@@ -126,7 +125,7 @@ Configuration is crucial for the application to run successfully. Ensure all nec
             teams-sender:
               client-id: <client-id>
               client-secret: <client-secret>
-            
+
   ```
 
 ### Database Initialization
@@ -140,10 +139,10 @@ spring:
 ```
 
 - **Additional setup**
-  - **Purpose:** To populate the database it's recommended to use the accompanying CSV-file loader. 
+  - **Purpose:** To populate the database it's recommended to use the accompanying CSV-file loader.
   - **Repository:** [Link to the repository](https://github.com/Public-Service-as-a-Service/cvs-filereader)
   - **Setup Instructions:** Refer to its documentation for installation and configuration steps.
-      
+
 ### Additional Notes
 
 - **Application Profiles:**
