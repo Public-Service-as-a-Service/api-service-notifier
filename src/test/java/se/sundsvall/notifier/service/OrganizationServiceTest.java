@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -13,16 +14,20 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.zalando.problem.ThrowableProblem;
 import se.sundsvall.notifier.api.model.response.OrganizationResponse;
 import se.sundsvall.notifier.integration.db.entity.Organization;
 import se.sundsvall.notifier.integration.db.repository.OrganizationRepository;
-import se.sundsvall.notifier.service.mapper.GroupEmployeeOrganizationMapper;
+import se.sundsvall.notifier.service.mapper.EntityToResponseMapper;
 
 @ExtendWith(MockitoExtension.class)
 public class OrganizationServiceTest {
 	@Mock
-	private GroupEmployeeOrganizationMapper mapper;
+	private EntityToResponseMapper mapper;
 
 	@Mock
 	private OrganizationRepository organizationRepository;
@@ -187,4 +192,71 @@ public class OrganizationServiceTest {
 		verifyNoInteractions(mapper);
 	}
 
+	@Test
+	void getOrganizationWithSearch_test() {
+		var service = new OrganizationService(mapper, organizationRepository);
+
+		var org1 = new Organization();
+		var org2 = new Organization();
+		var response1 = mock(OrganizationResponse.class);
+		var response2 = mock(OrganizationResponse.class);
+
+		Pageable pageable = PageRequest.of(0, 2);
+		Page<Organization> result = new PageImpl<>(List.of(org1, org2), pageable, 2);
+
+		when(organizationRepository.findByNameContaining("search", pageable)).thenReturn(result);
+		when(mapper.mapToOrganizationResponse(org1)).thenReturn(response1);
+		when(mapper.mapToOrganizationResponse(org2)).thenReturn(response2);
+
+		var searchResult = service.getOrganizationWithSearch("search", pageable);
+
+		assertThat(searchResult.getContent()).containsExactly(response1, response2);
+	}
+
+	@Test
+	void getChildrenReplaceDuplicateDescendantsWithRoot_test() {
+		var service = new OrganizationService(mapper, organizationRepository);
+
+		var top = new Organization();
+		top.setOrgId("orgIdTop");
+		top.setParentOrgId("parentOrgId");
+		top.setName("duplicateOrg");
+		top.setTreeLevel(2);
+
+		var middle = new Organization();
+		middle.setOrgId("orgIdMiddle");
+		middle.setParentOrgId("orgIdTop");
+		middle.setName("duplicateOrg");
+		middle.setTreeLevel(3);
+
+		var bottom = new Organization();
+		bottom.setOrgId("orgIdBottom");
+		bottom.setParentOrgId("orgIdMiddle");
+		bottom.setName("duplicateOrg");
+		bottom.setTreeLevel(4);
+
+		var bottomResponse = OrganizationResponse.builder()
+			.withOrgId(bottom.getOrgId())
+			.withParentOrgId(top.getParentOrgId())
+			.withTreeLevel(top.getTreeLevel())
+			.withName("duplicateOrg")
+			.build();
+
+		when(mapper.mapToOrganizationResponse(bottom)).thenReturn(bottomResponse);
+		when(organizationRepository.findChildren("parentOrgId")).thenReturn(List.of(top));
+		when(organizationRepository.findChildren("orgIdTop")).thenReturn(List.of(middle));
+		when(organizationRepository.findChildren("orgIdMiddle")).thenReturn(List.of(bottom));
+		when(organizationRepository.findChildren("orgIdBottom")).thenReturn(List.of());
+
+		var result = service.getChildrenReplaceDuplicateDescendantsWithRoot("parentOrgId");
+		var remainingOrg = result.getFirst();
+
+		assertThat(result).hasSize(1);
+		assertThat(remainingOrg.orgId()).isEqualTo(bottom.getOrgId());
+		assertThat(remainingOrg.parentOrgId()).isEqualTo(top.getParentOrgId());
+		assertThat(remainingOrg.name()).isEqualTo(top.getName());
+
+		verify(mapper).mapToOrganizationResponse(bottom);
+		verifyNoMoreInteractions(mapper);
+	}
 }

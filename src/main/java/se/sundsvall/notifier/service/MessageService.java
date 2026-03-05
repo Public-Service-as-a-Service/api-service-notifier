@@ -4,10 +4,10 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import se.sundsvall.notifier.api.model.request.MessageRequest;
+import se.sundsvall.notifier.api.model.request.MessageType;
 import se.sundsvall.notifier.api.model.response.MessageResponse;
 import se.sundsvall.notifier.integration.db.entity.Employee;
 import se.sundsvall.notifier.integration.db.entity.MessageRecipient;
-import se.sundsvall.notifier.integration.db.entity.MessageRecipientId;
 import se.sundsvall.notifier.integration.db.repository.EmployeeRepository;
 import se.sundsvall.notifier.integration.db.repository.MessageRepository;
 import se.sundsvall.notifier.integration.smssender.MessageStatus;
@@ -46,10 +46,6 @@ public class MessageService {
 
 		for (Employee employee : employees) {
 
-			MessageRecipientId recipientId = new MessageRecipientId();
-			recipientId.setMessageId(savedMessage.getId());
-			recipientId.setEmployeeId(employee.getId());
-
 			var delivered = sendMessageToEmployee(employee, messageRequest);
 			MessageRecipient messageRecipient = messageMapper.toMessageRecipient(employee, delivered);
 
@@ -72,14 +68,16 @@ public class MessageService {
 	public MessageRecipient.DeliveryStatus sendMessageToEmployee(Employee employee, MessageRequest messageRequest) {
 		boolean teamsSuccess = false;
 		MessageStatus smsSuccess = MessageStatus.NOT_SENT;
+		boolean isTeamsMessage = messageRequest.messageType() == MessageType.TEAMS || messageRequest.messageType() == MessageType.TEAMS_AND_SMS;
+		boolean isSmsMessage = messageRequest.messageType() == MessageType.SMS || messageRequest.messageType() == MessageType.TEAMS_AND_SMS;
 
-		if (messageRequest.sendToTeams() && employee.getEmail() != null) {
+		if (isTeamsMessage && employee.getEmail() != null) {
 			teamsSuccess = teamsSenderIntegration.sendTeamsMessage("2281",
 				messageMapper.toSendTeamsDto(messageRequest.content(), employee.getEmail()));
 		}
 
 		String phoneNumber = phoneNumberUtil.cleanPhoneNumber(employee.getWorkMobile());
-		if (messageRequest.sendSms() && phoneNumber != null) {
+		if (isSmsMessage && phoneNumber != null) {
 			smsSuccess = smsSenderIntegration.sendSms("2281",
 				messageMapper.toSendSmsDto(messageRequest.content(), phoneNumber));
 		}

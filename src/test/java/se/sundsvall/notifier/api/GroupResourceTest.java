@@ -1,29 +1,28 @@
 package se.sundsvall.notifier.api;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import se.sundsvall.notifier.Application;
 import se.sundsvall.notifier.api.model.request.GroupRequest;
 import se.sundsvall.notifier.api.model.request.GroupUpdateRequest;
 import se.sundsvall.notifier.api.model.response.GroupResponse;
-import se.sundsvall.notifier.service.GroupService;
 
 @SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("junit")
+@Sql(
+	scripts = {
+		"/db/script/truncate.sql", "/db/script/testdata.sql"
+	},
+	executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class GroupResourceTest {
-
-	@MockitoBean
-	private GroupService groupService;
 
 	@Autowired
 	private WebTestClient webTestClient;
@@ -32,58 +31,60 @@ public class GroupResourceTest {
 
 	@Test
 	void getGroups_withoutCreatorId_ok_returnsAllGroups() {
-		var response1 = GroupResponse.builder().withId(1L).withName("G1").build();
-		var response2 = GroupResponse.builder().withId(2L).withName("G2").build();
-
-		when(groupService.getAllGroups()).thenReturn(List.of(response1, response2));
-
-		webTestClient.get()
+		final var response = webTestClient.get()
 			.uri(BASE_PATH)
 			.exchange()
 			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
 			.expectBodyList(GroupResponse.class)
-			.contains(response1, response2);
+			.returnResult()
+			.getResponseBody();
 
-		verify(groupService).getAllGroups();
-		verifyNoMoreInteractions(groupService);
+		assertThat(response).isNotNull();
+		assertThat(response)
+			.extracting(GroupResponse::name)
+			.containsExactlyInAnyOrder("G1", "G2", "G3");
 	}
 
 	@Test
 	void getGroups_withCreatorId_ok_returnsGroupsByCreator() {
-		var creatorId = "creator-123";
-		var response = GroupResponse.builder().withId(1L).withCreatorId(creatorId).build();
-
-		when(groupService.getGroupsByCreatorId(creatorId)).thenReturn(List.of(response));
-
-		webTestClient.get()
-			.uri(uriBuilder -> uriBuilder.path(BASE_PATH)
-				.queryParam("creatorId", creatorId)
-				.build())
+		final var response = webTestClient.get()
+			.uri(BASE_PATH + "?creatorId=creator-123")
 			.exchange()
 			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
 			.expectBodyList(GroupResponse.class)
-			.contains(response);
+			.returnResult()
+			.getResponseBody();
 
-		verify(groupService).getGroupsByCreatorId(creatorId);
-		verifyNoMoreInteractions(groupService);
+		assertThat(response).isNotNull();
+		assertThat(response)
+			.extracting(GroupResponse::name)
+			.containsExactlyInAnyOrder("G1", "G2");
 	}
 
 	@Test
 	void getGroupById_ok() {
-		var groupId = 1L;
-		var response = GroupResponse.builder().withId(groupId).withName("G1").build();
-
-		when(groupService.getGroupById(groupId)).thenReturn(response);
-
-		webTestClient.get()
-			.uri(BASE_PATH + "/" + groupId)
+		final var response = webTestClient.get()
+			.uri(BASE_PATH + "/1")
 			.exchange()
 			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
 			.expectBody(GroupResponse.class)
-			.isEqualTo(response);
+			.returnResult()
+			.getResponseBody();
 
-		verify(groupService).getGroupById(groupId);
-		verifyNoMoreInteractions(groupService);
+		assertThat(response).isNotNull();
+		assertThat(response.id()).isEqualTo(1L);
+		assertThat(response.name()).isEqualTo("G1");
+	}
+
+	@Test
+	void getGroupById_notFound_returns404() {
+		webTestClient.get()
+			.uri(BASE_PATH + "/999")
+			.exchange()
+			.expectStatus().isNotFound();
 	}
 
 	@Test
@@ -92,40 +93,39 @@ public class GroupResourceTest {
 			.withName("Team A")
 			.withDescription("Beskrivning")
 			.withCreatorId("creator-123")
-			.withEmployees(Set.of(10L, 20L))
+			.withEmployees(Set.of(1L, 2L))
 			.build();
 
-		when(groupService.createGroup(any(GroupRequest.class))).thenReturn(123L);
-
-		webTestClient.post()
+		final var location = webTestClient.post()
 			.uri(BASE_PATH)
+			.contentType(MediaType.APPLICATION_JSON)
 			.bodyValue(request)
 			.exchange()
 			.expectStatus().isCreated()
-			.expectHeader().valueEquals("Location", "/api/notifier/groups/123");
+			.expectHeader().exists("Location")
+			.returnResult(Void.class)
+			.getResponseHeaders()
+			.getLocation();
 
-		verify(groupService).createGroup(any(GroupRequest.class));
-		verifyNoMoreInteractions(groupService);
+		assertThat(location).isNotNull();
+		assertThat(location.toString()).startsWith("/api/notifier/groups/");
 	}
 
 	@Test
 	void createGroup_invalidBody_returns400() {
-		// NotBlank / NotNull ska trigga 400
 		var invalid = GroupRequest.builder()
-			.withName("")                 // NotBlank
-			.withDescription("")          // NotBlank
-			.withCreatorId("")            // NotBlank
-			.withEmployees(null)          // NotNull
+			.withName("")
+			.withDescription("")
+			.withCreatorId("")
+			.withEmployees(null)
 			.build();
 
 		webTestClient.post()
 			.uri(BASE_PATH)
+			.contentType(MediaType.APPLICATION_JSON)
 			.bodyValue(invalid)
 			.exchange()
 			.expectStatus().isBadRequest();
-
-		// Viktigt: service ska inte anropas vid valideringsfel
-		verifyNoMoreInteractions(groupService);
 	}
 
 	@Test
@@ -135,27 +135,23 @@ public class GroupResourceTest {
 		var request = GroupUpdateRequest.builder()
 			.withName("New name")
 			.withDescription("New desc")
-			.withEmployees(Set.of(10L))
+			.withEmployees(Set.of(1L))
 			.build();
 
-		var response = GroupResponse.builder()
-			.withId(groupId)
-			.withName("New name")
-			.withDescription("New desc")
-			.build();
-
-		when(groupService.updateGroup(eq(groupId), any(GroupUpdateRequest.class))).thenReturn(response);
-
-		webTestClient.put()
+		final var response = webTestClient.put()
 			.uri(BASE_PATH + "/" + groupId)
+			.contentType(MediaType.APPLICATION_JSON)
 			.bodyValue(request)
 			.exchange()
 			.expectStatus().isOk()
 			.expectBody(GroupResponse.class)
-			.isEqualTo(response);
+			.returnResult()
+			.getResponseBody();
 
-		verify(groupService).updateGroup(eq(groupId), any(GroupUpdateRequest.class));
-		verifyNoMoreInteractions(groupService);
+		assertThat(response).isNotNull();
+		assertThat(response.id()).isEqualTo(groupId);
+		assertThat(response.name()).isEqualTo("New name");
+		assertThat(response.description()).isEqualTo("New desc");
 	}
 
 	@Test
@@ -163,31 +159,30 @@ public class GroupResourceTest {
 		var groupId = 1L;
 
 		var invalid = GroupUpdateRequest.builder()
-			.withName("")          // NotBlank
-			.withDescription("")   // NotBlank
-			.withEmployees(null)   // NotNull
+			.withName("")
+			.withDescription("")
+			.withEmployees(null)
 			.build();
 
 		webTestClient.put()
 			.uri(BASE_PATH + "/" + groupId)
+			.contentType(MediaType.APPLICATION_JSON)
 			.bodyValue(invalid)
 			.exchange()
 			.expectStatus().isBadRequest();
-
-		verifyNoMoreInteractions(groupService);
 	}
 
 	@Test
 	void deleteGroup_ok_returns204() {
-		var groupId = 1L;
-
 		webTestClient.delete()
-			.uri(BASE_PATH + "/" + groupId)
+			.uri(BASE_PATH + "/1")
 			.exchange()
 			.expectStatus().isNoContent()
 			.expectBody().isEmpty();
 
-		verify(groupService).deleteGroup(groupId);
-		verifyNoMoreInteractions(groupService);
+		webTestClient.get()
+			.uri(BASE_PATH + "/1")
+			.exchange()
+			.expectStatus().isNotFound();
 	}
 }

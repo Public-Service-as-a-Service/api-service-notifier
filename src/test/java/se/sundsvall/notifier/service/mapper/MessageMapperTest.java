@@ -7,9 +7,11 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import se.sundsvall.notifier.api.model.request.MessageRequest;
+import se.sundsvall.notifier.api.model.request.MessageType;
 import se.sundsvall.notifier.integration.db.entity.Employee;
 import se.sundsvall.notifier.integration.db.entity.Message;
 import se.sundsvall.notifier.integration.db.entity.MessageRecipient;
+import se.sundsvall.notifier.integration.db.entity.Organization;
 
 class MessageMapperTest {
 	private MessageMapper messageMapper;
@@ -25,10 +27,8 @@ class MessageMapperTest {
 		var messageRequest = new MessageRequest("title",
 			"content",
 			"sender",
-			null,
 			Set.of(1L, 2L, 3L),
-			true,
-			true);
+			MessageType.SMS);
 		var result = messageMapper.toEntity(messageRequest);
 
 		assertThat(result).isNotNull();
@@ -41,8 +41,14 @@ class MessageMapperTest {
 	@Test
 	void toMessageResponseTest() {
 		var createdAt = LocalDateTime.now();
+		var organization = new Organization();
+		organization.setName("IT Department");
+
 		var employee = new Employee();
 		employee.setId(1L);
+		employee.setFirstName("John");
+		employee.setLastName("Doe");
+		employee.setOrganization(organization);
 
 		var messageRecipient = MessageRecipient.builder()
 			.withEmployee(employee)

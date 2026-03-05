@@ -33,7 +33,7 @@ public class MessageEntityTest {
 			hasValidGettersAndSetters(),
 			hasValidBeanEqualsFor("id"),
 			hasValidBeanHashCodeFor("id"),
-			hasValidBeanToStringExcluding("recipients", "group", "sender")));
+			hasValidBeanToStringExcluding("recipients", "group", "sender", "messageType")));
 	}
 
 	@Test
@@ -48,14 +48,11 @@ public class MessageEntityTest {
 			.withTitle(title)
 			.withContent(content)
 			.withSender(sender)
-			.withGroup(group)
 			.build();
 
 		assertThat(message.getTitle()).isEqualTo(title);
 		assertThat(message.getContent()).isEqualTo(content);
 		assertThat(message.getSender()).isEqualTo(sender);
-		assertThat(message.getGroup()).isEqualTo(group);
-
 	}
 
 	@Test
@@ -110,31 +107,6 @@ public class MessageEntityTest {
 
 		message.addRecipient(recipient);
 		message.addRecipient(recipient);
-
-		assertThat(message.getRecipients()).hasSize(1);
-	}
-
-	@Test
-	void removeRecipient_removesAndUnlinks() {
-		var message = new Message();
-		message.setRecipients(new HashSet<>());
-
-		var recipient = new MessageRecipient();
-		message.addRecipient(recipient);
-
-		message.removeRecipient(recipient);
-
-		assertThat(message.getRecipients()).isEmpty();
-		assertThat(recipient.getMessage()).isNull();
-	}
-
-	@Test
-	void removeRecipient_null() {
-		var message = new Message();
-		message.setRecipients(new HashSet<>());
-		message.addRecipient(new MessageRecipient());
-
-		message.removeRecipient(null);
 
 		assertThat(message.getRecipients()).hasSize(1);
 	}

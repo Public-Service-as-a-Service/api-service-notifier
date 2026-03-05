@@ -3,6 +3,8 @@ package se.sundsvall.notifier.integration.db.repository;
 import feign.Param;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -43,4 +45,22 @@ public interface OrganizationRepository extends JpaRepository<Organization, Long
 		WHERE child.parent_org_id = :orgId
 		""", nativeQuery = true)
 	List<Organization> findOrgAndChildren(@Param("orgId") String orgId);
+
+	@Query(value = """
+		SELECT child.*
+		FROM organization child
+		WHERE child.parent_org_id = :orgId
+		""", nativeQuery = true)
+	List<Organization> findChildren(@Param("orgId") String orgId);
+
+	@Query("""
+		select o
+		from Organization o
+		where o.name like concat('%', :name, '%')
+			and o.treeLevel = (
+			select max(o2.treeLevel)
+			from Organization o2
+			where o2.name = o.name and o2.name like concat('%', :name, '%'))
+		""")
+	Page<Organization> findByNameContaining(@Param("name") String name, Pageable pageable);
 }

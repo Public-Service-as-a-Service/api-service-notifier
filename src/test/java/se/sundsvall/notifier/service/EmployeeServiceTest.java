@@ -15,16 +15,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import se.sundsvall.notifier.api.model.response.EmployeeManagerResponse;
 import se.sundsvall.notifier.api.model.response.EmployeeWithOrgNameResponse;
 import se.sundsvall.notifier.integration.db.entity.Employee;
 import se.sundsvall.notifier.integration.db.repository.EmployeeRepository;
-import se.sundsvall.notifier.service.mapper.GroupEmployeeOrganizationMapper;
+import se.sundsvall.notifier.service.mapper.EntityToResponseMapper;
 
 @ExtendWith(MockitoExtension.class)
 public class EmployeeServiceTest {
 
 	@Mock
-	private GroupEmployeeOrganizationMapper mapper;
+	private EntityToResponseMapper mapper;
 
 	@Mock
 	private EmployeeRepository employeeRepository;
@@ -101,16 +103,73 @@ public class EmployeeServiceTest {
 		var employee2 = new Employee();
 		var response1 = mock(EmployeeWithOrgNameResponse.class);
 		var response2 = mock(EmployeeWithOrgNameResponse.class);
-		Pageable page = PageRequest.of(0, 2);
-		Page<Employee> employeePage = new PageImpl<>(List.of(employee1, employee2), page, 2);
 
-		when(employeeRepository.findByFirstNameStartingWithOrLastNameStartingWith("searchterm", "searchterm", page)).thenReturn(employeePage);
+		Pageable page = PageRequest.of(0, 2,
+			Sort.by(Sort.Order.asc("firstName"), Sort.Order.asc("lastName")));
+		Pageable sortedPage = PageRequest.of(0, 2, Sort.by("firstName").ascending().and(Sort.by("lastName").ascending()));
+
+		Page<Employee> employeePage = new PageImpl<>(List.of(employee1, employee2), sortedPage, 2);
+
+		when(employeeRepository.findMatchingEmployee("searchterm1", "serachterm2", sortedPage)).thenReturn(employeePage);
 		when(mapper.mapToEmployeeWithOrgNameResponse(employee1)).thenReturn(response1);
 		when(mapper.mapToEmployeeWithOrgNameResponse(employee2)).thenReturn(response2);
 
-		var result = service.getEmployeesWithSearch("searchterm", page);
+		var result = service.getEmployeesWithSearch("searchterm1 serachterm2", page);
 
 		assertThat(result.getContent()).containsExactly(response1, response2);
 	}
 
+	@Test
+	void getEmployee_withManagerCode_test() {
+		var service = new EmployeeService(employeeRepository, mapper);
+
+		var employee1 = new Employee();
+		var employee2 = new Employee();
+
+		var response1 = EmployeeManagerResponse.builder()
+			.withId(1L)
+			.withPersonId("p1")
+			.withOrgId("org1")
+			.withFirstName("Anna")
+			.withLastName("Andersson")
+			.withEmail("anna@example.com")
+			.withWorkMobile("0700000001")
+			.withWorkPhone("060000001")
+			.withWorkTitle("Chef")
+			.withManagerCode("MGR1")
+			.build();
+
+		var response2 = EmployeeManagerResponse.builder()
+			.withId(2L)
+			.withPersonId("p2")
+			.withOrgId("org2")
+			.withFirstName("Bertil")
+			.withLastName("Berg")
+			.withEmail("bertil@example.com")
+			.withWorkMobile("0700000002")
+			.withWorkPhone("060000002")
+			.withWorkTitle("Team lead")
+			.withManagerCode("MGR2")
+			.build();
+
+		when(employeeRepository.findAllByManagerCodeIsNotNull()).thenReturn(List.of(employee1, employee2));
+		when(mapper.mapToEmployeeManagerResponse(employee1)).thenReturn(response1);
+		when(mapper.mapToEmployeeManagerResponse(employee2)).thenReturn(response2);
+
+		var result = service.getAllEmployeeManagers();
+
+		assertThat(result).isEqualTo(List.of(response1, response2));
+	}
+
+	@Test
+	void getEmployee_withManagerCode_emptyList_test() {
+		var service = new EmployeeService(employeeRepository, mapper);
+
+		when(employeeRepository.findAllByManagerCodeIsNotNull()).thenReturn(List.of());
+
+		var result = service.getAllEmployeeManagers();
+
+		assertThat(result).isEmpty();
+		verifyNoInteractions(mapper);
+	}
 }

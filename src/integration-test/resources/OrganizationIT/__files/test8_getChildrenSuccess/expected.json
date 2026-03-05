@@ -1,0 +1,16 @@
+[
+	{
+		"companyId": "COMP",
+		"parentOrgId": "ORG-1",
+		"orgId": "ORG-2",
+		"name": "Org 2",
+		"treeLevel": 2
+	},
+	{
+		"companyId": "COMP",
+		"parentOrgId": "ORG-1",
+		"orgId": "ORG-3",
+		"name": "Org 3",
+		"treeLevel": 2
+	}
+]

@@ -1,95 +1,130 @@
 package se.sundsvall.notifier.api;
 
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import se.sundsvall.notifier.Application;
+import se.sundsvall.notifier.api.model.response.EmployeeManagerResponse;
 import se.sundsvall.notifier.api.model.response.EmployeeWithOrgNameResponse;
-import se.sundsvall.notifier.service.EmployeeService;
 
-@WebMvcTest(EmployeeResource.class)
-@AutoConfigureMockMvc(addFilters = false)
+@SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("junit")
+@Sql(
+	scripts = {
+		"/db/script/truncate.sql", "/db/script/testdata.sql"
+	},
+	executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class EmployeeResourceTest {
 
 	@Autowired
-	private MockMvc mvc;
+	private WebTestClient webTestClient;
 
-	@MockitoBean
-	private EmployeeService service;
+	private static final String BASE_PATH = "/api/notifier/employees";
 
 	@Test
-	void getEmployee_succesful_test() throws Exception {
-		var response = List.of(
-			new EmployeeWithOrgNameResponse(1L, "personId1", "orgId1", "firstName1", "lastName1", "email1", "workMobile1", "workPhone1", "workTitle1", "avdelning1"),
-			new EmployeeWithOrgNameResponse(2L, "personId2", "orgId1", "firstName2", "lastName2", "email2", "workMobile2", "workPhone2", "workTitle2", "avdelning2"));
+	void getEmployeesByOrgId_ok_returnsEmployeesInOrg() {
+		final var response = webTestClient.get()
+			.uri(BASE_PATH + "/ORG-1")
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBodyList(EmployeeWithOrgNameResponse.class)
+			.returnResult()
+			.getResponseBody();
 
-		when(service.getEmployeesByOrg("orgId1")).thenReturn(response);
-
-		mvc.perform(get("/api/notifier/employee/{orgId}", "orgId1")
-			.accept(MediaType.APPLICATION_JSON))
-			.andExpect(status().isOk());
-
-		verify(service).getEmployeesByOrg("orgId1");
+		assertThat(response).isNotNull();
+		assertThat(response).hasSize(1);
+		assertThat(response)
+			.extracting(EmployeeWithOrgNameResponse::personId)
+			.containsExactly("p1");
 	}
 
 	@Test
-	void getAll_succesfulTest() throws Exception {
-		var response = List.of(
-			new EmployeeWithOrgNameResponse(1L, "personId1", "orgId1", "firstName1", "lastName1", "email1", "workMobile1", "workPhone1", "workTitle1", "avdelning1"),
-			new EmployeeWithOrgNameResponse(2L, "personId2", "orgId2", "firstName2", "lastName2", "email2", "workMobile2", "workPhone2", "workTitle2", "avdelning1"));
+	void getAll_ok_returnsAllEmployees() {
+		final var response = webTestClient.get()
+			.uri(BASE_PATH)
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBodyList(EmployeeWithOrgNameResponse.class)
+			.returnResult()
+			.getResponseBody();
 
-		when(service.getAllEmployees()).thenReturn(response);
-
-		mvc.perform(get("/api/notifier/employee/employees"))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.length()").value(2));
-
-		verify(service).getAllEmployees();
-
+		assertThat(response).isNotNull();
+		assertThat(response).hasSize(3);
+		assertThat(response)
+			.extracting(EmployeeWithOrgNameResponse::personId)
+			.containsExactlyInAnyOrder("p1", "p2", "p3");
 	}
 
 	@Test
-	void getWithList_succesful() throws Exception {
-		var response = List.of(
-			new EmployeeWithOrgNameResponse(1L, "personId1", "orgId1", "firstName1", "lastName1", "email1", "workMobile1", "workPhone1", "workTitle1", "avdelning1"),
-			new EmployeeWithOrgNameResponse(2L, "personId2", "orgId2", "firstName2", "lastName2", "email2", "workMobile2", "workPhone2", "workTitle2", "avdelning2"));
+	void getEmployeesByOrgIds_ok_returnsMatchingEmployees() {
+		final var response = webTestClient.get()
+			.uri(BASE_PATH + "/ids?orgIds=ORG-1&orgIds=ORG-2")
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBodyList(EmployeeWithOrgNameResponse.class)
+			.returnResult()
+			.getResponseBody();
 
-		when(service.getEmployeesByOrgList(List.of("orgId1", "orgId2"))).thenReturn(response);
-
-		mvc.perform(get("/api/notifier/employee/ids").param("orgIds", "orgId1", "orgId2"))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.length()").value(2));
-
-		verify(service).getEmployeesByOrgList(List.of("orgId1", "orgId2"));
+		assertThat(response).isNotNull();
+		assertThat(response).hasSize(2);
+		assertThat(response)
+			.extracting(EmployeeWithOrgNameResponse::personId)
+			.containsExactlyInAnyOrder("p1", "p2");
 	}
 
 	@Test
-	void GetEmployeesWithPartialSearch_test() throws Exception {
-		var request = PageRequest.of(0, 2);
-		Page<EmployeeWithOrgNameResponse> result = new PageImpl<>(List.of(), request, 0);
+	void getEmployeesWithSearch_ok_returnsMatchingEmployees() {
+		webTestClient.get()
+			.uri(BASE_PATH + "/search?search=Test&page=0&size=10")
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBody()
+			.jsonPath("$.content").isArray()
+			.jsonPath("$.content.length()").isEqualTo(3)
+			.jsonPath("$.totalElements").isEqualTo(3)
+			.jsonPath("$.content[?(@.personId == 'p1')]").exists()
+			.jsonPath("$.content[?(@.personId == 'p2')]").exists()
+			.jsonPath("$.content[?(@.personId == 'p3')]").exists();
+	}
 
-		when(service.getEmployeesWithSearch(eq("searchterm"), any(Pageable.class))).thenReturn(result);
+	@Test
+	void getEmployeesWithSearch_noMatch_returnsEmptyPage() {
+		webTestClient.get()
+			.uri(BASE_PATH + "/search?search=finnsinte&page=0&size=10")
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBody()
+			.jsonPath("$.content").isArray()
+			.jsonPath("$.content.length()").isEqualTo(0)
+			.jsonPath("$.totalElements").isEqualTo(0);
+	}
 
-		mvc.perform(get("/api/notifier/employee/employees/search")
-			.param("search", "searchterm")
-			.param("page", String.valueOf(request.getPageNumber()))
-			.param("size", String.valueOf(request.getPageSize())))
-			.andExpect(status().isOk());
+	@Test
+	void getManagers_ok_returnsAllEmployeesWithManagerCode() {
+		final var response = webTestClient.get()
+			.uri(BASE_PATH + "/managers")
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBodyList(EmployeeManagerResponse.class)
+			.returnResult()
+			.getResponseBody();
 
-		verify(service).getEmployeesWithSearch("searchterm", Pageable.ofSize(2));
-
+		assertThat(response).isNotNull();
+		assertThat(response).hasSize(3);
+		assertThat(response)
+			.extracting(EmployeeManagerResponse::managerCode)
+			.containsExactlyInAnyOrder("A_", "B_", "C_");
 	}
 }
