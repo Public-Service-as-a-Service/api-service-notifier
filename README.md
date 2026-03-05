@@ -18,7 +18,7 @@ _The service provides functionality to send notifications to employees within an
 
    ```bash
    git clone https://github.com/Public-Service-as-a-Service/api-service-notifier
-   cd api-service-
+   cd api-service-notifer
    ```
 2. **Configure the application:**
 
