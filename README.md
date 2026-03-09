@@ -1,12 +1,12 @@
-# TemplateSpringBoot
+# Notifier
 
-_A concise description of what this Spring Boot microservice does._
+_The service provides functionality to send notifications to employees within an organization or group. Groups can be manually created and contain employees from different organization._
 
 ## Getting Started
 
 ### Prerequisites
 
-- **Java 21 or higher**
+- **Java 25 or higher**
 - **Maven**
 - **MariaDB**(if applicable)
 - **Git**
@@ -17,8 +17,8 @@ _A concise description of what this Spring Boot microservice does._
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/Sundsvallskommun/YOUR-PROJECT-ID.git
-   cd YOUR-PROJECT-ID
+   git clone https://github.com/Public-Service-as-a-Service/api-service-notifier
+   cd api-service-notifier
    ```
 2. **Configure the application:**
 
@@ -48,12 +48,15 @@ _A concise description of what this Spring Boot microservice does._
 
 This microservice depends on the following services:
 
-- **Service Name**
-  - **Purpose:** Brief description of what the dependent service does.
-  - **Repository:** [Link to the repository](https://github.com/Sundsvallskommun/service_name)
+- **Sms Sender**
+  - **Purpose:**  Is used to send text messages to recipients
+  - **Repository:** [Link to the repository](https://github.com/Sundsvallskommun/api-service-sms-sender)
   - **Setup Instructions:** Refer to its documentation for installation and configuration steps.
-
-Ensure that these services are running and properly configured before starting this microservice.
+- **Teams Sender**
+  - **Purpose:** Is used to send teams messages to recipients
+  - **Repository:** [Link to the repository](https://github.com/Sundsvallskommun/api-service-teams-sender)
+  - **Setup Instructions:** Refer to its documentation for installation and configuration steps.
+    Ensure that these services are running and properly configured before starting this microservice.
 
 ## API Documentation
 
@@ -72,7 +75,7 @@ Refer to the [API Documentation](#api-documentation) for detailed information on
 ### Example Request
 
 ```bash
-curl -X GET http://localhost:8080/api/resource
+curl -X GET http://localhost:8080/api/notifier/employee/employees/123
 ```
 
 ## Configuration
@@ -100,15 +103,29 @@ Configuration is crucial for the application to run successfully. Ensure all nec
 
   ```yaml
   integration:
-    service:
-      url: http://dependency_service_url
-      oauth2:
-        client-id: some-client-id
-        client-secret: some-client-secret
+  sms-sender:
+    base-url: <service-url>
+    sender: <sender>
+  teams-sender:
+    base-url: <service-url>
 
-  service:
-    oauth2:
-      token-url: http://dependecy_service_token_url
+    spring:
+    security:
+      oauth2:
+        client:
+          provider:
+            sms-sender:
+              token-uri: <token-url>
+            teams-sender:
+              token-uri: <token-url>
+          registration:
+            sms-sender:
+              client-id: <client-id>
+              client-secret: <client-secret>           
+            teams-sender:
+              client-id: <client-id>
+              client-secret: <client-secret>
+
   ```
 
 ### Database Initialization
@@ -121,7 +138,10 @@ spring:
     enabled: true
 ```
 
-- **No additional setup is required** for database initialization, as long as the database connection settings are correctly configured.
+- **Additional setup**
+  - **Purpose:** To populate the database it's recommended to use the accompanying CSV-file loader.
+  - **Repository:** [Link to the repository](https://github.com/Public-Service-as-a-Service/cvs-filereader)
+  - **Setup Instructions:** Refer to its documentation for installation and configuration steps.
 
 ### Additional Notes
 
@@ -143,12 +163,12 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Code status
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_YOUR-PROJECT-ID&metric=alert_status)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_YOUR-PROJECT-ID)
-[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_YOUR-PROJECT-ID&metric=reliability_rating)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_YOUR-PROJECT-ID)
-[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_YOUR-PROJECT-ID&metric=security_rating)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_YOUR-PROJECT-ID)
-[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_YOUR-PROJECT-ID&metric=sqale_rating)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_YOUR-PROJECT-ID)
-[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_YOUR-PROJECT-ID&metric=vulnerabilities)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_YOUR-PROJECT-ID)
-[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_YOUR-PROJECT-ID&metric=bugs)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_YOUR-PROJECT-ID)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Public-Service-as-a-Service_api-service-notifier&metric=alert_status)](https://sonarcloud.io/summary/overall?id=Public-Service-as-a-Service_api-service-notifier)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=Public-Service-as-a-Service_api-service-notifier&metric=reliability_rating)](https://sonarcloud.io/summary/overall?id=Public-Service-as-a-Service_api-service-notifier)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Public-Service-as-a-Service_api-service-notifier&metric=security_rating)](https://sonarcloud.io/summary/overall?id=Public-Service-as-a-Service_api-service-notifier)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Public-Service-as-a-Service_api-service-notifier&metric=sqale_rating)](https://sonarcloud.io/summary/overall?id=Public-Service-as-a-Service_api-service-notifier)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Public-Service-as-a-Service_api-service-notifier&metric=vulnerabilities)](https://sonarcloud.io/summary/overall?id=Public-Service-as-a-Service_api-service-notifier)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Public-Service-as-a-Service_api-service-notifier&metric=bugs)](https://sonarcloud.io/summary/overall?id=Public-Service-as-a-Service_api-service-notifier)
 
 ---
 
