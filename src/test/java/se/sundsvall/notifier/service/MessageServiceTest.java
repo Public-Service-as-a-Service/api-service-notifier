@@ -1,19 +1,15 @@
 package se.sundsvall.notifier.service;
 
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.notifier.api.model.request.MessageRequest;
 import se.sundsvall.notifier.api.model.request.MessageType;
 import se.sundsvall.notifier.api.model.response.MessageResponse;
@@ -27,6 +23,15 @@ import se.sundsvall.notifier.integration.smssender.SmsSenderIntegration;
 import se.sundsvall.notifier.integration.teamssender.TeamsSenderIntegration;
 import se.sundsvall.notifier.service.mapper.MessageMapper;
 import se.sundsvall.notifier.service.utility.PhoneNumberUtil;
+
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MessageServiceTest {
@@ -79,6 +84,36 @@ class MessageServiceTest {
 		verify(messageMapper).toEntity(messageRequest);
 		verify(messageRepository, times(2)).save(any(Message.class));
 		verify(employeeRepository).findAllById(recipients);
+	}
+
+	@Test
+	void getMessageByIdTest() {
+		var messageId = 1L;
+		var emaii = "test@sundsvall.se";
+		var message = Message.builder().withId(messageId).withSender(emaii).build();
+		var response = MessageResponse.builder().withId(messageId).withSender(emaii).build();
+
+		when(messageRepository.findBySenderAndId(emaii, messageId)).thenReturn(Optional.of(message));
+		when(messageMapper.entityToMessageResponse(message)).thenReturn(response);
+
+		var result = messageService.getMessageById(emaii, messageId);
+		assertThat(result).isEqualTo(response);
+		verify(messageRepository).findBySenderAndId(emaii, messageId);
+	}
+
+	@Test
+	void getMessagesByIdTest_NotFound() {
+		var messageId = 1L;
+		var email = "test";
+
+		when(messageRepository.findBySenderAndId(any(), any())).thenReturn(Optional.empty());
+		var exception = assertThrows(Throwable.class, () -> messageService.getMessageById(email, messageId));
+
+		verify(messageRepository).findBySenderAndId(any(), any());
+		Assertions.assertThat(exception)
+			.isInstanceOf(Problem.class)
+			.hasMessageContaining("Message with id: " + messageId + " not found");
+		verifyNoInteractions(messageMapper);
 	}
 
 	@Test

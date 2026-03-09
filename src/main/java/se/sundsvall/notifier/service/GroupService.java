@@ -5,8 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.zalando.problem.Problem;
-import org.zalando.problem.Status;
+import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.notifier.api.model.request.GroupRequest;
 import se.sundsvall.notifier.api.model.request.GroupUpdateRequest;
 import se.sundsvall.notifier.api.model.response.GroupResponse;
@@ -14,6 +13,8 @@ import se.sundsvall.notifier.integration.db.entity.Group;
 import se.sundsvall.notifier.integration.db.repository.EmployeeRepository;
 import se.sundsvall.notifier.integration.db.repository.GroupRepository;
 import se.sundsvall.notifier.service.mapper.EntityToResponseMapper;
+
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
 public class GroupService {
@@ -47,7 +48,7 @@ public class GroupService {
 	}
 
 	public GroupResponse getGroupById(Long id) {
-		var group = groupRepository.findById(id).orElseThrow(() -> Problem.valueOf(Status.NOT_FOUND, "Group with id '%s' not found".formatted(id)));
+		var group = groupRepository.findById(id).orElseThrow(() -> Problem.valueOf(NOT_FOUND, "Group with id '%s' not found".formatted(id)));
 
 		return mapper.mapToGroupResponse(group);
 	}
@@ -67,7 +68,7 @@ public class GroupService {
 	@Transactional
 	public GroupResponse updateGroup(Long id, GroupUpdateRequest request) {
 		var existingGroup = groupRepository.findById(id)
-			.orElseThrow(() -> Problem.valueOf(Status.NOT_FOUND, "Group with id '%s' not found".formatted(id)));
+			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "Group with id '%s' not found".formatted(id)));
 
 		existingGroup.setName(request.name());
 		existingGroup.setDescription(request.description());
@@ -78,7 +79,7 @@ public class GroupService {
 	}
 
 	public void deleteGroup(Long id) {
-		var group = groupRepository.findById(id).orElseThrow(() -> Problem.valueOf(Status.NOT_FOUND, "Group with id '%s' not found".formatted(id)));
+		var group = groupRepository.findById(id).orElseThrow(() -> Problem.valueOf(NOT_FOUND, "Group with id '%s' not found".formatted(id)));
 
 		groupRepository.deleteById(group.getId());
 	}

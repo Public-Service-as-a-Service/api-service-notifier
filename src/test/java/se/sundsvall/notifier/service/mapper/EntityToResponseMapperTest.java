@@ -1,7 +1,5 @@
 package se.sundsvall.notifier.service.mapper;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.time.LocalDateTime;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -12,6 +10,8 @@ import se.sundsvall.notifier.api.model.response.OrganizationResponse;
 import se.sundsvall.notifier.integration.db.entity.Employee;
 import se.sundsvall.notifier.integration.db.entity.Group;
 import se.sundsvall.notifier.integration.db.entity.Organization;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class EntityToResponseMapperTest {
 

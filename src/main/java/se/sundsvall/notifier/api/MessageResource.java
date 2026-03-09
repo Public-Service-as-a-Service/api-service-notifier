@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import java.util.List;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,13 +18,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.zalando.problem.Problem;
+import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.notifier.api.model.request.MessageRequest;
 import se.sundsvall.notifier.api.model.response.MessageResponse;
 import se.sundsvall.notifier.service.MessageService;
 
 @RestController
-@RequestMapping("/api/notifier/messages")
+@RequestMapping(path = "/api/notifier/messages", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Message Resource")
 @ApiResponse(
 	responseCode = "400",
@@ -47,6 +48,14 @@ public class MessageResource {
 	public ResponseEntity<Void> sendMessage(@RequestBody @Valid MessageRequest message) {
 		messageService.createMessage(message);
 		return ResponseEntity.noContent().build();
+	}
+
+	@Operation(description = "Get a single message from user")
+	@GetMapping("/{messageId}/{sender}")
+	@ApiResponse(responseCode = "200", description = "Successful Operation")
+	@ApiResponse(responseCode = "404", description = "Not Found")
+	public ResponseEntity<MessageResponse> getMessage(@PathVariable @Email String sender, @PathVariable Long messageId) {
+		return ResponseEntity.ok(messageService.getMessageById(sender, messageId));
 	}
 
 	@Operation(description = "Get message from specific user")

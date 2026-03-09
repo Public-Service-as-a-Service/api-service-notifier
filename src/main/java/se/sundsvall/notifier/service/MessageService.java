@@ -3,6 +3,7 @@ package se.sundsvall.notifier.service;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.notifier.api.model.request.MessageRequest;
 import se.sundsvall.notifier.api.model.request.MessageType;
 import se.sundsvall.notifier.api.model.response.MessageResponse;
@@ -15,6 +16,8 @@ import se.sundsvall.notifier.integration.smssender.SmsSenderIntegration;
 import se.sundsvall.notifier.integration.teamssender.TeamsSenderIntegration;
 import se.sundsvall.notifier.service.mapper.MessageMapper;
 import se.sundsvall.notifier.service.utility.PhoneNumberUtil;
+
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
 public class MessageService {
@@ -52,6 +55,12 @@ public class MessageService {
 			savedMessage.addRecipient(messageRecipient);
 		}
 		messageRepository.save(savedMessage);
+	}
+
+	public MessageResponse getMessageById(String sender, Long messageId) {
+		var message = messageRepository.findBySenderAndId(sender, messageId)
+			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "Message with id: " + messageId + " not found"));
+		return messageMapper.entityToMessageResponse(message);
 	}
 
 	public List<MessageResponse> getMessages(String sender) {

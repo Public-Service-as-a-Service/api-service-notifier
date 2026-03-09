@@ -1,20 +1,21 @@
 package se.sundsvall.notifier.integration.teamssender;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-
 import generated.se.sundsvall.teamssender.SendTeamsMessageRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.zalando.problem.Problem;
-import org.zalando.problem.Status;
+import se.sundsvall.dept44.problem.Problem;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.BAD_GATEWAY;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @ExtendWith(MockitoExtension.class)
 class TeamsSenderIntegrationTest {
@@ -57,9 +58,9 @@ class TeamsSenderIntegrationTest {
 
 		when(mapper.toSendTeamsMessageRequest(any(TeamsSenderDTO.class))).thenReturn(request);
 		when(teamsSenderClient.sendTeamsMessage(anyString(), any(SendTeamsMessageRequest.class))).thenThrow(Problem.builder()
-			.withStatus(Status.BAD_GATEWAY)
+			.withStatus(BAD_GATEWAY)
 			.withCause(Problem.builder()
-				.withStatus(Status.BAD_REQUEST)
+				.withStatus(BAD_REQUEST)
 				.build())
 			.build());
 		var result = teamsSenderIntegration.sendTeamsMessage(null, null);

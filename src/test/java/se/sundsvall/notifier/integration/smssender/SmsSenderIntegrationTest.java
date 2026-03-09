@@ -1,13 +1,5 @@
 package se.sundsvall.notifier.integration.smssender;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-
 import generated.se.sundsvall.smssender.SendSmsRequest;
 import generated.se.sundsvall.smssender.SendSmsResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +9,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SmsSenderIntegrationTest {
@@ -61,7 +62,7 @@ class SmsSenderIntegrationTest {
 
 		when(mapper.toSendSmsRequest(dto)).thenReturn(new SendSmsRequest());
 		when(client.sendSms(eq(municipalityId), any(SendSmsRequest.class)))
-			.thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
+			.thenReturn(ResponseEntity.ok().build());
 
 		var result = integration.sendSms(municipalityId, dto);
 
@@ -107,5 +108,17 @@ class SmsSenderIntegrationTest {
 		verify(mapper).toSendSmsRequest(dto);
 		verify(client).sendSms(eq(municipalityId), any(SendSmsRequest.class));
 		verifyNoMoreInteractions(client, mapper);
+	}
+
+	@Test
+	void sendSms_exception() {
+		var municipalityId = "2281";
+		var dto = mock(SmsDto.class);
+
+		when(client.sendSms(eq(municipalityId), any()))
+			.thenThrow(new RuntimeException("Connection refused"));
+		var result = integration.sendSms(municipalityId, dto);
+
+		assertThat(result).isEqualTo(MessageStatus.NOT_SENT);
 	}
 }

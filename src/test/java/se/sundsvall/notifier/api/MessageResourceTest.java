@@ -1,11 +1,10 @@
 package se.sundsvall.notifier.api;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
@@ -15,6 +14,9 @@ import se.sundsvall.notifier.api.model.request.MessageRequest;
 import se.sundsvall.notifier.api.model.request.MessageType;
 import se.sundsvall.notifier.api.model.response.MessageResponse;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+@AutoConfigureWebTestClient
 @SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("junit")
 @Sql(
@@ -58,6 +60,34 @@ class MessageResourceTest {
 			.uri(BASE_PATH)
 			.contentType(MediaType.APPLICATION_JSON)
 			.bodyValue(invalid)
+			.exchange()
+			.expectStatus().isBadRequest();
+	}
+
+	@Test
+	void getMessageById_ok() {
+		String sender = "test@sundsvall.se";
+		Long messageId = 1L;
+		final var response = webTestClient.get()
+			.uri(BASE_PATH + "/{messageId}/{sender}", messageId, sender)
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBodyList(MessageResponse.class)
+			.returnResult()
+			.getResponseBody();
+
+		assertThat(response).isNotNull();
+		assertThat(response).hasSize(1);
+		assertThat(response).extracting(MessageResponse::sender).contains("test@sundsvall.se");
+	}
+
+	@Test
+	void getMessageById_invalidSender() {
+		String sender = "no-email";
+		Long messageId = 1L;
+		webTestClient.get()
+			.uri(BASE_PATH + "/{messageId}/{sender}", messageId, sender)
 			.exchange()
 			.expectStatus().isBadRequest();
 	}
