@@ -63,4 +63,5 @@ public interface OrganizationRepository extends JpaRepository<Organization, Long
 			where o2.name = o.name and o2.name like concat('%', :name, '%'))
 		""")
 	Page<Organization> findByNameContaining(@Param("name") String name, Pageable pageable);
+
 }

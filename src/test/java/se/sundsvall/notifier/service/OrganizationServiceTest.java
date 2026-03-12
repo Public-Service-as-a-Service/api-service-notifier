@@ -2,6 +2,7 @@ package se.sundsvall.notifier.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import se.sundsvall.dept44.problem.ThrowableProblem;
 import se.sundsvall.notifier.api.model.response.OrganizationResponse;
 import se.sundsvall.notifier.integration.db.entity.Organization;
+import se.sundsvall.notifier.integration.db.repository.EmployeeRepository;
 import se.sundsvall.notifier.integration.db.repository.OrganizationRepository;
 import se.sundsvall.notifier.service.mapper.EntityToResponseMapper;
 
@@ -31,10 +33,12 @@ public class OrganizationServiceTest {
 
 	@Mock
 	private OrganizationRepository organizationRepository;
+	@Mock
+	private EmployeeRepository employeeRepository;
 
 	@Test
 	void getAllOrganizations() {
-		var service = new OrganizationService(mapper, organizationRepository);
+		var service = new OrganizationService(mapper, organizationRepository, employeeRepository);
 
 		var org1 = new Organization();
 		var org2 = new Organization();
@@ -57,7 +61,7 @@ public class OrganizationServiceTest {
 	@Test
 	void getSpecificOrg_test() {
 
-		var service = new OrganizationService(mapper, organizationRepository);
+		var service = new OrganizationService(mapper, organizationRepository, employeeRepository);
 
 		var org = new Organization();
 		var response = mock(OrganizationResponse.class);
@@ -72,7 +76,7 @@ public class OrganizationServiceTest {
 
 	@Test
 	void getOrgsByIds_test() {
-		var service = new OrganizationService(mapper, organizationRepository);
+		var service = new OrganizationService(mapper, organizationRepository, employeeRepository);
 
 		var org1 = new Organization();
 		var org2 = new Organization();
@@ -91,7 +95,7 @@ public class OrganizationServiceTest {
 
 	@Test
 	void getOrgChildrenAndDescendantsWithId_test() {
-		var service = new OrganizationService(mapper, organizationRepository);
+		var service = new OrganizationService(mapper, organizationRepository, employeeRepository);
 
 		var org1 = new Organization();
 		var org2 = new Organization();
@@ -110,7 +114,7 @@ public class OrganizationServiceTest {
 
 	@Test
 	void getOrgAndChildrenWithId_test() {
-		var service = new OrganizationService(mapper, organizationRepository);
+		var service = new OrganizationService(mapper, organizationRepository, employeeRepository);
 
 		var org1 = new Organization();
 		var org2 = new Organization();
@@ -129,7 +133,7 @@ public class OrganizationServiceTest {
 
 	@Test
 	void getOrgsByIds_Null_test() {
-		var service = new OrganizationService(mapper, organizationRepository);
+		var service = new OrganizationService(mapper, organizationRepository, employeeRepository);
 
 		var exception = assertThrows(IllegalArgumentException.class, () -> service.getOrgsById(null));
 
@@ -139,7 +143,7 @@ public class OrganizationServiceTest {
 
 	@Test
 	void getSpecificOrg_Id_Null_test() {
-		var service = new OrganizationService(mapper, organizationRepository);
+		var service = new OrganizationService(mapper, organizationRepository, employeeRepository);
 
 		var exception = assertThrows(IllegalArgumentException.class, () -> service.getSpecificOrg(null));
 
@@ -149,7 +153,7 @@ public class OrganizationServiceTest {
 
 	@Test
 	void getOrgChildrenAndDescendantsWithId_nothing_found_test() {
-		var service = new OrganizationService(mapper, organizationRepository);
+		var service = new OrganizationService(mapper, organizationRepository, employeeRepository);
 
 		when(organizationRepository.findOrgWithChildrenAndDescendants("1"))
 			.thenReturn(List.of());
@@ -164,7 +168,7 @@ public class OrganizationServiceTest {
 
 	@Test
 	void getOrgAndChildrenWithId_nothing_found_test() {
-		var service = new OrganizationService(mapper, organizationRepository);
+		var service = new OrganizationService(mapper, organizationRepository, employeeRepository);
 
 		when(organizationRepository.findOrgAndChildren("1"))
 			.thenReturn(List.of());
@@ -179,7 +183,7 @@ public class OrganizationServiceTest {
 
 	@Test
 	void getOrgsById_nothing_found_test() {
-		var service = new OrganizationService(mapper, organizationRepository);
+		var service = new OrganizationService(mapper, organizationRepository, employeeRepository);
 
 		when(organizationRepository.findByOrgIdIn(List.of("1")))
 			.thenReturn(List.of());
@@ -194,7 +198,7 @@ public class OrganizationServiceTest {
 
 	@Test
 	void getOrganizationWithSearch_test() {
-		var service = new OrganizationService(mapper, organizationRepository);
+		var service = new OrganizationService(mapper, organizationRepository, employeeRepository);
 
 		var org1 = new Organization();
 		var org2 = new Organization();
@@ -215,7 +219,7 @@ public class OrganizationServiceTest {
 
 	@Test
 	void getChildrenReplaceDuplicateDescendantsWithRoot_test() {
-		var service = new OrganizationService(mapper, organizationRepository);
+		var service = new OrganizationService(mapper, organizationRepository, employeeRepository);
 
 		var top = new Organization();
 		top.setOrgId("orgIdTop");
@@ -258,5 +262,56 @@ public class OrganizationServiceTest {
 
 		verify(mapper).mapToOrganizationResponse(bottom);
 		verifyNoMoreInteractions(mapper);
+	}
+
+	@Test
+	void getChildrenReplaceDuplicateDescendantsWithRoot_addsResolvedChildWhenChildHasChildren() {
+		var service = new OrganizationService(mapper, organizationRepository, employeeRepository);
+
+		var top = new Organization();
+		top.setOrgId("orgIdTop");
+		top.setParentOrgId("parentOrgId");
+		top.setName("duplicateOrg");
+
+		var middle = new Organization();
+		middle.setOrgId("orgIdMiddle");
+		middle.setParentOrgId("orgIdTop");
+		middle.setName("duplicateOrg");
+
+		var bottom = new Organization();
+		bottom.setOrgId("orgIdChild");
+		bottom.setParentOrgId("orgIdMiddle");
+		bottom.setName("duplicateOrg");
+
+		var branch = new Organization();
+		branch.setOrgId("orgIdBranch");
+		branch.setParentOrgId("orgIdMiddle");
+		branch.setName("branch");
+
+		var branchChild = new Organization();
+		branchChild.setOrgId("orgIdBranchChild");
+		branchChild.setParentOrgId("orgIdBranch");
+		branchChild.setName("branchChild");
+
+		var response = OrganizationResponse.builder()
+			.withOrgId(branch.getOrgId())
+			.withParentOrgId(branch.getParentOrgId())
+			.withTreeLevel(branch.getTreeLevel())
+			.withName(branch.getName())
+			.build();
+		branch.setChildren(Set.of(branchChild));
+
+		when(organizationRepository.findChildren("parentOrgId")).thenReturn(List.of(top));
+		when(organizationRepository.findChildren("orgIdTop")).thenReturn(List.of(middle));
+		when(organizationRepository.findChildren("orgIdMiddle")).thenReturn(List.of(bottom, branch));
+		when(mapper.mapToOrganizationResponse(branch)).thenReturn(response);
+
+		var result = service.getChildrenReplaceDuplicateDescendantsWithRoot("parentOrgId");
+
+		assertThat(result).hasSize(1);
+		assertThat(result.getFirst().orgId()).isEqualTo("orgIdBranch");
+		assertThat(result.getFirst().name()).isEqualTo("branch");
+
+		verify(mapper).mapToOrganizationResponse(branch);
 	}
 }
