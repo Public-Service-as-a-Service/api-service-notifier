@@ -238,12 +238,15 @@ public class OrganizationServiceTest {
 		bottom.setParentOrgId("orgIdMiddle");
 		bottom.setName("duplicateOrg");
 		bottom.setTreeLevel(4);
+		bottom.setChildren(Set.of());
+
+		top.setChildren(Set.of(middle));
 
 		var bottomResponse = OrganizationResponse.builder()
 			.withOrgId(bottom.getOrgId())
-			.withParentOrgId(top.getParentOrgId())
-			.withTreeLevel(top.getTreeLevel())
-			.withName("duplicateOrg")
+			.withParentOrgId(bottom.getParentOrgId())
+			.withTreeLevel(bottom.getTreeLevel())
+			.withName(bottom.getName())
 			.build();
 
 		when(mapper.mapToOrganizationResponse(bottom)).thenReturn(bottomResponse);
@@ -257,11 +260,12 @@ public class OrganizationServiceTest {
 
 		assertThat(result).hasSize(1);
 		assertThat(remainingOrg.orgId()).isEqualTo(bottom.getOrgId());
-		assertThat(remainingOrg.parentOrgId()).isEqualTo(top.getParentOrgId());
-		assertThat(remainingOrg.name()).isEqualTo(top.getName());
+		assertThat(remainingOrg.parentOrgId()).isEqualTo(bottom.getParentOrgId());
+		assertThat(remainingOrg.name()).isEqualTo(bottom.getName());
 
 		verify(mapper).mapToOrganizationResponse(bottom);
 		verifyNoMoreInteractions(mapper);
+		verifyNoInteractions(employeeRepository);
 	}
 
 	@Test
@@ -282,6 +286,7 @@ public class OrganizationServiceTest {
 		bottom.setOrgId("orgIdChild");
 		bottom.setParentOrgId("orgIdMiddle");
 		bottom.setName("duplicateOrg");
+		bottom.setChildren(Set.of());
 
 		var branch = new Organization();
 		branch.setOrgId("orgIdBranch");
@@ -293,17 +298,20 @@ public class OrganizationServiceTest {
 		branchChild.setParentOrgId("orgIdBranch");
 		branchChild.setName("branchChild");
 
+		top.setChildren(Set.of(middle));
+		branch.setChildren(Set.of(branchChild));
+
 		var response = OrganizationResponse.builder()
 			.withOrgId(branch.getOrgId())
 			.withParentOrgId(branch.getParentOrgId())
 			.withTreeLevel(branch.getTreeLevel())
 			.withName(branch.getName())
 			.build();
-		branch.setChildren(Set.of(branchChild));
 
 		when(organizationRepository.findChildren("parentOrgId")).thenReturn(List.of(top));
 		when(organizationRepository.findChildren("orgIdTop")).thenReturn(List.of(middle));
 		when(organizationRepository.findChildren("orgIdMiddle")).thenReturn(List.of(bottom, branch));
+		when(employeeRepository.findByOrgId("orgIdChild")).thenReturn(List.of());
 		when(mapper.mapToOrganizationResponse(branch)).thenReturn(response);
 
 		var result = service.getChildrenReplaceDuplicateDescendantsWithRoot("parentOrgId");
@@ -313,5 +321,7 @@ public class OrganizationServiceTest {
 		assertThat(result.getFirst().name()).isEqualTo("branch");
 
 		verify(mapper).mapToOrganizationResponse(branch);
+		verifyNoMoreInteractions(mapper);
+		verify(employeeRepository).findByOrgId("orgIdChild");
 	}
 }

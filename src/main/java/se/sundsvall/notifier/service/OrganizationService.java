@@ -89,24 +89,21 @@ public class OrganizationService {
 
 		List<OrganizationResponse> response = new ArrayList<>();
 		for (Organization topChild : directChildren) {
-			if (topChild.getChildren().stream().anyMatch(child -> child.getName().equals(topChild.getName()))) {
-				Organization triggeredNode = findLastDuplicateBeforeBranch(topChild);
-				List<Organization> resolvedChildren = organizationRepository.findChildren(triggeredNode.getOrgId());
+			if (topChild.getChildren().stream().noneMatch(child -> child.getName().equals(topChild.getName()))) {
+				response.add(mapper.mapToOrganizationResponse(topChild));
+				continue;
+			}
+			Organization triggeredNode = findLastDuplicateBeforeBranch(topChild);
 
-				if (resolvedChildren.isEmpty()) {
-					response.add(mapper.mapToOrganizationResponse(triggeredNode));
-				} else {
-					for (Organization child : resolvedChildren) {
-						if (!child.getChildren().isEmpty()) {
-							response.add(mapper.mapToOrganizationResponse(child));
-						}
-						if (child.getChildren().isEmpty() & !employeeRepository.findByOrgId(child.getOrgId()).isEmpty()) {
-							response.add(mapper.mapToOrganizationResponse(child));
-						}
+			List<Organization> resolvedChildren = organizationRepository.findChildren(triggeredNode.getOrgId());
+			if (resolvedChildren.isEmpty()) {
+				response.add(mapper.mapToOrganizationResponse(triggeredNode));
+			} else {
+				for (Organization child : resolvedChildren) {
+					if (!child.getChildren().isEmpty() || !employeeRepository.findByOrgId(child.getOrgId()).isEmpty()) {
+						response.add(mapper.mapToOrganizationResponse(child));
 					}
 				}
-			} else {
-				response.add(mapper.mapToOrganizationResponse(topChild));
 			}
 		}
 		return response;
