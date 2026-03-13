@@ -1,5 +1,4 @@
-create table shedlock
-(
+CREATE TABLE shedlock(
     name       varchar(64)  NOT NULL,
     lock_until timestamp(3) NOT NULL,
     locked_at  timestamp(3) NOT NULL default current_timestamp(3),
