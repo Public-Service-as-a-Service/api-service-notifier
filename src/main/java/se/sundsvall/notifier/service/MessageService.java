@@ -5,9 +5,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.notifier.api.model.request.MessageRequest;
+import se.sundsvall.notifier.api.model.request.MessageRequestWithoutRecipient;
 import se.sundsvall.notifier.api.model.request.MessageType;
 import se.sundsvall.notifier.api.model.response.MessageResponse;
 import se.sundsvall.notifier.integration.db.entity.Employee;
+import se.sundsvall.notifier.integration.db.entity.Message;
 import se.sundsvall.notifier.integration.db.entity.MessageRecipient;
 import se.sundsvall.notifier.integration.db.repository.EmployeeRepository;
 import se.sundsvall.notifier.integration.db.repository.MessageRepository;
@@ -49,7 +51,28 @@ public class MessageService {
 
 		for (Employee employee : employees) {
 
-			var delivered = sendMessageToEmployee(employee, messageRequest);
+			var delivered = sendMessageToEmployee(employee, messageRequest.messageType(), messageRequest.content());
+			MessageRecipient messageRecipient = messageMapper.toMessageRecipient(employee, delivered);
+
+			savedMessage.addRecipient(messageRecipient);
+		}
+		messageRepository.save(savedMessage);
+	}
+
+	public void sendMessageToAll(MessageRequestWithoutRecipient messageRequest) {
+		var message = Message.builder()
+			.withTitle(messageRequest.title())
+			.withContent(messageRequest.content())
+			.withSender(messageRequest.sender())
+			.withMessageType(messageRequest.messageType())
+			.build();
+
+		var savedMessage = messageRepository.save(message);
+
+		var employees = employeeRepository.findAll();
+
+		for (Employee employee : employees) {
+			var delivered = sendMessageToEmployee(employee, messageRequest.messageType(), messageRequest.content());
 			MessageRecipient messageRecipient = messageMapper.toMessageRecipient(employee, delivered);
 
 			savedMessage.addRecipient(messageRecipient);
@@ -74,21 +97,21 @@ public class MessageService {
 		messageRepository.deleteById(id);
 	}
 
-	public MessageRecipient.DeliveryStatus sendMessageToEmployee(Employee employee, MessageRequest messageRequest) {
+	public MessageRecipient.DeliveryStatus sendMessageToEmployee(Employee employee, MessageType messageType, String content) {
 		boolean teamsSuccess = false;
 		MessageStatus smsSuccess = MessageStatus.NOT_SENT;
-		boolean isTeamsMessage = messageRequest.messageType() == MessageType.TEAMS || messageRequest.messageType() == MessageType.TEAMS_AND_SMS;
-		boolean isSmsMessage = messageRequest.messageType() == MessageType.SMS || messageRequest.messageType() == MessageType.TEAMS_AND_SMS;
+		boolean isTeamsMessage = messageType == MessageType.TEAMS || messageType == MessageType.TEAMS_AND_SMS;
+		boolean isSmsMessage = messageType == MessageType.SMS || messageType == MessageType.TEAMS_AND_SMS;
 
 		if (isTeamsMessage && employee.getEmail() != null) {
 			teamsSuccess = teamsSenderIntegration.sendTeamsMessage("2281",
-				messageMapper.toSendTeamsDto(messageRequest.content(), employee.getEmail()));
+				messageMapper.toSendTeamsDto(content, employee.getEmail()));
 		}
 
 		String phoneNumber = phoneNumberUtil.cleanPhoneNumber(employee.getWorkMobile());
 		if (isSmsMessage && phoneNumber != null) {
 			smsSuccess = smsSenderIntegration.sendSms("2281",
-				messageMapper.toSendSmsDto(messageRequest.content(), phoneNumber));
+				messageMapper.toSendSmsDto(content, phoneNumber));
 		}
 		return (teamsSuccess || smsSuccess == MessageStatus.SENT)
 			? MessageRecipient.DeliveryStatus.DELIVERED

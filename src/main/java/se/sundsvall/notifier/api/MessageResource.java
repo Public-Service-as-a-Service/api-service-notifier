@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.notifier.api.model.request.MessageRequest;
+import se.sundsvall.notifier.api.model.request.MessageRequestWithoutRecipient;
 import se.sundsvall.notifier.api.model.response.MessageResponse;
 import se.sundsvall.notifier.service.MessageService;
 
@@ -47,6 +48,15 @@ public class MessageResource {
 	@PostMapping
 	public ResponseEntity<Void> sendMessage(@RequestBody @Valid MessageRequest message) {
 		messageService.createMessage(message);
+		return ResponseEntity.noContent().build();
+	}
+
+	@Operation(description = "Send message to all employees")
+	@PostMapping("/all")
+	@ApiResponse(responseCode = "200", description = "Successful Operation")
+	@ApiResponse(responseCode = "404", description = "Not Found")
+	public ResponseEntity<Void> sendMessageToAll(@RequestBody @Valid MessageRequestWithoutRecipient message) {
+		messageService.sendMessageToAll(message);
 		return ResponseEntity.noContent().build();
 	}
 
