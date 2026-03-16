@@ -54,7 +54,6 @@ public class MessageResource {
 	@Operation(description = "Send message to all employees")
 	@PostMapping("/all")
 	@ApiResponse(responseCode = "200", description = "Successful Operation")
-	@ApiResponse(responseCode = "404", description = "Not Found")
 	public ResponseEntity<Void> sendMessageToAll(@RequestBody @Valid MessageRequestWithoutRecipient message) {
 		messageService.sendMessageToAll(message);
 		return ResponseEntity.noContent().build();
