@@ -3,13 +3,13 @@ package se.sundsvall.notifier.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.notifier.api.model.response.OrganizationResponse;
 import se.sundsvall.notifier.integration.db.entity.Organization;
+import se.sundsvall.notifier.integration.db.repository.EmployeeRepository;
 import se.sundsvall.notifier.integration.db.repository.OrganizationRepository;
 import se.sundsvall.notifier.service.mapper.EntityToResponseMapper;
 
@@ -20,10 +20,12 @@ public class OrganizationService {
 
 	private final EntityToResponseMapper mapper;
 	private final OrganizationRepository organizationRepository;
+	private final EmployeeRepository employeeRepository;
 
-	public OrganizationService(EntityToResponseMapper mapper, OrganizationRepository organizationRepository) {
+	public OrganizationService(EntityToResponseMapper mapper, OrganizationRepository organizationRepository, EmployeeRepository employeeRepository) {
 		this.mapper = mapper;
 		this.organizationRepository = organizationRepository;
+		this.employeeRepository = employeeRepository;
 	}
 
 	public List<OrganizationResponse> getAllOrganizations() {
@@ -86,39 +88,41 @@ public class OrganizationService {
 		}
 
 		List<OrganizationResponse> response = new ArrayList<>();
-
 		for (Organization topChild : directChildren) {
-			Organization bottomDuplicateChild = findBottomDuplicateChild(topChild);
-
-			OrganizationResponse bottomResponse = mapper.mapToOrganizationResponse(bottomDuplicateChild);
-			if (!bottomDuplicateChild.getOrgId().equals(topChild.getOrgId())) {
-				bottomResponse = bottomResponse.toBuilder()
-					.withParentOrgId(orgId)
-					.withTreeLevel(topChild.getTreeLevel())
-					.build();
+			if (topChild.getChildren().stream().noneMatch(child -> child.getName().equals(topChild.getName()))) {
+				response.add(mapper.mapToOrganizationResponse(topChild));
+				continue;
 			}
-			response.add(bottomResponse);
+			Organization triggeredNode = findLastDuplicateBeforeBranch(topChild);
+
+			List<Organization> resolvedChildren = organizationRepository.findChildren(triggeredNode.getOrgId());
+			if (resolvedChildren.isEmpty()) {
+				response.add(mapper.mapToOrganizationResponse(triggeredNode));
+			} else {
+				for (Organization child : resolvedChildren) {
+					if (!child.getChildren().isEmpty() || !employeeRepository.findByOrgId(child.getOrgId()).isEmpty()) {
+						response.add(mapper.mapToOrganizationResponse(child));
+					}
+				}
+			}
 		}
 		return response;
 	}
 
-	private Organization findBottomDuplicateChild(Organization first) {
-		Organization current = first;
-
-		while (true) {
+	private Organization findLastDuplicateBeforeBranch(Organization start) {
+		String firstOrg = start.getName();
+		Organization current = start;
+		while (Objects.equals(firstOrg, current.getName())) {
 			List<Organization> children = organizationRepository.findChildren(current.getOrgId());
 
-			String currentName = current.getName();
-
-			Optional<Organization> nextDuplicate = children.stream()
-				.filter(child -> Objects.equals(child.getName(), currentName))
-				.findAny();
-
-			if (nextDuplicate.isEmpty()) {
+			if (children.isEmpty()) {
 				return current;
 			}
-
-			current = nextDuplicate.get();
+			if (children.size() > 1) {
+				return current;
+			}
+			current = children.getFirst();
 		}
+		return current;
 	}
 }
