@@ -11,6 +11,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import se.sundsvall.notifier.Application;
 import se.sundsvall.notifier.api.model.request.MessageRequest;
+import se.sundsvall.notifier.api.model.request.MessageRequestWithoutRecipient;
 import se.sundsvall.notifier.api.model.request.MessageType;
 import se.sundsvall.notifier.api.model.response.MessageResponse;
 
@@ -62,6 +63,24 @@ class MessageResourceTest {
 			.bodyValue(invalid)
 			.exchange()
 			.expectStatus().isBadRequest();
+	}
+
+	@Test
+	void sendMessageToAll_ok() {
+		var request = MessageRequestWithoutRecipient.builder()
+			.withContent("content")
+			.withSender("sender@sundsvall.se")
+			.withTitle("title")
+			.withMessageType(MessageType.SMS)
+			.build();
+
+		webTestClient.post()
+			.uri(BASE_PATH + "/all")
+			.contentType(MediaType.APPLICATION_JSON)
+			.bodyValue(request)
+			.exchange()
+			.expectStatus().isNoContent()
+			.expectBody().isEmpty();
 	}
 
 	@Test

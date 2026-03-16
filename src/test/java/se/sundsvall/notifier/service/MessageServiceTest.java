@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.notifier.api.model.request.MessageRequest;
+import se.sundsvall.notifier.api.model.request.MessageRequestWithoutRecipient;
 import se.sundsvall.notifier.api.model.request.MessageType;
 import se.sundsvall.notifier.api.model.response.MessageResponse;
 import se.sundsvall.notifier.integration.db.entity.Employee;
@@ -89,16 +90,16 @@ class MessageServiceTest {
 	@Test
 	void getMessageByIdTest() {
 		var messageId = 1L;
-		var emaii = "test@sundsvall.se";
-		var message = Message.builder().withId(messageId).withSender(emaii).build();
-		var response = MessageResponse.builder().withId(messageId).withSender(emaii).build();
+		var email = "test@sundsvall.se";
+		var message = Message.builder().withId(messageId).withSender(email).build();
+		var response = MessageResponse.builder().withId(messageId).withSender(email).build();
 
-		when(messageRepository.findBySenderAndId(emaii, messageId)).thenReturn(Optional.of(message));
+		when(messageRepository.findBySenderAndId(email, messageId)).thenReturn(Optional.of(message));
 		when(messageMapper.entityToMessageResponse(message)).thenReturn(response);
 
-		var result = messageService.getMessageById(emaii, messageId);
+		var result = messageService.getMessageById(email, messageId);
 		assertThat(result).isEqualTo(response);
-		verify(messageRepository).findBySenderAndId(emaii, messageId);
+		verify(messageRepository).findBySenderAndId(email, messageId);
 	}
 
 	@Test
@@ -143,12 +144,8 @@ class MessageServiceTest {
 		Employee employee = new Employee();
 		employee.setEmail("test@example.com");
 		employee.setWorkMobile("+46701234567");
-
-		var messageRequest = MessageRequest.builder()
-			.withContent("content")
-			.withSender("sender")
-			.withMessageType(MessageType.TEAMS_AND_SMS)
-			.build();
+		MessageType messageStatus = MessageType.TEAMS_AND_SMS;
+		String content = "this is message test";
 
 		when(phoneNumberUtil.cleanPhoneNumber(anyString()))
 			.thenReturn("+46701234567");
@@ -157,12 +154,55 @@ class MessageServiceTest {
 		when(smsSenderIntegration.sendSms(anyString(), any()))
 			.thenReturn(MessageStatus.SENT);
 
-		var result = messageService.sendMessageToEmployee(employee, messageRequest);
+		var result = messageService.sendMessageToEmployee(employee, messageStatus, content);
 
 		assertThat(result).isEqualTo(MessageRecipient.DeliveryStatus.DELIVERED);
 		verify(smsSenderIntegration).sendSms(anyString(), any());
 		verify(phoneNumberUtil).cleanPhoneNumber(anyString());
 		verify(teamsSenderIntegration).sendTeamsMessage(anyString(), any());
+	}
+
+	@Test
+	void sendMessageToAllTest() {
+		Employee employee = new Employee();
+		employee.setEmail("test@example.com");
+		employee.setWorkMobile("+46701234567");
+
+		var messageRequest = new MessageRequestWithoutRecipient(
+			"title",
+			"content",
+			"sender",
+			MessageType.TEAMS_AND_SMS);
+
+		var savedMessage = Message.builder()
+			.withTitle("title")
+			.withContent("content")
+			.withSender("sender")
+			.withMessageType(MessageType.TEAMS_AND_SMS)
+			.build();
+
+		var messageRecipient = new MessageRecipient();
+		messageRecipient.setDeliveryStatus(MessageRecipient.DeliveryStatus.DELIVERED);
+
+		when(employeeRepository.findAll()).thenReturn(List.of(employee));
+		when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
+		when(messageMapper.toMessageRecipient((employee), (MessageRecipient.DeliveryStatus.DELIVERED)))
+			.thenReturn(messageRecipient);
+
+		when(phoneNumberUtil.cleanPhoneNumber(anyString()))
+			.thenReturn("+46701234567");
+		when(teamsSenderIntegration.sendTeamsMessage(anyString(), any()))
+			.thenReturn(true);
+		when(smsSenderIntegration.sendSms(anyString(), any()))
+			.thenReturn(MessageStatus.SENT);
+
+		messageService.sendMessageToAll(messageRequest);
+
+		verify(employeeRepository).findAll();
+		verify(smsSenderIntegration).sendSms(anyString(), any());
+		verify(phoneNumberUtil).cleanPhoneNumber(anyString());
+		verify(teamsSenderIntegration).sendTeamsMessage(anyString(), any());
+		verify(messageMapper).toMessageRecipient(employee, MessageRecipient.DeliveryStatus.DELIVERED);
 	}
 
 }
