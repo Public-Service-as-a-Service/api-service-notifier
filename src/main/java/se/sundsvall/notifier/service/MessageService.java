@@ -1,6 +1,10 @@
 package se.sundsvall.notifier.service;
 
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import se.sundsvall.dept44.problem.Problem;
@@ -12,6 +16,7 @@ import se.sundsvall.notifier.integration.db.entity.Employee;
 import se.sundsvall.notifier.integration.db.entity.Message;
 import se.sundsvall.notifier.integration.db.entity.MessageRecipient;
 import se.sundsvall.notifier.integration.db.repository.EmployeeRepository;
+import se.sundsvall.notifier.integration.db.repository.MessageRecipientRepository;
 import se.sundsvall.notifier.integration.db.repository.MessageRepository;
 import se.sundsvall.notifier.integration.smssender.MessageStatus;
 import se.sundsvall.notifier.integration.smssender.SmsSenderIntegration;
@@ -21,22 +26,25 @@ import se.sundsvall.notifier.service.utility.PhoneNumberUtil;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
+@Slf4j
 @Service
 public class MessageService {
 
 	private final MessageRepository messageRepository;
 	private final EmployeeRepository employeeRepository;
+	private final MessageRecipientRepository messageRecipientRepository;
 	private final MessageMapper messageMapper;
 	private final SmsSenderIntegration smsSenderIntegration;
 	private final TeamsSenderIntegration teamsSenderIntegration;
 	private final PhoneNumberUtil phoneNumberUtil;
 
 	public MessageService(MessageRepository messageRepository,
-		EmployeeRepository employeeRepository,
+		EmployeeRepository employeeRepository, MessageRecipientRepository messageRecipientRepository,
 		MessageMapper messageMapper, SmsSenderIntegration smsSenderIntegration,
 		TeamsSenderIntegration teamsSenderIntegration, PhoneNumberUtil phoneNumberUtil) {
 		this.messageRepository = messageRepository;
 		this.employeeRepository = employeeRepository;
+		this.messageRecipientRepository = messageRecipientRepository;
 		this.messageMapper = messageMapper;
 		this.smsSenderIntegration = smsSenderIntegration;
 		this.teamsSenderIntegration = teamsSenderIntegration;
@@ -59,6 +67,7 @@ public class MessageService {
 		messageRepository.save(savedMessage);
 	}
 
+	@Async
 	public void sendMessageToAll(MessageRequestWithoutRecipient messageRequest) {
 		var message = Message.builder()
 			.withTitle(messageRequest.title())
@@ -69,15 +78,30 @@ public class MessageService {
 
 		var savedMessage = messageRepository.save(message);
 
-		var employees = employeeRepository.findAll();
+		int page = 0;
+		int size = 200;
+		int processed = 0;
+		Page<Employee> employeePage;
 
-		for (Employee employee : employees) {
-			var delivered = sendMessageToEmployee(employee, messageRequest.messageType(), messageRequest.content());
-			MessageRecipient messageRecipient = messageMapper.toMessageRecipient(employee, delivered);
+		do {
+			employeePage = employeeRepository.findAll(PageRequest.of(page, size));
 
-			savedMessage.addRecipient(messageRecipient);
-		}
-		messageRepository.save(savedMessage);
+			for (Employee employee : employeePage.getContent()) {
+				try {
+					var delivered = sendMessageToEmployee(employee, messageRequest.messageType(), messageRequest.content());
+					var recipient = messageMapper.toMessageRecipient(employee, delivered);
+					recipient.setMessage(savedMessage);
+					messageRecipientRepository.save(recipient);
+				} catch (Exception e) {
+					var recipient = messageMapper.toMessageRecipient(employee, MessageRecipient.DeliveryStatus.FAILED);
+					recipient.setMessage(savedMessage);
+					messageRecipientRepository.save(recipient);
+				}
+			}
+			processed += size;
+			log.info("Messages processed: {}", processed);
+			page++;
+		} while (employeePage.hasNext());
 	}
 
 	public MessageResponse getMessageById(String sender, Long messageId) {
