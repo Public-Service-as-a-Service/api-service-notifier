@@ -88,6 +88,7 @@ public class MessageService {
 
 			for (Employee employee : employeePage.getContent()) {
 				try {
+					Thread.sleep(100);
 					var delivered = sendMessageToEmployee(employee, messageRequest.messageType(), messageRequest.content());
 					var recipient = messageMapper.toMessageRecipient(employee, delivered);
 					recipient.setMessage(savedMessage);
@@ -98,9 +99,10 @@ public class MessageService {
 					messageRecipientRepository.save(recipient);
 				}
 			}
-			processed += size;
+			processed += employeePage.getNumberOfElements();
 			log.info("Messages processed: {}", processed);
 			page++;
+
 		} while (employeePage.hasNext());
 	}
 
