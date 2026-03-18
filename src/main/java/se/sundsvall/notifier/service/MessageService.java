@@ -93,7 +93,10 @@ public class MessageService {
 					var recipient = messageMapper.toMessageRecipient(employee, delivered);
 					recipient.setMessage(savedMessage);
 					messageRecipientRepository.save(recipient);
-				} catch (Exception e) {
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+					return;
+				} catch (Exception e){
 					var recipient = messageMapper.toMessageRecipient(employee, MessageRecipient.DeliveryStatus.FAILED);
 					recipient.setMessage(savedMessage);
 					messageRecipientRepository.save(recipient);
