@@ -9,6 +9,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.notifier.api.model.request.MessageRequest;
 import se.sundsvall.notifier.api.model.request.MessageRequestWithoutRecipient;
@@ -18,6 +22,7 @@ import se.sundsvall.notifier.integration.db.entity.Employee;
 import se.sundsvall.notifier.integration.db.entity.Message;
 import se.sundsvall.notifier.integration.db.entity.MessageRecipient;
 import se.sundsvall.notifier.integration.db.repository.EmployeeRepository;
+import se.sundsvall.notifier.integration.db.repository.MessageRecipientRepository;
 import se.sundsvall.notifier.integration.db.repository.MessageRepository;
 import se.sundsvall.notifier.integration.smssender.MessageStatus;
 import se.sundsvall.notifier.integration.smssender.SmsSenderIntegration;
@@ -49,6 +54,9 @@ class MessageServiceTest {
 
 	@Mock
 	private EmployeeRepository employeeRepository;
+
+	@Mock
+	private MessageRecipientRepository messageRecipientRepository;
 
 	@Mock
 	private MessageMapper messageMapper;
@@ -184,9 +192,11 @@ class MessageServiceTest {
 		var messageRecipient = new MessageRecipient();
 		messageRecipient.setDeliveryStatus(MessageRecipient.DeliveryStatus.DELIVERED);
 
-		when(employeeRepository.findAll()).thenReturn(List.of(employee));
+		Page<Employee> employeePage = new PageImpl<>(List.of(employee));
+
+		when(employeeRepository.findAll(PageRequest.of(0, 200))).thenReturn(employeePage);
 		when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
-		when(messageMapper.toMessageRecipient((employee), (MessageRecipient.DeliveryStatus.DELIVERED)))
+		when(messageMapper.toMessageRecipient(any(Employee.class), any(MessageRecipient.DeliveryStatus.class)))
 			.thenReturn(messageRecipient);
 
 		when(phoneNumberUtil.cleanPhoneNumber(anyString()))
@@ -198,11 +208,13 @@ class MessageServiceTest {
 
 		messageService.sendMessageToAll(messageRequest);
 
-		verify(employeeRepository).findAll();
+		verify(employeeRepository).findAll(any(Pageable.class));
 		verify(smsSenderIntegration).sendSms(anyString(), any());
 		verify(phoneNumberUtil).cleanPhoneNumber(anyString());
 		verify(teamsSenderIntegration).sendTeamsMessage(anyString(), any());
 		verify(messageMapper).toMessageRecipient(employee, MessageRecipient.DeliveryStatus.DELIVERED);
+		verify(messageRecipientRepository).save(messageRecipient);
+		verify(messageRepository).save(any(Message.class));
 	}
 
 }
