@@ -69,4 +69,10 @@ public class EmployeeResource {
 	public ResponseEntity<List<EmployeeManagerResponse>> getManagers() {
 		return ResponseEntity.ok(employeeService.getAllEmployeeManagers());
 	}
+
+	@Operation(summary = "Get all employees for it-prod")
+	@GetMapping("/org-group/it-prod")
+	public ResponseEntity<List<EmployeeWithOrgNameResponse>> getEmployeesForItProd() {
+		return ResponseEntity.ok(employeeService.getAllEmployeesForItProd());
+	}
 }

@@ -58,4 +58,7 @@ public class EmployeeService {
 		return employeeRepository.findAllByManagerCodeIsNotNull().stream().map(mapper::mapToEmployeeManagerResponse).toList();
 	}
 
+	public List<EmployeeWithOrgNameResponse> getAllEmployeesForItProd() {
+		return getEmployeesByOrgList(List.of("11212", "11215", "500398"));
+	}
 }
