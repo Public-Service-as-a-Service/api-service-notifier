@@ -40,7 +40,7 @@ public class EmployeeServiceTest {
 		var response1 = mock(EmployeeWithOrgNameResponse.class);
 		var response2 = mock(EmployeeWithOrgNameResponse.class);
 
-		when(employeeRepository.findByOrgId("Id")).thenReturn(List.of(employee1, employee2));
+		when(employeeRepository.findByOrgIdAndActiveEmployeeTrue("Id")).thenReturn(List.of(employee1, employee2));
 		when(mapper.mapToEmployeeWithOrgNameResponse(employee1)).thenReturn(response1);
 		when(mapper.mapToEmployeeWithOrgNameResponse(employee2)).thenReturn(response2);
 
@@ -58,7 +58,7 @@ public class EmployeeServiceTest {
 		var response1 = mock(EmployeeWithOrgNameResponse.class);
 		var response2 = mock(EmployeeWithOrgNameResponse.class);
 
-		when(employeeRepository.findByOrgIdIn(List.of("Id1", "Id2"))).thenReturn(List.of(employee1, employee2));
+		when(employeeRepository.findByOrgIdInAndActiveEmployeeTrue(List.of("Id1", "Id2"))).thenReturn(List.of(employee1, employee2));
 		when(mapper.mapToEmployeeWithOrgNameResponse(employee1)).thenReturn(response1);
 		when(mapper.mapToEmployeeWithOrgNameResponse(employee2)).thenReturn(response2);
 
@@ -76,7 +76,7 @@ public class EmployeeServiceTest {
 		var response1 = mock(EmployeeWithOrgNameResponse.class);
 		var response2 = mock(EmployeeWithOrgNameResponse.class);
 
-		when(employeeRepository.findAll()).thenReturn(List.of(employee1, employee2));
+		when(employeeRepository.findByActiveEmployeeTrue()).thenReturn(List.of(employee1, employee2));
 		when(mapper.mapToEmployeeWithOrgNameResponse(employee1)).thenReturn(response1);
 		when(mapper.mapToEmployeeWithOrgNameResponse(employee2)).thenReturn(response2);
 
@@ -152,7 +152,7 @@ public class EmployeeServiceTest {
 			.withManagerCode("MGR2")
 			.build();
 
-		when(employeeRepository.findAllByManagerCodeIsNotNull()).thenReturn(List.of(employee1, employee2));
+		when(employeeRepository.findAllByManagerCodeIsNotNullAndActiveEmployeeTrue()).thenReturn(List.of(employee1, employee2));
 		when(mapper.mapToEmployeeManagerResponse(employee1)).thenReturn(response1);
 		when(mapper.mapToEmployeeManagerResponse(employee2)).thenReturn(response2);
 
@@ -165,7 +165,7 @@ public class EmployeeServiceTest {
 	void getEmployee_withManagerCode_emptyList_test() {
 		var service = new EmployeeService(employeeRepository, mapper);
 
-		when(employeeRepository.findAllByManagerCodeIsNotNull()).thenReturn(List.of());
+		when(employeeRepository.findAllByManagerCodeIsNotNullAndActiveEmployeeTrue()).thenReturn(List.of());
 
 		var result = service.getAllEmployeeManagers();
 

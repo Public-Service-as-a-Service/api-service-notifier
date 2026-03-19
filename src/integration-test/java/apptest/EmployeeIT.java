@@ -43,7 +43,7 @@ public class EmployeeIT extends AbstractAppTest {
     @Test
     void test3_getAllEmployeesWithOrgIdListSuccess() {
         setupCall()
-                .withServicePath(PATH + "/ids?orgIds=ORG-1,ORG-2")
+                .withServicePath(PATH + "/orgIds?orgIds=ORG-1,ORG-2")
                 .withHttpMethod(GET)
                 .withExpectedResponse(RESPONSE_FILE)
                 .withExpectedResponseStatus(OK)
@@ -91,7 +91,7 @@ public class EmployeeIT extends AbstractAppTest {
     @Test
     void test8_getEmployeesByOrgList_emptyParam() {
         setupCall()
-        .withServicePath(PATH + "/ids?orgIds=")
+        .withServicePath(PATH + "/orgIds?orgIds=")
                 .withHttpMethod(GET)
                 .withExpectedResponse(RESPONSE_FILE)
                 .withExpectedResponseStatus(OK)

@@ -84,7 +84,7 @@ public class MessageService {
 		Page<Employee> employeePage;
 
 		do {
-			employeePage = employeeRepository.findAll(PageRequest.of(page, size));
+			employeePage = employeeRepository.findByActiveEmployeeTrue(PageRequest.of(page, size));
 
 			for (Employee employee : employeePage.getContent()) {
 				try {

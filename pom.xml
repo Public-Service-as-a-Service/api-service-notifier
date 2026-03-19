@@ -152,6 +152,18 @@
 							</excludes>
 						</configuration>
 					</execution>
+					<execution>
+						<id>check-coverage-metrics</id>
+						<goals>
+							<goal>check</goal>
+						</goals>
+						<configuration>
+							<excludes>
+								<exclude>generated/**</exclude>
+								<exclude>**/generated/**</exclude>
+							</excludes>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 

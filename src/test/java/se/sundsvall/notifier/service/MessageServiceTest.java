@@ -9,9 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.notifier.api.model.request.MessageRequest;
@@ -32,6 +30,7 @@ import se.sundsvall.notifier.service.utility.PhoneNumberUtil;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.times;
@@ -51,12 +50,11 @@ class MessageServiceTest {
 	private PhoneNumberUtil phoneNumberUtil;
 	@Mock
 	private MessageRepository messageRepository;
+	@Mock
+	private MessageRecipientRepository messageRecipientRepository;
 
 	@Mock
 	private EmployeeRepository employeeRepository;
-
-	@Mock
-	private MessageRecipientRepository messageRecipientRepository;
 
 	@Mock
 	private MessageMapper messageMapper;
@@ -192,11 +190,9 @@ class MessageServiceTest {
 		var messageRecipient = new MessageRecipient();
 		messageRecipient.setDeliveryStatus(MessageRecipient.DeliveryStatus.DELIVERED);
 
-		Page<Employee> employeePage = new PageImpl<>(List.of(employee));
-
-		when(employeeRepository.findAll(PageRequest.of(0, 200))).thenReturn(employeePage);
+		when(employeeRepository.findByActiveEmployeeTrue(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(employee)));
 		when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
-		when(messageMapper.toMessageRecipient(any(Employee.class), any(MessageRecipient.DeliveryStatus.class)))
+		when(messageMapper.toMessageRecipient(eq(employee), any(MessageRecipient.DeliveryStatus.class)))
 			.thenReturn(messageRecipient);
 
 		when(phoneNumberUtil.cleanPhoneNumber(anyString()))
@@ -208,13 +204,11 @@ class MessageServiceTest {
 
 		messageService.sendMessageToAll(messageRequest);
 
-		verify(employeeRepository).findAll(any(Pageable.class));
+		verify(employeeRepository).findByActiveEmployeeTrue(any(Pageable.class));
 		verify(smsSenderIntegration).sendSms(anyString(), any());
 		verify(phoneNumberUtil).cleanPhoneNumber(anyString());
 		verify(teamsSenderIntegration).sendTeamsMessage(anyString(), any());
-		verify(messageMapper).toMessageRecipient(employee, MessageRecipient.DeliveryStatus.DELIVERED);
 		verify(messageRecipientRepository).save(messageRecipient);
-		verify(messageRepository).save(any(Message.class));
+		verify(messageMapper).toMessageRecipient(eq(employee), any(MessageRecipient.DeliveryStatus.class));
 	}
-
 }

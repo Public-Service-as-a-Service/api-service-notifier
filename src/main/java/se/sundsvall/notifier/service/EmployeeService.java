@@ -23,7 +23,7 @@ public class EmployeeService {
 	}
 
 	public List<EmployeeWithOrgNameResponse> getEmployeesByOrg(String orgId) {
-		return employeeRepository.findByOrgId(orgId).stream().map(mapper::mapToEmployeeWithOrgNameResponse).toList();
+		return employeeRepository.findByOrgIdAndActiveEmployeeTrue(orgId).stream().map(mapper::mapToEmployeeWithOrgNameResponse).toList();
 	}
 
 	public List<EmployeeWithOrgNameResponse> getEmployeesByOrgList(List<String> orgId) {
@@ -31,11 +31,11 @@ public class EmployeeService {
 			throw new IllegalArgumentException("org id is required");
 		}
 
-		return employeeRepository.findByOrgIdIn(orgId).stream().map(mapper::mapToEmployeeWithOrgNameResponse).toList();
+		return employeeRepository.findByOrgIdInAndActiveEmployeeTrue(orgId).stream().map(mapper::mapToEmployeeWithOrgNameResponse).toList();
 	}
 
 	public List<EmployeeWithOrgNameResponse> getAllEmployees() {
-		return employeeRepository.findAll().stream().map(mapper::mapToEmployeeWithOrgNameResponse).toList();
+		return employeeRepository.findByActiveEmployeeTrue().stream().map(mapper::mapToEmployeeWithOrgNameResponse).toList();
 	}
 
 	public Page<EmployeeWithOrgNameResponse> getEmployeesWithSearch(String search, Pageable pageable) {
@@ -55,7 +55,7 @@ public class EmployeeService {
 	}
 
 	public List<EmployeeManagerResponse> getAllEmployeeManagers() {
-		return employeeRepository.findAllByManagerCodeIsNotNull().stream().map(mapper::mapToEmployeeManagerResponse).toList();
+		return employeeRepository.findAllByManagerCodeIsNotNullAndActiveEmployeeTrue().stream().map(mapper::mapToEmployeeManagerResponse).toList();
 	}
 
 	public List<EmployeeWithOrgNameResponse> getAllEmployeesForItProd() {
