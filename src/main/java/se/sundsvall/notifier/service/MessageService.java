@@ -98,9 +98,10 @@ public class MessageService {
 					messageRecipientRepository.save(recipient);
 				}
 			}
-			processed += size;
+			processed += employeePage.getNumberOfElements();
 			log.info("Messages processed: {}", processed);
 			page++;
+
 		} while (employeePage.hasNext());
 	}
 
@@ -128,8 +129,15 @@ public class MessageService {
 		boolean isSmsMessage = messageType == MessageType.SMS || messageType == MessageType.TEAMS_AND_SMS;
 
 		if (isTeamsMessage && employee.getEmail() != null) {
-			teamsSuccess = teamsSenderIntegration.sendTeamsMessage("2281",
-				messageMapper.toSendTeamsDto(content, employee.getEmail()));
+			try {
+				teamsSuccess = teamsSenderIntegration.sendTeamsMessage("2281",
+					messageMapper.toSendTeamsDto(content, employee.getEmail()));
+				// Throttling for TeamsSender to help it keep up and not timeout requests
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
+
 		}
 
 		String phoneNumber = phoneNumberUtil.cleanPhoneNumber(employee.getWorkMobile());
