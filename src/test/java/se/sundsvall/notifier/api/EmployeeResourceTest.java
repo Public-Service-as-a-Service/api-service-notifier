@@ -68,7 +68,7 @@ public class EmployeeResourceTest {
 	@Test
 	void getEmployeesByOrgIds_ok_returnsMatchingEmployees() {
 		final var response = webTestClient.get()
-			.uri(BASE_PATH + "/ids?orgIds=ORG-1&orgIds=ORG-2")
+			.uri(BASE_PATH + "/orgIds?orgIds=ORG-1&orgIds=ORG-2")
 			.exchange()
 			.expectStatus().isOk()
 			.expectHeader().contentType(MediaType.APPLICATION_JSON)

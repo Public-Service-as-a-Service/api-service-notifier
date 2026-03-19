@@ -9,6 +9,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.notifier.api.model.request.MessageRequest;
 import se.sundsvall.notifier.api.model.request.MessageRequestWithoutRecipient;
@@ -18,6 +20,7 @@ import se.sundsvall.notifier.integration.db.entity.Employee;
 import se.sundsvall.notifier.integration.db.entity.Message;
 import se.sundsvall.notifier.integration.db.entity.MessageRecipient;
 import se.sundsvall.notifier.integration.db.repository.EmployeeRepository;
+import se.sundsvall.notifier.integration.db.repository.MessageRecipientRepository;
 import se.sundsvall.notifier.integration.db.repository.MessageRepository;
 import se.sundsvall.notifier.integration.smssender.MessageStatus;
 import se.sundsvall.notifier.integration.smssender.SmsSenderIntegration;
@@ -27,6 +30,7 @@ import se.sundsvall.notifier.service.utility.PhoneNumberUtil;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.times;
@@ -46,6 +50,8 @@ class MessageServiceTest {
 	private PhoneNumberUtil phoneNumberUtil;
 	@Mock
 	private MessageRepository messageRepository;
+	@Mock
+	private MessageRecipientRepository messageRecipientRepository;
 
 	@Mock
 	private EmployeeRepository employeeRepository;
@@ -184,9 +190,9 @@ class MessageServiceTest {
 		var messageRecipient = new MessageRecipient();
 		messageRecipient.setDeliveryStatus(MessageRecipient.DeliveryStatus.DELIVERED);
 
-		when(employeeRepository.findAll()).thenReturn(List.of(employee));
+		when(employeeRepository.findByActiveEmployeeTrue(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(employee)));
 		when(messageRepository.save(any(Message.class))).thenReturn(savedMessage);
-		when(messageMapper.toMessageRecipient((employee), (MessageRecipient.DeliveryStatus.DELIVERED)))
+		when(messageMapper.toMessageRecipient(eq(employee), any(MessageRecipient.DeliveryStatus.class)))
 			.thenReturn(messageRecipient);
 
 		when(phoneNumberUtil.cleanPhoneNumber(anyString()))
@@ -198,11 +204,11 @@ class MessageServiceTest {
 
 		messageService.sendMessageToAll(messageRequest);
 
-		verify(employeeRepository).findAll();
+		verify(employeeRepository).findByActiveEmployeeTrue(any(Pageable.class));
 		verify(smsSenderIntegration).sendSms(anyString(), any());
 		verify(phoneNumberUtil).cleanPhoneNumber(anyString());
 		verify(teamsSenderIntegration).sendTeamsMessage(anyString(), any());
-		verify(messageMapper).toMessageRecipient(employee, MessageRecipient.DeliveryStatus.DELIVERED);
+		verify(messageRecipientRepository).save(messageRecipient);
+		verify(messageMapper).toMessageRecipient(eq(employee), any(MessageRecipient.DeliveryStatus.class));
 	}
-
 }
