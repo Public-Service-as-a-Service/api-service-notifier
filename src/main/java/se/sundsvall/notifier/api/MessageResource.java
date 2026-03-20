@@ -8,6 +8,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import java.util.List;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.notifier.api.model.request.MessageRequest;
 import se.sundsvall.notifier.api.model.request.MessageRequestWithoutRecipient;
+import se.sundsvall.notifier.api.model.response.MessageRecipientResponse;
 import se.sundsvall.notifier.api.model.response.MessageResponse;
 import se.sundsvall.notifier.service.MessageService;
 
@@ -70,8 +74,7 @@ public class MessageResource {
 	@Operation(description = "Get message from specific user")
 	@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true)
 	@GetMapping
-	public ResponseEntity<List<MessageResponse>> getMessages(
-		@RequestParam("sender") @Email String sender) {
+	public ResponseEntity<List<MessageResponse>> getMessages(@RequestParam("sender") @Email String sender) {
 
 		var messageHistory = messageService.getMessages(sender);
 		return ResponseEntity.ok(messageHistory);
@@ -82,5 +85,11 @@ public class MessageResource {
 	public ResponseEntity<Void> deleteMessage(@PathVariable Long id) {
 		messageService.deleteMessages(id);
 		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/message/{messageId}/recipients")
+	public ResponseEntity<Page<MessageRecipientResponse>> getRecipients(@PathVariable Long messageId, @ParameterObject Pageable pageable) {
+
+		return ResponseEntity.ok(messageService.getRecipientsWithMessageId(messageId, pageable));
 	}
 }

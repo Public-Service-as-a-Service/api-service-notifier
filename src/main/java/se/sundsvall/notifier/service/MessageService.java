@@ -4,13 +4,14 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.notifier.api.model.request.MessageRequest;
 import se.sundsvall.notifier.api.model.request.MessageRequestWithoutRecipient;
 import se.sundsvall.notifier.api.model.request.MessageType;
+import se.sundsvall.notifier.api.model.response.MessageRecipientResponse;
 import se.sundsvall.notifier.api.model.response.MessageResponse;
 import se.sundsvall.notifier.integration.db.entity.Employee;
 import se.sundsvall.notifier.integration.db.entity.Message;
@@ -21,6 +22,7 @@ import se.sundsvall.notifier.integration.db.repository.MessageRepository;
 import se.sundsvall.notifier.integration.smssender.MessageStatus;
 import se.sundsvall.notifier.integration.smssender.SmsSenderIntegration;
 import se.sundsvall.notifier.integration.teamssender.TeamsSenderIntegration;
+import se.sundsvall.notifier.service.mapper.EntityToResponseMapper;
 import se.sundsvall.notifier.service.mapper.MessageMapper;
 import se.sundsvall.notifier.service.utility.PhoneNumberUtil;
 
@@ -37,11 +39,12 @@ public class MessageService {
 	private final SmsSenderIntegration smsSenderIntegration;
 	private final TeamsSenderIntegration teamsSenderIntegration;
 	private final PhoneNumberUtil phoneNumberUtil;
+	private final EntityToResponseMapper entityMapper;
 
 	public MessageService(MessageRepository messageRepository,
 		EmployeeRepository employeeRepository, MessageRecipientRepository messageRecipientRepository,
 		MessageMapper messageMapper, SmsSenderIntegration smsSenderIntegration,
-		TeamsSenderIntegration teamsSenderIntegration, PhoneNumberUtil phoneNumberUtil) {
+		TeamsSenderIntegration teamsSenderIntegration, PhoneNumberUtil phoneNumberUtil, EntityToResponseMapper entityMapper) {
 		this.messageRepository = messageRepository;
 		this.employeeRepository = employeeRepository;
 		this.messageRecipientRepository = messageRecipientRepository;
@@ -49,6 +52,7 @@ public class MessageService {
 		this.smsSenderIntegration = smsSenderIntegration;
 		this.teamsSenderIntegration = teamsSenderIntegration;
 		this.phoneNumberUtil = phoneNumberUtil;
+		this.entityMapper = entityMapper;
 	}
 
 	@Transactional
@@ -67,7 +71,6 @@ public class MessageService {
 		messageRepository.save(savedMessage);
 	}
 
-	@Async
 	public void sendMessageToAll(MessageRequestWithoutRecipient messageRequest) {
 		var message = Message.builder()
 			.withTitle(messageRequest.title())
@@ -148,5 +151,9 @@ public class MessageService {
 		return (teamsSuccess || smsSuccess == MessageStatus.SENT)
 			? MessageRecipient.DeliveryStatus.DELIVERED
 			: MessageRecipient.DeliveryStatus.FAILED;
+	}
+
+	public Page<MessageRecipientResponse> getRecipientsWithMessageId(Long id, Pageable pageable) {
+		return messageRecipientRepository.findByMessageId(id, pageable).map(entityMapper::mapToRecipientResponse);
 	}
 }
