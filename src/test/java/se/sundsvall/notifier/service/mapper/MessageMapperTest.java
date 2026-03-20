@@ -69,6 +69,44 @@ class MessageMapperTest {
 		var result = messageMapper.entityToMessageResponse(message);
 
 		assertThat(result).isNotNull();
+		assertThat(result.id()).isEqualTo(1L);
+		assertThat(result.title()).isEqualTo("title");
+		assertThat(result.content()).isEqualTo("content");
+		assertThat(result.sender()).isEqualTo("sender");
+		assertThat(result.createdAt()).isEqualTo(createdAt);
+	}
+
+	@Test
+	void toMessageWithRecipientResponseTest() {
+		var createdAt = LocalDateTime.now();
+		var organization = new Organization();
+		organization.setName("IT Department");
+
+		var employee = new Employee();
+		employee.setId(1L);
+		employee.setFirstName("John");
+		employee.setLastName("Doe");
+		employee.setOrganization(organization);
+
+		var messageRecipient = MessageRecipient.builder()
+			.withEmployee(employee)
+			.withWorkTitle("Developer")
+			.withOrgId("123")
+			.withDeliveryStatus(MessageRecipient.DeliveryStatus.DELIVERED)
+			.build();
+
+		var message = Message.builder()
+			.withId(1L)
+			.withTitle("title")
+			.withContent("content")
+			.withSender("sender")
+			.withRecipients(Set.of(messageRecipient))
+			.withCreatedAt(createdAt)
+			.build();
+
+		var result = messageMapper.entityToMessageWithRecipientsResponse(message);
+
+		assertThat(result).isNotNull();
 		assertThat(result.recipients()).hasSize(1);
 		assertThat(result.id()).isEqualTo(1L);
 		assertThat(result.title()).isEqualTo("title");

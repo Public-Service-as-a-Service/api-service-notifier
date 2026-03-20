@@ -10,9 +10,11 @@ import se.sundsvall.notifier.api.model.response.EmployeeManagerResponse;
 import se.sundsvall.notifier.api.model.response.EmployeeResponse;
 import se.sundsvall.notifier.api.model.response.EmployeeWithOrgNameResponse;
 import se.sundsvall.notifier.api.model.response.GroupResponse;
+import se.sundsvall.notifier.api.model.response.MessageRecipientResponse;
 import se.sundsvall.notifier.api.model.response.OrganizationResponse;
 import se.sundsvall.notifier.integration.db.entity.Employee;
 import se.sundsvall.notifier.integration.db.entity.Group;
+import se.sundsvall.notifier.integration.db.entity.MessageRecipient;
 import se.sundsvall.notifier.integration.db.entity.Organization;
 
 @Component
@@ -88,6 +90,18 @@ public class EntityToResponseMapper {
 			.withOrgId(organization.getOrgId())
 			.withName(organization.getName())
 			.withTreeLevel(organization.getTreeLevel())
+			.build();
+	}
+
+	public MessageRecipientResponse mapToRecipientResponse(MessageRecipient messageRecipient) {
+		return MessageRecipientResponse.builder()
+			.withEmployeeId(messageRecipient.getEmployee().getId())
+			.withFirstName(messageRecipient.getEmployee().getFirstName())
+			.withLastName(messageRecipient.getEmployee().getLastName())
+			.withOrgId(messageRecipient.getOrgId())
+			.withOrgName(messageRecipient.getEmployee().getOrganization().getName())
+			.withDeliveryStatus(messageRecipient.getDeliveryStatus().toString())
+			.withReceivedAt(messageRecipient.getReceivedAt())
 			.build();
 	}
 }

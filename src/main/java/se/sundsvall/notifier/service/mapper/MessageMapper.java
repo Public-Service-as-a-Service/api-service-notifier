@@ -6,6 +6,7 @@ import se.sundsvall.notifier.api.model.request.MessageRequest;
 import se.sundsvall.notifier.api.model.request.Priority;
 import se.sundsvall.notifier.api.model.response.MessageRecipientResponse;
 import se.sundsvall.notifier.api.model.response.MessageResponse;
+import se.sundsvall.notifier.api.model.response.MessageWithRecipientsResponse;
 import se.sundsvall.notifier.integration.db.entity.Employee;
 import se.sundsvall.notifier.integration.db.entity.Message;
 import se.sundsvall.notifier.integration.db.entity.MessageRecipient;
@@ -28,6 +29,22 @@ public class MessageMapper {
 		if (message == null) {
 			return null;
 		}
+
+		return MessageResponse.builder()
+			.withId(message.getId())
+			.withTitle(message.getTitle())
+			.withContent(message.getContent())
+			.withSender(message.getSender())
+			.withMessageType(message.getMessageType())
+			.withCreatedAt(message.getCreatedAt())
+			.build();
+
+	}
+
+	public MessageWithRecipientsResponse entityToMessageWithRecipientsResponse(Message message) {
+		if (message == null) {
+			return null;
+		}
 		var recipients = message.getRecipients().stream()
 			.map(recipient -> MessageRecipientResponse.builder()
 				.withEmployeeId(recipient.getEmployee().getId())
@@ -39,7 +56,7 @@ public class MessageMapper {
 				.withDeliveryStatus(recipient.getDeliveryStatus().toString())
 				.build()).collect(Collectors.toSet());
 
-		return MessageResponse.builder()
+		return MessageWithRecipientsResponse.builder()
 			.withId(message.getId())
 			.withTitle(message.getTitle())
 			.withContent(message.getContent())

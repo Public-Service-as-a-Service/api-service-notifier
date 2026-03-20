@@ -5,7 +5,6 @@
 		"content": "Test content",
 		"sender": "test@sundsvall.se",
 		"createdAt": "2026-02-17T16:00:00",
-		"messageType": "SMS",
-		"recipients": []
+		"messageType": "SMS"
 	}
 ]
