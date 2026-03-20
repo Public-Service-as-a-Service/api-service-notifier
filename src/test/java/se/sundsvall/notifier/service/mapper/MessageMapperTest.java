@@ -154,4 +154,34 @@ class MessageMapperTest {
 		assertThat(result.getEmployee()).isEqualTo(employee);
 		assertThat(result.getDeliveryStatus()).isEqualTo(status);
 	}
+
+	@Test
+	void mapToRecipientResponseTest() {
+		var organization = new Organization();
+		organization.setName("TestOrg");
+
+		var employee = new Employee();
+		employee.setId(100L);
+		employee.setFirstName("John");
+		employee.setLastName("Doe");
+		employee.setOrganization(organization);
+
+		var receivedAt = LocalDateTime.of(2025, 2, 1, 10, 0);
+
+		var messageRecipient = new MessageRecipient();
+		messageRecipient.setEmployee(employee);
+		messageRecipient.setOrgId("org1");
+		messageRecipient.setDeliveryStatus(MessageRecipient.DeliveryStatus.DELIVERED);
+		messageRecipient.setReceivedAt(receivedAt);
+
+		var result = messageMapper.mapToRecipientResponse(messageRecipient);
+
+		assertThat(result.employeeId()).isEqualTo(100L);
+		assertThat(result.firstName()).isEqualTo("John");
+		assertThat(result.lastName()).isEqualTo("Doe");
+		assertThat(result.orgId()).isEqualTo("org1");
+		assertThat(result.orgName()).isEqualTo("TestOrg");
+		assertThat(result.deliveryStatus()).isEqualTo("DELIVERED");
+		assertThat(result.receivedAt()).isEqualTo(receivedAt);
+	}
 }

@@ -12,7 +12,8 @@
 				"firstName": "Test",
 				"lastName": "One",
 				"email": "test1@sundsvall.se",
-				"workTitle": "Developer"
+				"workTitle": "Developer",
+				"orgName": "Org 1"
 			},
 			{
 				"id": 2,
@@ -21,7 +22,8 @@
 				"firstName": "Test",
 				"lastName": "Two",
 				"email": "test2@sundsvall.se",
-				"workTitle": "Developer"
+				"workTitle": "Developer",
+				"orgName": "Org 2"
 			}
 		],
 		"createdAt": "2026-02-17T16:00:00"
@@ -39,7 +41,8 @@
 				"firstName": "Test",
 				"lastName": "Three",
 				"email": "test3@sundsvall.se",
-				"workTitle": "Manager"
+				"workTitle": "Manager",
+				"orgName": "Org 3"
 			}
 		],
 		"createdAt": "2026-02-17T16:01:00"
