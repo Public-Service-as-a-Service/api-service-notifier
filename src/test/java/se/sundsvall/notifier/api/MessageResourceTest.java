@@ -155,7 +155,7 @@ class MessageResourceTest {
 
 	@Test
 	void getRecipients_ok() {
-		var response = webTestClient.get()
+		webTestClient.get()
 			.uri(uriBuilder -> uriBuilder
 				.path(BASE_PATH + "/message" + "/3" + "/recipients")
 				.queryParam("page", 0)
