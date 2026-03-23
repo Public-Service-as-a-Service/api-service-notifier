@@ -98,6 +98,7 @@ public class MessageMapper {
 			.withLastName(messageRecipient.getEmployee().getLastName())
 			.withOrgId(messageRecipient.getOrgId())
 			.withOrgName(messageRecipient.getEmployee().getOrganization().getName())
+			.withWorkTitle(messageRecipient.getEmployee().getWorkTitle())
 			.withDeliveryStatus(messageRecipient.getDeliveryStatus().toString())
 			.withReceivedAt(messageRecipient.getReceivedAt())
 			.build();

@@ -165,6 +165,7 @@ class MessageMapperTest {
 		employee.setFirstName("John");
 		employee.setLastName("Doe");
 		employee.setOrganization(organization);
+		employee.setWorkTitle("workTitle");
 
 		var receivedAt = LocalDateTime.of(2025, 2, 1, 10, 0);
 
@@ -182,6 +183,7 @@ class MessageMapperTest {
 		assertThat(result.orgId()).isEqualTo("org1");
 		assertThat(result.orgName()).isEqualTo("TestOrg");
 		assertThat(result.deliveryStatus()).isEqualTo("DELIVERED");
+		assertThat(result.workTitle()).isEqualTo("workTitle");
 		assertThat(result.receivedAt()).isEqualTo(receivedAt);
 	}
 }
