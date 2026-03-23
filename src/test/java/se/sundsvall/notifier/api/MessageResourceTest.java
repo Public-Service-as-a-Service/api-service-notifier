@@ -13,6 +13,7 @@ import se.sundsvall.notifier.Application;
 import se.sundsvall.notifier.api.model.request.MessageRequest;
 import se.sundsvall.notifier.api.model.request.MessageRequestWithoutRecipient;
 import se.sundsvall.notifier.api.model.request.MessageType;
+import se.sundsvall.notifier.api.model.response.MessageRecipientResponse;
 import se.sundsvall.notifier.api.model.response.MessageResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -151,7 +152,25 @@ class MessageResourceTest {
 			.expectStatus().isOk()
 			.expectBodyList(MessageResponse.class)
 			.hasSize(0);
+	}
 
+	@Test
+	void getRecipients_ok() {
+		var response = webTestClient.get()
+			.uri(uriBuilder -> uriBuilder
+				.path(BASE_PATH + "/message" + "/3" + "/recipients")
+				.queryParam("page", 0)
+				.queryParam("size", 5)
+				.build(2))
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBodyList(MessageRecipientResponse.class)
+			.returnResult()
+			.getResponseBody();
+
+		assertThat(response).isNotNull();
+		assertThat(response).hasSize(1);
 	}
 
 }
