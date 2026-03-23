@@ -13,7 +13,6 @@ import se.sundsvall.notifier.Application;
 import se.sundsvall.notifier.api.model.request.MessageRequest;
 import se.sundsvall.notifier.api.model.request.MessageRequestWithoutRecipient;
 import se.sundsvall.notifier.api.model.request.MessageType;
-import se.sundsvall.notifier.api.model.response.MessageRecipientResponse;
 import se.sundsvall.notifier.api.model.response.MessageResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -165,12 +164,12 @@ class MessageResourceTest {
 			.exchange()
 			.expectStatus().isOk()
 			.expectHeader().contentType(MediaType.APPLICATION_JSON)
-			.expectBodyList(MessageRecipientResponse.class)
-			.returnResult()
-			.getResponseBody();
-
-		assertThat(response).isNotNull();
-		assertThat(response).hasSize(1);
+			.expectBody()
+			.jsonPath("$.content.length()").isEqualTo(1)
+			.jsonPath("$.totalElements").isEqualTo(1)
+			.jsonPath("$.content[0].firstName").isEqualTo("Test")
+			.jsonPath("$.content[0].lastName").isEqualTo("Three")
+			.jsonPath("$.content[0].deliveryStatus").isEqualTo("FAILED");
 	}
 
 }
