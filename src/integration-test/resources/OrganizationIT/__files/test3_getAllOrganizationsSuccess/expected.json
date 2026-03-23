@@ -18,5 +18,23 @@
 		"orgId": "ORG-3",
 		"name": "Org 3",
 		"treeLevel": 2
+	},
+	{
+		"companyId": "COMP",
+		"orgId": "11212",
+		"name": "IT Prod 1",
+		"treeLevel": 2
+	},
+	{
+		"companyId": "COMP",
+		"orgId": "11215",
+		"name": "IT Prod 2",
+		"treeLevel": 2
+	},
+	{
+		"companyId": "COMP",
+		"orgId": "500398",
+		"name": "IT Prod 3",
+		"treeLevel": 2
 	}
 ]

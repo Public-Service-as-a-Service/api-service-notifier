@@ -1,13 +1,19 @@
 INSERT INTO organization(company_id, parent_org_id, org_id, org_name, tree_level)
 VALUES ('COMP', NULL, 'ORG-1', 'Org 1', 1),
        ('COMP', 'ORG-1', 'ORG-2', 'Org 2', 2),
-       ('COMP', 'ORG-1', 'ORG-3', 'Org 3', 2);
+       ('COMP', 'ORG-1', 'ORG-3', 'Org 3', 2),
+       ('COMP', NULL,'11212', 'IT Prod 1', 2),
+       ('COMP', NULL,'11215', 'IT Prod 2', 2),
+       ('COMP', NULL,'500398', 'IT Prod 3', 2);
 
 INSERT INTO employee(employee_id, person_id, org_id, first_name, last_name, email,
                      work_mobile, work_phone, work_title, active_employee, manager_id, manager_code)
 VALUES (1, 'p1', 'ORG-1', 'Test', 'One', 'test1@sundsvall.se', NULL, NULL, 'Developer', TRUE, NULL, 'A_'),
        (2, 'p2', 'ORG-2', 'Test', 'Two', 'test2@sundsvall.se', NULL, NULL, 'Developer', TRUE, 'p1', 'B_'),
-       (3, 'p3', 'ORG-3', 'Test', 'Three', 'test3@sundsvall.se', NULL, NULL, 'Manager', TRUE, 'p1', 'C_');
+       (3, 'p3', 'ORG-3', 'Test', 'Three', 'test3@sundsvall.se', NULL, NULL, 'Manager', TRUE, 'p1', 'C_'),
+       (10, 'p10', '11212', 'Alice', 'IT', 'alice@sundsvall.se', NULL, NULL, 'Developer', TRUE, NULL, NULL),
+       (11, 'p11', '11215', 'Bob', 'IT', 'bob@sundsvall.se', NULL, NULL, 'Developer', TRUE, 'p10', NULL),
+       (12, 'p12', '500398', 'Charlie', 'IT', 'charlie@sundsvall.se', NULL, NULL, 'Manager', TRUE, 'p10', NULL);
 
 INSERT INTO user_group(group_id, group_name, description, creator_id, created_at)
 VALUES (1, 'G1', 'Group 1', 'creator-123', '2026-02-17 16:00:00.000000'),

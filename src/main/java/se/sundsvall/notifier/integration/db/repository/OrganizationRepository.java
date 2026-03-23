@@ -57,10 +57,10 @@ public interface OrganizationRepository extends JpaRepository<Organization, Long
 		select o
 		from Organization o
 		where o.name like concat('%', :name, '%')
-			and o.treeLevel = (
-			select max(o2.treeLevel)
-			from Organization o2
-			where o2.name = o.name and o2.name like concat('%', :name, '%'))
+		    and o.treeLevel = (
+		    select max(o2.treeLevel)
+		    from Organization o2
+		    where o2.name = o.name and o2.name like concat('%', :name, '%'))
 		""")
 	Page<Organization> findByNameContaining(@Param("name") String name, Pageable pageable);
 

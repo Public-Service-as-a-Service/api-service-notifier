@@ -66,10 +66,10 @@ class OrganizationResourceTest {
 			.getResponseBody();
 
 		assertThat(response).isNotNull();
-		assertThat(response).hasSize(3);
+		assertThat(response).hasSize(6);
 		assertThat(response)
 			.extracting(OrganizationResponse::orgId)
-			.containsExactlyInAnyOrder("ORG-1", "ORG-2", "ORG-3");
+			.containsExactlyInAnyOrder("ORG-1", "ORG-2", "ORG-3", "11212", "11215", "500398");
 	}
 
 	@Test

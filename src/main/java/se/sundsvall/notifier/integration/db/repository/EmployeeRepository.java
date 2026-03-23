@@ -33,20 +33,20 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 		select e
 		from Employee e
 		where e.activeEmployee = true
-			and(
-				:s2 is null
-					and (
-						e.firstName like concat(:s1,'%')
-						or e.lastName like concat(:s1,'%')
-						or e.workTitle like concat(:s1,'%')
-						)
-				or
-				:s2 is not null
-					and
-						e.firstName like concat(:s1,'%') and e.lastName like concat(:s2,'%')
-						or e.lastName like concat(:s1,'%') and e.firstName like concat(:s2,'%')
-						or e.firstName like concat(:s1,'%') and e.workTitle like concat(:s2,'%')
-						or e.workTitle like concat(:s1,'%') and e.firstName like concat(:s2,'%')
+		    and(
+		        :s2 is null
+		            and (
+		                e.firstName like concat(:s1,'%')
+		                or e.lastName like concat(:s1,'%')
+		                or e.workTitle like concat(:s1,'%')
+		                )
+		        or
+		        :s2 is not null
+		            and
+		                e.firstName like concat(:s1,'%') and e.lastName like concat(:s2,'%')
+		                or e.lastName like concat(:s1,'%') and e.firstName like concat(:s2,'%')
+		                or e.firstName like concat(:s1,'%') and e.workTitle like concat(:s2,'%')
+		                or e.workTitle like concat(:s1,'%') and e.firstName like concat(:s2,'%')
 		)""")
 	Page<Employee> findMatchingEmployee(@Param("s1") String searchTerm1, @Param("s2") String searchTerm2, Pageable page);
 

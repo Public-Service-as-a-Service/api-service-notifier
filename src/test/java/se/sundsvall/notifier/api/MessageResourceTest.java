@@ -151,7 +151,25 @@ class MessageResourceTest {
 			.expectStatus().isOk()
 			.expectBodyList(MessageResponse.class)
 			.hasSize(0);
+	}
 
+	@Test
+	void getRecipients_ok() {
+		webTestClient.get()
+			.uri(uriBuilder -> uriBuilder
+				.path(BASE_PATH + "/message" + "/3" + "/recipients")
+				.queryParam("page", 0)
+				.queryParam("size", 5)
+				.build(2))
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBody()
+			.jsonPath("$.content.length()").isEqualTo(1)
+			.jsonPath("$.totalElements").isEqualTo(1)
+			.jsonPath("$.content[0].firstName").isEqualTo("Test")
+			.jsonPath("$.content[0].lastName").isEqualTo("Three")
+			.jsonPath("$.content[0].deliveryStatus").isEqualTo("FAILED");
 	}
 
 }

@@ -137,7 +137,7 @@ public class OrganizationServiceTest {
 
 		var exception = assertThrows(IllegalArgumentException.class, () -> service.getOrgsById(null));
 
-		assertThat("orgid is required").isEqualTo(exception.getMessage());
+		assertThat(exception.getMessage()).isEqualTo("orgid is required");
 		verifyNoInteractions(organizationRepository, mapper);
 	}
 
@@ -147,7 +147,7 @@ public class OrganizationServiceTest {
 
 		var exception = assertThrows(IllegalArgumentException.class, () -> service.getSpecificOrg(null));
 
-		assertThat("orgid is required").isEqualTo(exception.getMessage());
+		assertThat(exception.getMessage()).isEqualTo("orgid is required");
 		verifyNoInteractions(organizationRepository, mapper);
 	}
 

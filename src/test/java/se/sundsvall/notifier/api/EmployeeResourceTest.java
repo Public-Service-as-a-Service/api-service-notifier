@@ -59,10 +59,10 @@ public class EmployeeResourceTest {
 			.getResponseBody();
 
 		assertThat(response).isNotNull();
-		assertThat(response).hasSize(3);
+		assertThat(response).hasSize(6);
 		assertThat(response)
 			.extracting(EmployeeWithOrgNameResponse::personId)
-			.containsExactlyInAnyOrder("p1", "p2", "p3");
+			.containsExactlyInAnyOrder("p1", "p2", "p3", "p10", "p11", "p12");
 	}
 
 	@Test
@@ -128,5 +128,22 @@ public class EmployeeResourceTest {
 		assertThat(response)
 			.extracting(EmployeeManagerResponse::managerCode)
 			.containsExactlyInAnyOrder("A_", "B_", "C_");
+	}
+
+	@Test
+	void getEmployeesForItProd_ok() {
+		final var response = webTestClient.get()
+			.uri(BASE_PATH + "/org-group/it-prod").exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBodyList(EmployeeWithOrgNameResponse.class)
+			.returnResult()
+			.getResponseBody();
+
+		assertThat(response).isNotNull()
+			.isNotEmpty()
+			.hasSize(3);
+		assertThat(response).extracting(EmployeeWithOrgNameResponse::firstName)
+			.containsExactlyInAnyOrder("Alice", "Bob", "Charlie");
 	}
 }
