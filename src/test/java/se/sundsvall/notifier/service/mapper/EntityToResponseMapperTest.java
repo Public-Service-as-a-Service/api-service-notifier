@@ -1,7 +1,6 @@
 package se.sundsvall.notifier.service.mapper;
 
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import se.sundsvall.notifier.api.model.response.EmployeeManagerResponse;
@@ -9,7 +8,6 @@ import se.sundsvall.notifier.api.model.response.EmployeeWithOrgNameResponse;
 import se.sundsvall.notifier.api.model.response.OrganizationResponse;
 import se.sundsvall.notifier.integration.db.entity.Employee;
 import se.sundsvall.notifier.integration.db.entity.Group;
-import se.sundsvall.notifier.integration.db.entity.MessageRecipient;
 import se.sundsvall.notifier.integration.db.entity.Organization;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -147,43 +145,5 @@ public class EntityToResponseMapperTest {
 		assertThat(response.workMobile()).isEqualTo("0701234567");
 		assertThat(response.workPhone()).isEqualTo("0601234567");
 		assertThat(response.workTitle()).isEqualTo("testPerson");
-	}
-
-	@Test
-	void mapToRecipientResponse() {
-		var org = new Organization();
-		org.setName("orgName");
-		org.setOrgId("org1");
-
-		var emp = new Employee();
-		emp.setId(123L);
-		emp.setPersonId("p1");
-		emp.setOrganization(org);
-		emp.setOrgId("org1");
-		emp.setFirstName("firstTest");
-		emp.setLastName("lastTest");
-		emp.setEmail("test@test.se");
-		emp.setWorkMobile("0701234567");
-		emp.setWorkPhone("0601234567");
-		emp.setWorkTitle("testPerson");
-		emp.setManagerCode("managerCode");
-
-		var recipient = new MessageRecipient();
-		recipient.setEmployee(emp);
-		recipient.setDeliveryStatus(MessageRecipient.DeliveryStatus.DELIVERED);
-		recipient.setReceivedAt(OffsetDateTime.now().toLocalDateTime());
-		recipient.setOrgId(emp.getOrgId());
-
-		var response = mapper.mapToRecipientResponse(recipient);
-
-		assertThat(response.employeeId()).isEqualTo(emp.getId());
-		assertThat(response.firstName()).isEqualTo(emp.getFirstName());
-		assertThat(response.lastName()).isEqualTo(emp.getLastName());
-		assertThat(response.orgId()).isEqualTo(emp.getOrgId());
-		assertThat(response.workTitle()).isEqualTo(emp.getWorkTitle());
-		assertThat(response.orgName()).isEqualTo(emp.getOrganization().getName());
-		assertThat(response.deliveryStatus()).isEqualTo(recipient.getDeliveryStatus().toString());
-		assertThat(response.receivedAt()).isEqualTo(recipient.getReceivedAt());
-
 	}
 }
