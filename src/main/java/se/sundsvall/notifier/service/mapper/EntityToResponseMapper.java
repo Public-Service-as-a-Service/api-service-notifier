@@ -7,14 +7,11 @@ import java.util.stream.Collectors;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 import se.sundsvall.notifier.api.model.response.EmployeeManagerResponse;
-import se.sundsvall.notifier.api.model.response.EmployeeResponse;
 import se.sundsvall.notifier.api.model.response.EmployeeWithOrgNameResponse;
 import se.sundsvall.notifier.api.model.response.GroupResponse;
-import se.sundsvall.notifier.api.model.response.MessageRecipientResponse;
 import se.sundsvall.notifier.api.model.response.OrganizationResponse;
 import se.sundsvall.notifier.integration.db.entity.Employee;
 import se.sundsvall.notifier.integration.db.entity.Group;
-import se.sundsvall.notifier.integration.db.entity.MessageRecipient;
 import se.sundsvall.notifier.integration.db.entity.Organization;
 
 @Component
@@ -22,9 +19,9 @@ import se.sundsvall.notifier.integration.db.entity.Organization;
 public class EntityToResponseMapper {
 
 	public GroupResponse mapToGroupResponse(Group group) {
-		Set<EmployeeResponse> response = group.getEmployees().stream()
+		Set<EmployeeWithOrgNameResponse> response = group.getEmployees().stream()
 			.sorted(Comparator.comparing(Employee::getId))
-			.map(this::mapToEmployeeResponse)
+			.map(this::mapToEmployeeWithOrgNameResponse)
 			.collect(Collectors.toCollection(LinkedHashSet::new));
 
 		return GroupResponse.builder()
@@ -36,20 +33,6 @@ public class EntityToResponseMapper {
 			.withEmployees(response)
 			.build();
 
-	}
-
-	public EmployeeResponse mapToEmployeeResponse(Employee employee) {
-		return EmployeeResponse.builder()
-			.withId(employee.getId())
-			.withPersonId(employee.getPersonId())
-			.withOrgId(employee.getOrgId())
-			.withFirstName(employee.getFirstName())
-			.withLastName(employee.getLastName())
-			.withEmail(employee.getEmail())
-			.withWorkMobile(employee.getWorkMobile())
-			.withWorkPhone(employee.getWorkPhone())
-			.withWorkTitle(employee.getWorkTitle())
-			.build();
 	}
 
 	public EmployeeManagerResponse mapToEmployeeManagerResponse(Employee employee) {
@@ -90,19 +73,6 @@ public class EntityToResponseMapper {
 			.withOrgId(organization.getOrgId())
 			.withName(organization.getName())
 			.withTreeLevel(organization.getTreeLevel())
-			.build();
-	}
-
-	public MessageRecipientResponse mapToRecipientResponse(MessageRecipient messageRecipient) {
-		return MessageRecipientResponse.builder()
-			.withEmployeeId(messageRecipient.getEmployee().getId())
-			.withFirstName(messageRecipient.getEmployee().getFirstName())
-			.withLastName(messageRecipient.getEmployee().getLastName())
-			.withOrgId(messageRecipient.getOrgId())
-			.withOrgName(messageRecipient.getEmployee().getOrganization().getName())
-			.withWorkTitle(messageRecipient.getEmployee().getWorkTitle())
-			.withDeliveryStatus(messageRecipient.getDeliveryStatus().toString())
-			.withReceivedAt(messageRecipient.getReceivedAt())
 			.build();
 	}
 }

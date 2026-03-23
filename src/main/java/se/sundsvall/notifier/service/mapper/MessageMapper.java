@@ -91,4 +91,16 @@ public class MessageMapper {
 			.build();
 	}
 
+	public MessageRecipientResponse mapToRecipientResponse(MessageRecipient messageRecipient) {
+		return MessageRecipientResponse.builder()
+			.withEmployeeId(messageRecipient.getEmployee().getId())
+			.withFirstName(messageRecipient.getEmployee().getFirstName())
+			.withLastName(messageRecipient.getEmployee().getLastName())
+			.withOrgId(messageRecipient.getOrgId())
+			.withOrgName(messageRecipient.getEmployee().getOrganization().getName())
+			.withDeliveryStatus(messageRecipient.getDeliveryStatus().toString())
+			.withReceivedAt(messageRecipient.getReceivedAt())
+			.build();
+	}
+
 }

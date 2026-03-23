@@ -5,7 +5,6 @@ import java.time.OffsetDateTime;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import se.sundsvall.notifier.api.model.response.EmployeeManagerResponse;
-import se.sundsvall.notifier.api.model.response.EmployeeResponse;
 import se.sundsvall.notifier.api.model.response.EmployeeWithOrgNameResponse;
 import se.sundsvall.notifier.api.model.response.OrganizationResponse;
 import se.sundsvall.notifier.integration.db.entity.Employee;
@@ -20,30 +19,6 @@ public class EntityToResponseMapperTest {
 	private final EntityToResponseMapper mapper = new EntityToResponseMapper();
 
 	@Test
-	void mapToEmployeeResponse() {
-		var employee = new Employee();
-		employee.setPersonId("p1");
-		employee.setOrgId("org1");
-		employee.setFirstName("firstTest");
-		employee.setLastName("lastTest");
-		employee.setEmail("test@test.se");
-		employee.setWorkMobile("0701234567");
-		employee.setWorkPhone("0601234567");
-		employee.setWorkTitle("testPerson");
-
-		EmployeeResponse response = mapper.mapToEmployeeResponse(employee);
-
-		assertThat(response.personId()).isEqualTo("p1");
-		assertThat(response.orgId()).isEqualTo("org1");
-		assertThat(response.firstName()).isEqualTo("firstTest");
-		assertThat(response.lastName()).isEqualTo("lastTest");
-		assertThat(response.email()).isEqualTo("test@test.se");
-		assertThat(response.workMobile()).isEqualTo("0701234567");
-		assertThat(response.workPhone()).isEqualTo("0601234567");
-		assertThat(response.workTitle()).isEqualTo("testPerson");
-	}
-
-	@Test
 	void mapToGroupResponse_withEmployee() {
 		var createdAt = LocalDateTime.of(2025, 2, 1, 20, 15);
 
@@ -55,6 +30,9 @@ public class EntityToResponseMapperTest {
 			.withCreatedAt(createdAt)
 			.build();
 
+		var org = new Organization();
+		org.setName("org1");
+
 		var emp1 = new Employee();
 		emp1.setPersonId("p1");
 		emp1.setOrgId("org1");
@@ -64,6 +42,7 @@ public class EntityToResponseMapperTest {
 		emp1.setWorkMobile("0701234567");
 		emp1.setWorkPhone("0601234567");
 		emp1.setWorkTitle("t1");
+		emp1.setOrganization(org);
 
 		group.setEmployees(Set.of(emp1));
 
