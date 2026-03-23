@@ -22,7 +22,6 @@ import se.sundsvall.notifier.integration.db.repository.MessageRepository;
 import se.sundsvall.notifier.integration.smssender.MessageStatus;
 import se.sundsvall.notifier.integration.smssender.SmsSenderIntegration;
 import se.sundsvall.notifier.integration.teamssender.TeamsSenderIntegration;
-import se.sundsvall.notifier.service.mapper.EntityToResponseMapper;
 import se.sundsvall.notifier.service.mapper.MessageMapper;
 import se.sundsvall.notifier.service.utility.PhoneNumberUtil;
 
@@ -39,12 +38,11 @@ public class MessageService {
 	private final SmsSenderIntegration smsSenderIntegration;
 	private final TeamsSenderIntegration teamsSenderIntegration;
 	private final PhoneNumberUtil phoneNumberUtil;
-	private final EntityToResponseMapper entityMapper;
 
 	public MessageService(MessageRepository messageRepository,
 		EmployeeRepository employeeRepository, MessageRecipientRepository messageRecipientRepository,
 		MessageMapper messageMapper, SmsSenderIntegration smsSenderIntegration,
-		TeamsSenderIntegration teamsSenderIntegration, PhoneNumberUtil phoneNumberUtil, EntityToResponseMapper entityMapper) {
+		TeamsSenderIntegration teamsSenderIntegration, PhoneNumberUtil phoneNumberUtil) {
 		this.messageRepository = messageRepository;
 		this.employeeRepository = employeeRepository;
 		this.messageRecipientRepository = messageRecipientRepository;
@@ -52,7 +50,6 @@ public class MessageService {
 		this.smsSenderIntegration = smsSenderIntegration;
 		this.teamsSenderIntegration = teamsSenderIntegration;
 		this.phoneNumberUtil = phoneNumberUtil;
-		this.entityMapper = entityMapper;
 	}
 
 	@Transactional
@@ -154,6 +151,6 @@ public class MessageService {
 	}
 
 	public Page<MessageRecipientResponse> getRecipientsWithMessageId(Long id, Pageable pageable) {
-		return messageRecipientRepository.findByMessageId(id, pageable).map(entityMapper::mapToRecipientResponse);
+		return messageRecipientRepository.findByMessageId(id, pageable).map(messageMapper::mapToRecipientResponse);
 	}
 }

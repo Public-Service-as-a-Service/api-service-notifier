@@ -10,6 +10,6 @@ public record GroupResponse(
 	String name,
 	String description,
 	String creatorId,
-	Set<EmployeeResponse> employees,
+	Set<EmployeeWithOrgNameResponse> employees,
 	LocalDateTime createdAt) {
 }
