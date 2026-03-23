@@ -22,6 +22,8 @@ public class GroupService {
 	private final EmployeeRepository employeeRepository;
 	private final EntityToResponseMapper mapper;
 
+	private static final String GROUP_NOT_FOUND = "Group with id '%s' not found";
+
 	public GroupService(GroupRepository groupRepo, EmployeeRepository employeeRepository, EntityToResponseMapper mapper) {
 		this.groupRepository = groupRepo;
 		this.employeeRepository = employeeRepository;
@@ -48,7 +50,7 @@ public class GroupService {
 	}
 
 	public GroupResponse getGroupById(Long id) {
-		var group = groupRepository.findById(id).orElseThrow(() -> Problem.valueOf(NOT_FOUND, "Group with id '%s' not found".formatted(id)));
+		var group = groupRepository.findById(id).orElseThrow(() -> Problem.valueOf(NOT_FOUND, GROUP_NOT_FOUND.formatted(id)));
 
 		return mapper.mapToGroupResponse(group);
 	}
@@ -68,7 +70,7 @@ public class GroupService {
 	@Transactional
 	public GroupResponse updateGroup(Long id, GroupUpdateRequest request) {
 		var existingGroup = groupRepository.findById(id)
-			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "Group with id '%s' not found".formatted(id)));
+			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, GROUP_NOT_FOUND.formatted(id)));
 
 		existingGroup.setName(request.name());
 		existingGroup.setDescription(request.description());
@@ -79,7 +81,7 @@ public class GroupService {
 	}
 
 	public void deleteGroup(Long id) {
-		var group = groupRepository.findById(id).orElseThrow(() -> Problem.valueOf(NOT_FOUND, "Group with id '%s' not found".formatted(id)));
+		var group = groupRepository.findById(id).orElseThrow(() -> Problem.valueOf(NOT_FOUND, GROUP_NOT_FOUND.formatted(id)));
 
 		groupRepository.deleteById(group.getId());
 	}

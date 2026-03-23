@@ -140,9 +140,9 @@ public class EmployeeResourceTest {
 			.returnResult()
 			.getResponseBody();
 
-		assertThat(response).isNotNull();
-		assertThat(response).isNotEmpty();
-		assertThat(response).hasSize(3);
+		assertThat(response).isNotNull()
+			.isNotEmpty()
+			.hasSize(3);
 		assertThat(response).extracting(EmployeeWithOrgNameResponse::firstName)
 			.containsExactlyInAnyOrder("Alice", "Bob", "Charlie");
 	}

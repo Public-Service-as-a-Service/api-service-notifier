@@ -91,7 +91,7 @@ public class EmployeeServiceTest {
 
 		var exception = assertThrows(IllegalArgumentException.class, () -> service.getEmployeesByOrgList(null));
 
-		assertThat("org id is required").isEqualTo(exception.getMessage());
+		assertThat(exception.getMessage()).isEqualTo("org id is required");
 		verifyNoInteractions(employeeRepository, mapper);
 	}
 
