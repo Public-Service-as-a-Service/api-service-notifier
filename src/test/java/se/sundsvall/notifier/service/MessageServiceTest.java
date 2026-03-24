@@ -34,7 +34,6 @@ import se.sundsvall.notifier.service.utility.PhoneNumberUtil;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.mock;
@@ -216,9 +215,9 @@ class MessageServiceTest {
 		when(messageRepository.save(any(Message.class)))
 			.thenReturn(savedMessage);
 
-		when(messageMapper.toMessageRecipient(eq(employee1), eq(MessageRecipient.DeliveryStatus.DELIVERED)))
+		when(messageMapper.toMessageRecipient(employee1, MessageRecipient.DeliveryStatus.DELIVERED))
 			.thenReturn(recipient1);
-		when(messageMapper.toMessageRecipient(eq(employee2), eq(MessageRecipient.DeliveryStatus.DELIVERED)))
+		when(messageMapper.toMessageRecipient(employee2, MessageRecipient.DeliveryStatus.DELIVERED))
 			.thenReturn(recipient2);
 		when(phoneNumberUtil.cleanPhoneNumber(anyString()))
 			.thenAnswer(invocation -> invocation.getArgument(0));
