@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import se.sundsvall.dept44.problem.Problem;
@@ -52,6 +53,7 @@ public class MessageService {
 		this.phoneNumberUtil = phoneNumberUtil;
 	}
 
+	@Async
 	@Transactional
 	public void createMessage(MessageRequest messageRequest) {
 
@@ -68,6 +70,7 @@ public class MessageService {
 		messageRepository.save(savedMessage);
 	}
 
+	@Async
 	public void sendMessageToAll(MessageRequestWithoutRecipient messageRequest) {
 		var message = Message.builder()
 			.withTitle(messageRequest.title())
