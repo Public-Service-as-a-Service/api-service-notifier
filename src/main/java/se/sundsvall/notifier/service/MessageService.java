@@ -7,7 +7,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.notifier.api.model.request.MessageRequest;
 import se.sundsvall.notifier.api.model.request.MessageRequestWithoutRecipient;
@@ -54,20 +53,32 @@ public class MessageService {
 	}
 
 	@Async
-	@Transactional
 	public void createMessage(MessageRequest messageRequest) {
 
-		var savedMessage = messageRepository.save(messageMapper.toEntity(messageRequest));
+		var message = Message.builder()
+			.withTitle(messageRequest.title())
+			.withContent(messageRequest.content())
+			.withSender(messageRequest.sender())
+			.withMessageType(messageRequest.messageType())
+			.build();
+
+		var savedMessage = messageRepository.save(message);
+
 		var employees = employeeRepository.findAllById(messageRequest.recipientEmployeeIds());
 
 		for (Employee employee : employees) {
-
-			var delivered = sendMessageToEmployee(employee, messageRequest.messageType(), messageRequest.content());
-			MessageRecipient messageRecipient = messageMapper.toMessageRecipient(employee, delivered);
-
-			savedMessage.addRecipient(messageRecipient);
+			try {
+				var delivered = sendMessageToEmployee(employee, messageRequest.messageType(), messageRequest.content());
+				MessageRecipient messageRecipient = messageMapper.toMessageRecipient(employee, delivered);
+				messageRecipient.setMessage(savedMessage);
+				messageRecipientRepository.save(messageRecipient);
+			} catch (Exception e) {
+				log.error("Failed to send to employee {}", employee.getId(), e);
+				MessageRecipient messageRecipient = messageMapper.toMessageRecipient(employee, MessageRecipient.DeliveryStatus.FAILED);
+				messageRecipient.setMessage(savedMessage);
+				messageRecipientRepository.save(messageRecipient);
+			}
 		}
-		messageRepository.save(savedMessage);
 	}
 
 	@Async
