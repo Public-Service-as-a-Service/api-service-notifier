@@ -55,14 +55,7 @@ public class MessageService {
 	@Async
 	public void createMessage(MessageRequest messageRequest) {
 
-		var message = Message.builder()
-			.withTitle(messageRequest.title())
-			.withContent(messageRequest.content())
-			.withSender(messageRequest.sender())
-			.withMessageType(messageRequest.messageType())
-			.build();
-
-		var savedMessage = messageRepository.save(message);
+		var savedMessage = messageRepository.save(messageMapper.toEntity(messageRequest));
 
 		var employees = employeeRepository.findAllById(messageRequest.recipientEmployeeIds());
 
@@ -83,6 +76,7 @@ public class MessageService {
 
 	@Async
 	public void sendMessageToAll(MessageRequestWithoutRecipient messageRequest) {
+
 		var message = Message.builder()
 			.withTitle(messageRequest.title())
 			.withContent(messageRequest.content())

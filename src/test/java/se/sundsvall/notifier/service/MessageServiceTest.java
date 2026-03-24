@@ -86,6 +86,7 @@ class MessageServiceTest {
 
 		var employees = List.of(employee1, employee2);
 
+		when(messageMapper.toEntity(any(MessageRequest.class))).thenReturn(message);
 		when(messageRepository.save(any(Message.class))).thenReturn(message);
 		when(employeeRepository.findAllById(recipients)).thenReturn(employees);
 		when(messageMapper.toMessageRecipient(any(), any())).thenReturn(recipient);
