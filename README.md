@@ -127,6 +127,12 @@ Configuration is crucial for the application to run successfully. Ensure all nec
               client-secret: <client-secret>
 
   ```
+- **Additional Settings:**
+
+  ```yaml
+  jwt:
+    secret: <secret>
+  ```
 
 ### Database Initialization
 
